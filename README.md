@@ -38,10 +38,11 @@ and every LAN address of the machine). Browsers will warn until you trust it or 
 
 ## Notes
 
-- The Hugging Face page searches `huggingface.co` from the server (outbound HTTPS) and asks the device whether
-  each repo can be imported. The device currently imports image-generation models and LoRA adapters built on
-  its store image models; imports may first download a large toolkit, and keep running on the device if you
-  leave the page.
+- The Hugging Face page searches `huggingface.co` from the server (outbound HTTPS) for fine-tunes and LoRA
+  adapters of store models, and asks the device whether each can be imported. Some are importable only after
+  their base model is downloaded from the store. Verdicts for the result list are cached for
+  `HF_CHECK_CACHE_MS` (default 1 hour); the per-repo Details check always asks the device. Imports may first
+  download a large toolkit, and keep running on the device if you leave the page.
 - The device serves one inference request per model at a time and gives up on requests that wait too long
   behind other clients; the chat page shows that as a "device gave up waiting" error.
 

@@ -13,11 +13,11 @@ interface HubModel {
 
 const RELATIONS = ["adapter", "finetune"] as const;
 
-async function hubSearch(filter: string, query: string): Promise<HubModel[]> {
+async function hubSearch(filter: string, query: string, limit: number): Promise<HubModel[]> {
 	const url = new URL("https://huggingface.co/api/models");
 	url.searchParams.set("filter", filter);
 	url.searchParams.set("sort", "downloads");
-	url.searchParams.set("limit", "40");
+	url.searchParams.set("limit", String(limit));
 	if (query) url.searchParams.set("search", query);
 	let response: Response;
 	try {
@@ -35,10 +35,12 @@ export const GET = apiRoute(async (request) => {
 	const params = new URL(request.url).searchParams;
 	const base = params.get("base") ?? "";
 	const query = (params.get("q") ?? "").trim();
+	const limit = Number(params.get("limit") ?? 40);
 	if (!/^[\w.-]+\/[\w.-]+$/.test(base)) throw new DeviceError("base must be a model id like Org/Name", 400);
+	if (!Number.isInteger(limit) || limit < 1 || limit > 100) throw new DeviceError("limit must be 1-100", 400);
 	const results = await Promise.all(
 		RELATIONS.map(async (relation) => {
-			const models = await hubSearch(`base_model:${relation}:${base}`, query);
+			const models = await hubSearch(`base_model:${relation}:${base}`, query, limit);
 			return models.map(
 				(model): HfRepo => ({
 					repoId: model.id,

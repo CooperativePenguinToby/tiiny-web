@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import RouterLink from "next/link";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -14,6 +15,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
 import type { HfInspection, ImportEvent } from "@/types/device";
+import { paths } from "@/paths";
 import { formatBytes } from "@/lib/format";
 import { readSse, responseError } from "@/lib/sse";
 
@@ -158,19 +160,43 @@ export const RepoCheck = React.forwardRef<RepoCheckHandle>(function RepoCheck(_,
 							<Stack direction="row" spacing={1} sx={{ alignItems: "center", flexWrap: "wrap" }}>
 								<Typography variant="subtitle1">{verdict.repoId}</Typography>
 								<Chip
-									color={verdict.supported ? "success" : "error"}
-									label={verdict.supported ? "compatible" : "not compatible"}
+									color={
+										{ compatible: "success", "needs-base-model": "warning", incompatible: "error" }[verdict.verdict] as
+											| "success"
+											| "warning"
+											| "error"
+									}
+									label={
+										{
+											compatible: "compatible",
+											"needs-base-model": "needs base model",
+											incompatible: "not compatible",
+										}[verdict.verdict]
+									}
 									size="small"
 								/>
 								{verdict.isLora ? <Chip label="LoRA adapter" size="small" /> : null}
 								{verdict.task ? <Chip label={verdict.task} size="small" variant="outlined" /> : null}
 							</Stack>
-							{verdict.supported ? null : (
+							{verdict.verdict === "needs-base-model" && verdict.requiredBaseModel ? (
+								<Alert
+									action={
+										<Button color="inherit" component={RouterLink} href={paths.dashboard.store} size="small">
+											Store
+										</Button>
+									}
+									severity="warning"
+								>
+									Importable once {verdict.requiredBaseModel.name} ({verdict.requiredBaseModel.modelId}) is downloaded
+									to the device from the Store.
+								</Alert>
+							) : null}
+							{verdict.verdict === "incompatible" ? (
 								<Typography color="text.secondary" variant="body2">
 									{verdict.reason ?? "The device cannot import this repo."}
 									{verdict.reasonCode ? ` (${verdict.reasonCode})` : ""}
 								</Typography>
-							)}
+							) : null}
 							<Typography color="text.secondary" variant="body2">
 								Size {formatBytes(verdict.sizeBytes)}
 								{verdict.baseModelId ? ` · base model ${verdict.baseModelId}` : ""}

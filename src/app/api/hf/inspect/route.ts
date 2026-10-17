@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { deviceJson } from "@/server/device";
-import { hfUrlFrom } from "@/server/hf";
+import { cachedVerdict, hfUrlFrom, rememberVerdict } from "@/server/hf";
 import { apiRoute } from "@/server/route";
 
 import type { HfInspection } from "@/types/device";
@@ -19,21 +19,41 @@ interface Inspection {
 		candidates?: { toolkit_id: string; requires_download: boolean }[];
 	};
 	lora?: { is_lora: boolean };
-	error?: { reason?: string; message?: string; reason_code?: string } | null;
+	error?: {
+		reason?: string;
+		message?: string;
+		reason_code?: string;
+		resolution?: string;
+		required_base_model?: { model_id: string; display_name: string };
+	} | null;
 }
 
 // Asks the device whether (and how) it could import a Hugging Face repo. Nothing is downloaded.
+// `{ cached: true }` (used by the compatibility list) may answer from a recent verdict; the default
+// always asks the device, since disk space and toolkit state change.
 export const POST = apiRoute(async (request) => {
+	const { cached } = (await request
+		.clone()
+		.json()
+		.catch(() => ({}))) as { cached?: unknown };
 	const hfUrl = await hfUrlFrom(request);
+	if (cached === true) {
+		const hit = cachedVerdict<HfInspection>(hfUrl);
+		if (hit) return NextResponse.json(hit);
+	}
 	const result = await deviceJson<Inspection>("/api/v1/models/import/inspect", {
 		method: "POST",
 		body: { hf_url: hfUrl },
 	});
 	const support = result.import_support;
 	const toolkit = support?.candidates?.find((candidate) => candidate.toolkit_id === support.toolkit_id);
+	const supported = Boolean(support?.supported) && !result.error;
+	const requiredBase = result.error?.resolution === "install_base_model" ? result.error.required_base_model : undefined;
 	const body: HfInspection = {
 		repoId: result.hf?.repo_id ?? hfUrl.replace("https://huggingface.co/", ""),
-		supported: Boolean(support?.supported) && !result.error,
+		verdict: supported ? "compatible" : requiredBase ? "needs-base-model" : "incompatible",
+		requiredBaseModel: requiredBase ? { modelId: requiredBase.model_id, name: requiredBase.display_name } : null,
+		supported,
 		reasonCode: result.error?.reason_code ?? support?.reason_code ?? null,
 		reason: result.error?.reason ?? support?.message ?? result.error?.message ?? null,
 		isLora: result.lora?.is_lora ?? false,
@@ -55,5 +75,6 @@ export const POST = apiRoute(async (request) => {
 				}
 			: null,
 	};
+	rememberVerdict(hfUrl, body);
 	return NextResponse.json(body);
 });

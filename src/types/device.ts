@@ -89,9 +89,14 @@ export interface DownloadEvent {
 	message?: string;
 }
 
-// The device's verdict on importing a Hugging Face repo.
+// The device's verdict on importing a Hugging Face repo. "needs-base-model": importable once the named
+// store model is downloaded to the device.
+export type HfVerdict = "compatible" | "needs-base-model" | "incompatible";
+
 export interface HfInspection {
 	repoId: string;
+	verdict: HfVerdict;
+	requiredBaseModel: { modelId: string; name: string } | null;
 	supported: boolean;
 	reasonCode: string | null;
 	reason: string | null;

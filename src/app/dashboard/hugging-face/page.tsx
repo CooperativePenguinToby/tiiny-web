@@ -14,8 +14,8 @@ export default function Page(): React.JSX.Element {
 			<div>
 				<Typography variant="h4">Hugging Face</Typography>
 				<Typography color="text.secondary" variant="body2">
-					Import custom models from Hugging Face. The device currently imports image-generation models and LoRA adapters
-					built on its store image models.
+					Import custom models from Hugging Face. The device decides what it can import: typically fine-tunes and LoRA
+					adapters of models in its store, some only after that store model is downloaded.
 				</Typography>
 			</div>
 			<HuggingFacePanel />
