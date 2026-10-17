@@ -48,7 +48,7 @@ and every LAN address of the machine). Browsers will warn until you trust it or 
 ## Development
 
 ```sh
-ADMIN_PASSWORD=dev npm run dev   # HTTPS dev server with hot reload
+ADMIN_PASSWORD=dev npm run dev   # HTTPS dev server with hot reload (shares .next: run `npm run build` again before `npm start`)
 npm run typecheck
 npm run lint
 BASE_URL=https://localhost:8443 ADMIN_PASSWORD=... npm run test:e2e   # against a running server + the real device
