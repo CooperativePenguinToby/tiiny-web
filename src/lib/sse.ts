@@ -1,0 +1,35 @@
+export interface SseEvent {
+	event: string;
+	data: string;
+}
+
+// Parses a text/event-stream response body into events as they arrive.
+export async function* readSse(response: Response): AsyncGenerator<SseEvent> {
+	if (!response.body) return;
+	const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+	let buffer = "";
+	for (;;) {
+		const { done, value } = await reader.read();
+		if (done) break;
+		buffer += value.replaceAll("\r\n", "\n");
+		let boundary = buffer.indexOf("\n\n");
+		while (boundary !== -1) {
+			const block = buffer.slice(0, boundary);
+			buffer = buffer.slice(boundary + 2);
+			boundary = buffer.indexOf("\n\n");
+			let event = "message";
+			const data: string[] = [];
+			for (const line of block.split("\n")) {
+				if (line.startsWith("event:")) event = line.slice(6).trim();
+				else if (line.startsWith("data:")) data.push(line.slice(5).trimStart());
+			}
+			if (data.length > 0) yield { event, data: data.join("\n") };
+		}
+	}
+}
+
+// Error message from a non-OK API response (`{ error }` JSON) or a fallback.
+export async function responseError(response: Response): Promise<string> {
+	const body = (await response.json().catch(() => ({}))) as { error?: string };
+	return body.error ?? `Request failed (${response.status})`;
+}

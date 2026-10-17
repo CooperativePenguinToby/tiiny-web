@@ -33,7 +33,18 @@ export interface DownloadedModel {
 	sizeBytes: number;
 	npuUsage: number;
 	status: string;
-	supportsChat: boolean;
-	reasoningLevels: string[];
-	defaultReasoningLevel: string | null;
+}
+
+export interface ModelList {
+	npuAvailablePercent: number;
+	models: DownloadedModel[];
+}
+
+// One parsed event from the device's model launch stream, as forwarded to the browser.
+export interface LaunchEvent {
+	status?: string;
+	progress?: number;
+	startup_message?: string;
+	startup_error?: string;
+	result?: { message?: string; progress?: number };
 }
