@@ -14,11 +14,12 @@ test("#2 + xflow A: load a model from the UI, see it on the dashboard, unload it
 	await expect(page).toHaveURL(/\/dashboard\/models$/);
 
 	const row = page.getByTestId(`model-${TEST_MODEL}`);
-	await expect(row).toContainText("not loaded");
+	const status = row.locator(".MuiChip-label");
+	await expect(status).toHaveText("not loaded");
 	await row.getByRole("button", { name: "Load" }).click();
 	await expect(row.getByRole("status")).toBeVisible();
 	await expect(page.getByRole("alert").filter({ hasText: "loaded." })).toBeVisible({ timeout: 5 * 60_000 });
-	await expect(row).toContainText("loaded");
+	await expect(status).toHaveText("loaded");
 	await expect(row.getByRole("button", { name: "Unload" })).toBeVisible();
 	expect(await runningModelIds()).toContain(TEST_MODEL);
 	await page.screenshot({ path: "test-results/models-loaded.png", fullPage: true });
@@ -31,7 +32,7 @@ test("#2 + xflow A: load a model from the UI, see it on the dashboard, unload it
 	await row.getByRole("button", { name: "Unload" }).click();
 	await page.getByRole("dialog").getByRole("button", { name: "Unload" }).click();
 	await expect(page.getByRole("alert").filter({ hasText: "unloaded." })).toBeVisible({ timeout: 2 * 60_000 });
-	await expect(row).toContainText("not loaded");
+	await expect(status).toHaveText("not loaded");
 	expect(await runningModelIds()).not.toContain(TEST_MODEL);
 
 	await page.getByRole("link", { name: "Overview" }).click();

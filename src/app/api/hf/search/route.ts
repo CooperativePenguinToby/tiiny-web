@@ -1,0 +1,55 @@
+import { NextResponse } from "next/server";
+import { DeviceError } from "@/server/device";
+import { apiRoute } from "@/server/route";
+
+import type { HfRepo } from "@/types/device";
+
+interface HubModel {
+	id: string;
+	downloads?: number;
+	likes?: number;
+	pipeline_tag?: string;
+}
+
+const RELATIONS = ["adapter", "finetune"] as const;
+
+async function hubSearch(filter: string, query: string): Promise<HubModel[]> {
+	const url = new URL("https://huggingface.co/api/models");
+	url.searchParams.set("filter", filter);
+	url.searchParams.set("sort", "downloads");
+	url.searchParams.set("limit", "40");
+	if (query) url.searchParams.set("search", query);
+	let response: Response;
+	try {
+		response = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+	} catch (error) {
+		throw new DeviceError(`Hugging Face is unreachable: ${String(error)}`, 502);
+	}
+	if (!response.ok) throw new DeviceError(`Hugging Face responded ${response.status}`, 502);
+	return (await response.json()) as HubModel[];
+}
+
+// Lists Hugging Face repos derived from a base model (LoRA adapters and fine-tunes). Whether the
+// device can import one is decided per repo by /api/hf/inspect.
+export const GET = apiRoute(async (request) => {
+	const params = new URL(request.url).searchParams;
+	const base = params.get("base") ?? "";
+	const query = (params.get("q") ?? "").trim();
+	if (!/^[\w.-]+\/[\w.-]+$/.test(base)) throw new DeviceError("base must be a model id like Org/Name", 400);
+	const results = await Promise.all(
+		RELATIONS.map(async (relation) => {
+			const models = await hubSearch(`base_model:${relation}:${base}`, query);
+			return models.map(
+				(model): HfRepo => ({
+					repoId: model.id,
+					relation,
+					downloads: model.downloads ?? 0,
+					likes: model.likes ?? 0,
+					pipelineTag: model.pipeline_tag ?? null,
+				})
+			);
+		})
+	);
+	const repos = results.flat().sort((a, b) => b.downloads - a.downloads);
+	return NextResponse.json(repos);
+});

@@ -30,7 +30,7 @@ import { usePolling } from "@/hooks/use-polling";
 
 interface Operation {
 	modelId: string;
-	kind: "load" | "unload";
+	kind: "load" | "unload" | "delete";
 	message: string;
 	progress: number | null;
 }
@@ -61,8 +61,8 @@ async function loadModel(
 	}
 }
 
-async function unloadModel(modelId: string): Promise<void> {
-	const response = await fetch("/api/models/unload", {
+async function postModel(action: "unload" | "delete", modelId: string): Promise<void> {
+	const response = await fetch(`/api/models/${action}`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ modelId }),
@@ -74,7 +74,7 @@ export function ModelsTable(): React.JSX.Element {
 	const { data, error, isLoading, refresh } = usePolling<ModelList>("/api/models", 5000);
 	const [operation, setOperation] = React.useState<Operation | null>(null);
 	const [outcome, setOutcome] = React.useState<Outcome | null>(null);
-	const [confirmUnload, setConfirmUnload] = React.useState<DownloadedModel | null>(null);
+	const [confirm, setConfirm] = React.useState<{ model: DownloadedModel; kind: "unload" | "delete" } | null>(null);
 
 	const run = React.useCallback(
 		async (model: DownloadedModel, kind: Operation["kind"]): Promise<void> => {
@@ -82,7 +82,7 @@ export function ModelsTable(): React.JSX.Element {
 			setOperation({
 				modelId: model.modelId,
 				kind,
-				message: kind === "load" ? "Starting…" : "Unloading…",
+				message: { load: "Starting…", unload: "Unloading…", delete: "Deleting…" }[kind],
 				progress: null,
 			});
 			try {
@@ -90,8 +90,11 @@ export function ModelsTable(): React.JSX.Element {
 					? loadModel(model.modelId, (message, progress) => {
 							setOperation({ modelId: model.modelId, kind, message, progress });
 						})
-					: unloadModel(model.modelId));
-				setOutcome({ severity: "success", message: `${model.name} ${kind === "load" ? "loaded" : "unloaded"}.` });
+					: postModel(kind, model.modelId));
+				setOutcome({
+					severity: "success",
+					message: `${model.name} ${{ load: "loaded", unload: "unloaded", delete: "deleted" }[kind]}.`,
+				});
 			} catch (error_) {
 				const reason = error_ instanceof Error ? error_.message : String(error_);
 				setOutcome({ severity: "error", message: `Could not ${kind} ${model.name}: ${reason}` });
@@ -137,7 +140,7 @@ export function ModelsTable(): React.JSX.Element {
 										<TableCell align="right">Size</TableCell>
 										<TableCell align="right">NPU share</TableCell>
 										<TableCell>Status</TableCell>
-										<TableCell align="right" sx={{ width: 220 }}>
+										<TableCell align="right" sx={{ width: 240 }}>
 											Action
 										</TableCell>
 									</TableRow>
@@ -181,19 +184,28 @@ export function ModelsTable(): React.JSX.Element {
 														<Button
 															color="error"
 															disabled={operation !== null}
-															onClick={() => setConfirmUnload(model)}
+															onClick={() => setConfirm({ model, kind: "unload" })}
 															variant="outlined"
 														>
 															Unload
 														</Button>
 													) : (
-														<Button
-															disabled={operation !== null}
-															onClick={() => void run(model, "load")}
-															variant="contained"
-														>
-															Load
-														</Button>
+														<Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end" }}>
+															<Button
+																color="error"
+																disabled={operation !== null}
+																onClick={() => setConfirm({ model, kind: "delete" })}
+															>
+																Delete
+															</Button>
+															<Button
+																disabled={operation !== null}
+																onClick={() => void run(model, "load")}
+																variant="contained"
+															>
+																Load
+															</Button>
+														</Stack>
 													)}
 												</TableCell>
 											</TableRow>
@@ -205,26 +217,29 @@ export function ModelsTable(): React.JSX.Element {
 					)}
 				</Card>
 			) : null}
-			<Dialog onClose={() => setConfirmUnload(null)} open={confirmUnload !== null}>
-				<DialogTitle>Unload {confirmUnload?.name}?</DialogTitle>
+			<Dialog onClose={() => setConfirm(null)} open={confirm !== null}>
+				<DialogTitle>
+					{confirm?.kind === "delete" ? "Delete" : "Unload"} {confirm?.model.name}?
+				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
-						This frees its NPU share. Any request currently using the model, from this app or other clients, will be
-						stopped.
+						{confirm?.kind === "delete"
+							? "This removes the model's files from the device. You can download it again from the store."
+							: "This frees its NPU share. Any request currently using the model, from this app or other clients, will be stopped."}
 					</DialogContentText>
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={() => setConfirmUnload(null)}>Cancel</Button>
+					<Button onClick={() => setConfirm(null)}>Cancel</Button>
 					<Button
 						color="error"
 						onClick={() => {
-							const model = confirmUnload;
-							setConfirmUnload(null);
-							if (model) void run(model, "unload");
+							const pending = confirm;
+							setConfirm(null);
+							if (pending) void run(pending.model, pending.kind);
 						}}
 						variant="contained"
 					>
-						Unload
+						{confirm?.kind === "delete" ? "Delete" : "Unload"}
 					</Button>
 				</DialogActions>
 			</Dialog>

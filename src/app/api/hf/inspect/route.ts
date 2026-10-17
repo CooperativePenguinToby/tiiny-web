@@ -1,0 +1,59 @@
+import { NextResponse } from "next/server";
+import { deviceJson } from "@/server/device";
+import { hfUrlFrom } from "@/server/hf";
+import { apiRoute } from "@/server/route";
+
+import type { HfInspection } from "@/types/device";
+
+interface Inspection {
+	hf?: { repo_id?: string };
+	model?: { size_bytes?: number; toolkit_size_bytes?: number };
+	model_task?: { label?: string };
+	disk_space?: { sufficient: boolean; required_bytes: number; available_bytes: number };
+	import_support?: {
+		supported: boolean;
+		reason_code: string | null;
+		message: string | null;
+		base_model_id: string | null;
+		toolkit_id: string | null;
+		candidates?: { toolkit_id: string; requires_download: boolean }[];
+	};
+	lora?: { is_lora: boolean };
+	error?: { reason?: string; message?: string; reason_code?: string } | null;
+}
+
+// Asks the device whether (and how) it could import a Hugging Face repo. Nothing is downloaded.
+export const POST = apiRoute(async (request) => {
+	const hfUrl = await hfUrlFrom(request);
+	const result = await deviceJson<Inspection>("/api/v1/models/import/inspect", {
+		method: "POST",
+		body: { hf_url: hfUrl },
+	});
+	const support = result.import_support;
+	const toolkit = support?.candidates?.find((candidate) => candidate.toolkit_id === support.toolkit_id);
+	const body: HfInspection = {
+		repoId: result.hf?.repo_id ?? hfUrl.replace("https://huggingface.co/", ""),
+		supported: Boolean(support?.supported) && !result.error,
+		reasonCode: result.error?.reason_code ?? support?.reason_code ?? null,
+		reason: result.error?.reason ?? support?.message ?? result.error?.message ?? null,
+		isLora: result.lora?.is_lora ?? false,
+		baseModelId: support?.base_model_id ?? null,
+		toolkit: toolkit
+			? {
+					id: toolkit.toolkit_id,
+					requiresDownload: toolkit.requires_download,
+					sizeBytes: result.model?.toolkit_size_bytes ?? 0,
+				}
+			: null,
+		task: result.model_task?.label ?? null,
+		sizeBytes: result.model?.size_bytes ?? 0,
+		disk: result.disk_space
+			? {
+					sufficient: result.disk_space.sufficient,
+					requiredBytes: result.disk_space.required_bytes,
+					availableBytes: result.disk_space.available_bytes,
+				}
+			: null,
+	};
+	return NextResponse.json(body);
+});

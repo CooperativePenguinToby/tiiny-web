@@ -1,6 +1,7 @@
 # tiiny-web
 
-A LAN web UI for a Tiiny device: live device stats, loading/unloading models, and streaming chat.
+A LAN web UI for a Tiiny device: live device stats, loading/unloading/deleting models, downloading from the
+Tiiny store, importing models from Hugging Face, and streaming chat.
 It talks to the device's own HTTP API (the same one the `tiiny` CLI uses); the device auth key stays on
 the server. Served over HTTPS only.
 
@@ -35,6 +36,15 @@ and every LAN address of the machine). Browsers will warn until you trust it or 
 | `TIINY_STREAM_WAIT_MS` | `900000` | How long a chat/load request may wait for the device to start answering. |
 | `TIINY_STREAM_IDLE_MS` | `300000` | Max gap between streamed chunks. |
 
+## Notes
+
+- The Hugging Face page searches `huggingface.co` from the server (outbound HTTPS) and asks the device whether
+  each repo can be imported. The device currently imports image-generation models and LoRA adapters built on
+  its store image models; imports may first download a large toolkit, and keep running on the device if you
+  leave the page.
+- The device serves one inference request per model at a time and gives up on requests that wait too long
+  behind other clients; the chat page shows that as a "device gave up waiting" error.
+
 ## Development
 
 ```sh
@@ -44,4 +54,7 @@ npm run lint
 BASE_URL=https://localhost:8443 ADMIN_PASSWORD=... npm run test:e2e   # against a running server + the real device
 ```
 
-The e2e tests use your installed Google Chrome (`PW_CHANNEL` to override) and drive the real device.
+The e2e tests use your installed Google Chrome (`PW_CHANNEL` to override) and drive the real device: they load
+and unload `Qwen/Qwen3-Embedding-0.6B` and `Qwen/Qwen3.6-35B-A3B`, download and delete
+`PaddlePaddle/PP-OCRv6-Small`, and start then cancel a LoRA import (override with the `E2E_*` variables in
+`e2e/`). Each test checks the device is back to its starting state.

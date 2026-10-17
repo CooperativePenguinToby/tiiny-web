@@ -3,9 +3,11 @@ stack: Next.js 15 + MUI 7 (devias material-kit-react 4.1.0) · custom Node HTTPS
 v1: #1 #2 #3 + xflow A,B   v2: knowledge base, ASR/TTS/image/OCR, connectors/MCP   never-v1: wifi, firmware upgrade, recovery, account
 shared-substrate: auth = signed session cookie (src/server/session.ts; checked in dashboard layout + apiRoute) · device = src/server/device.ts (one client) · shell = template dashboard layout/nav · design = template MUI theme · polling = src/hooks/use-polling.ts
 
-device API (recon 2026-10-17): http://10.11.0.11:80, `Authorization: Bearer <authKey from ~/.local/tiiny/config.json>`
+device API (recon 2026-10-17; store/import 2026-10-17): http://10.11.0.11:80, `Authorization: Bearer <authKey from ~/.local/tiiny/config.json>`
   GET  /api/v1/npu/status · /api/v1/models/running · /api/v1/models/?including_downloading=false · /v1/models
   POST /api/v1/models/{id}/launch/stream (SSE: init → progress… → status:running)   POST /api/v1/models/{id}/stop
+  GET /api/v1/models/online_models · POST /api/v1/models/{id}/download/stream (SSE init→progress→done) · DELETE /api/v1/models/{id}
+  POST /api/v1/models/import/inspect {hf_url} (verdict) · POST /api/v1/models/import {hf_url, lora, base_model_id} (SSE, keeps running after disconnect) · POST /api/v1/models/import/{id}/cancel
   POST /v1/chat/completions (OpenAI-compatible)   — inference is serialized per model; queued requests are invisible (`pending` stays empty)
 
 #1 [done]  device dashboard   proves: dashboard shows live NPU/RAM/disk/CPU + running models read from the device   via:oneshot  observed:e2e/dashboard.spec.ts (2 passed, values checked against device API) + test-results/dashboard.png  attempts:1
@@ -13,10 +15,10 @@ device API (recon 2026-10-17): http://10.11.0.11:80, `Authorization: Bearer <aut
 #3 [done]  streaming chat     proves: prompt → tokens stream into the browser from /v1/chat/completions; busy device shows queued state, Stop aborts   via:graft  depends:1  observed:e2e/chat.spec.ts (pong reply; incremental + Stop) + test-results/chat-stopped.png  attempts:3 (gateway timeouts behind another client on the shared 27B → tests now use a suite-loaded model)
 xflow A [done] 1,2  proves: load model → shows running on dashboard → unload → gone                      observed:e2e/models.spec.ts + test-results/dashboard-with-test-model.png  attempts:1  [immutable]
 xflow B [done] 2,3  proves: load model → chat with it → reply streams observed:e2e/chat.spec.ts whole-app test (35B loaded via UI, reply "42") + test-results/chat-loaded-model.png  attempts:1  [immutable]
-#4 [open]  store              proves: browse/search store → Download → progress → model appears downloaded on device + Models page; Delete removes it   via:graft  depends:2
-#5 [open]  HF import          proves: paste HF URL → device inspect verdict (supported/reason/size/disk) shown; Import starts with stage progress; Cancel stops it (full import only with a user-named model)   via:graft  depends:2
-#6 [open]  HF compatibility   proves: list HF repos whose base_model is a supported base (from store families) → per-repo device check shows verdict   via:graft  depends:5
-xflow C [open] 4,2  proves: download store model → load → unload → delete, device state back to before                     [immutable]
+#4 [done]  store              proves: browse/search store → Download → progress → model appears downloaded on device + Models page; Delete removes it   via:graft  depends:2  observed:e2e/store.spec.ts (device status oracle each step) + test-results/store-downloaded.png  attempts:2 (catalogue status lagged → status now from device model list; weak substring assertions tightened)
+#5 [done]  HF import          proves: paste HF URL → device inspect verdict (supported/reason/size/disk) shown; Import starts with stage progress; Cancel stops it (full import only with a user-named model)   via:graft  depends:2  observed:e2e/hugging-face.spec.ts (unsupported reason; LoRA import start → progress → cancel, device list clean) + test-results/hf-importing.png  attempts:1
+#6 [done]  HF compatibility   proves: list HF repos whose base_model is a supported base (from store families) → per-repo device check shows verdict   via:graft  depends:5  observed:e2e/hugging-face.spec.ts (HF search → device verdict compatible) + test-results/hf-compatible.png  attempts:1
+xflow C [done] 4,2  proves: download store model → load → unload → delete, device state back to before observed:e2e/store.spec.ts  attempts:1  [immutable]
 whole-app: HTTPS sign-in → dashboard → load → chat → unload, one session, clean screenshots observed:e2e/chat.spec.ts "whole app + xflow B" green + test-results/whole-app-final.png  [immutable]
 assumed: wrapper auth = one admin password (env) + HMAC-signed HttpOnly/Secure cookie · test model for load/unload = Qwen/Qwen3-Embedding-0.6B (1% NPU) so the shared 27B model is never unloaded
 deferred: —   left: v2 list above minus store/import   amend: 2026-10-17 user re-gate "Can we add browsing and downloading from the app store, importing custom from HF (Is there also a way to show what on HF is compatable?)" → approved #4-#6 + xflow C, HF discovery via HF API + device inspect (outbound calls to huggingface.co), add Delete, test downloads with a small store model (PP-OCRv6-Small), HF import verified to inspect+start+cancel

@@ -4,5 +4,7 @@ import { paths } from "@/paths";
 export const navItems = [
 	{ key: "overview", title: "Overview", href: paths.dashboard.overview, icon: "chart-pie" },
 	{ key: "models", title: "Models", href: paths.dashboard.models, icon: "cpu" },
+	{ key: "store", title: "Store", href: paths.dashboard.store, icon: "storefront" },
+	{ key: "hugging-face", title: "Hugging Face", href: paths.dashboard.huggingFace, icon: "download" },
 	{ key: "chat", title: "Chat", href: paths.dashboard.chat, icon: "chat-circle-text" },
 ] satisfies NavItemConfig[];

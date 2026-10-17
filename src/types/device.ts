@@ -63,3 +63,64 @@ export interface ChatMessage {
 
 // "off" disables thinking; otherwise a reasoning level the model supports.
 export type ThinkingSetting = "off" | string;
+
+export interface StoreModel {
+	modelId: string;
+	name: string;
+	type: string;
+	params: string;
+	npuUsage: number;
+	status: string;
+	progress: number;
+	description: string;
+	likes: number;
+	downloads: number;
+	trending: boolean;
+}
+
+// One parsed event from the device's model download stream, as forwarded to the browser.
+export interface DownloadEvent {
+	status?: string;
+	stage?: string;
+	progress?: number;
+	downloaded_bytes?: number;
+	total_bytes?: number;
+	error?: string;
+	message?: string;
+}
+
+// The device's verdict on importing a Hugging Face repo.
+export interface HfInspection {
+	repoId: string;
+	supported: boolean;
+	reasonCode: string | null;
+	reason: string | null;
+	isLora: boolean;
+	baseModelId: string | null;
+	toolkit: { id: string; requiresDownload: boolean; sizeBytes: number } | null;
+	task: string | null;
+	sizeBytes: number;
+	disk: { sufficient: boolean; requiredBytes: number; availableBytes: number } | null;
+}
+
+export interface HfRepo {
+	repoId: string;
+	relation: "adapter" | "finetune";
+	downloads: number;
+	likes: number;
+	pipelineTag: string | null;
+}
+
+// One parsed event from the device's import stream, as forwarded to the browser.
+export interface ImportEvent {
+	import_id?: string;
+	import_status?: string;
+	stage?: string;
+	stage_name?: string;
+	message?: string;
+	global_progress?: number;
+	downloaded_bytes?: number;
+	total_bytes?: number;
+	error?: string | { message?: string };
+	error_code?: string;
+}
