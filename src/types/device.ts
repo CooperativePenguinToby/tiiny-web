@@ -48,3 +48,18 @@ export interface LaunchEvent {
 	startup_error?: string;
 	result?: { message?: string; progress?: number };
 }
+
+export interface ChatModel {
+	modelId: string;
+	name: string;
+	activeRequests: number;
+	thinking: { supported: boolean; toggleable: boolean; levels: string[]; defaultLevel: string | null };
+}
+
+export interface ChatMessage {
+	role: "user" | "assistant";
+	content: string;
+}
+
+// "off" disables thinking; otherwise a reasoning level the model supports.
+export type ThinkingSetting = "off" | string;

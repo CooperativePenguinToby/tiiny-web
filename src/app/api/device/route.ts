@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { deviceJson } from "@/server/device";
+import type { RunningModels } from "@/server/device-types";
 import { apiRoute } from "@/server/route";
 
 import type { DeviceStatus } from "@/types/device";
@@ -23,18 +24,6 @@ interface DeviceInfo {
 	device_model_name: string;
 	tiiny_os: string;
 }
-export interface RunningInstance {
-	model_id: string;
-	display_name: string;
-	type: string;
-	status: string;
-	npu_usage: number;
-	active_request_count: number;
-}
-export interface RunningModels {
-	instances: { running: RunningInstance[]; pending: RunningInstance[] };
-}
-
 const MB = 1024 * 1024;
 
 export const GET = apiRoute(async () => {

@@ -1,6 +1,6 @@
 idea: LAN web wrapper for a Tiiny device (dashboard · model load/unload · streaming chat)   branch: forge/tiiny-web   mode: ultra
 stack: Next.js 15 + MUI 7 (devias material-kit-react 4.1.0) · custom Node HTTPS server · device HTTP API (no CLI)   meets {https, sse-streaming, server-held secret}
-v1: #1 #2 #3 + xflow A,B   v2: knowledge base, downloads/import, ASR/TTS/image/OCR, connectors/MCP   never-v1: wifi, firmware upgrade, recovery, account
+v1: #1 #2 #3 + xflow A,B   v2: knowledge base, ASR/TTS/image/OCR, connectors/MCP   never-v1: wifi, firmware upgrade, recovery, account
 shared-substrate: auth = signed session cookie (src/server/session.ts; checked in dashboard layout + apiRoute) · device = src/server/device.ts (one client) · shell = template dashboard layout/nav · design = template MUI theme · polling = src/hooks/use-polling.ts
 
 device API (recon 2026-10-17): http://10.11.0.11:80, `Authorization: Bearer <authKey from ~/.local/tiiny/config.json>`
@@ -10,9 +10,13 @@ device API (recon 2026-10-17): http://10.11.0.11:80, `Authorization: Bearer <aut
 
 #1 [done]  device dashboard   proves: dashboard shows live NPU/RAM/disk/CPU + running models read from the device   via:oneshot  observed:e2e/dashboard.spec.ts (2 passed, values checked against device API) + test-results/dashboard.png  attempts:1
 #2 [done]  model lifecycle    proves: click Load on a downloaded model → it appears running on device + UI; click Unload → gone   via:graft  depends:1  observed:e2e/models.spec.ts (device oracle: running list before/after) + test-results/models-loaded.png  attempts:1
-#3 [open]  streaming chat     proves: prompt → tokens stream into the browser from /v1/chat/completions; busy device shows queued state, Stop aborts   via:graft  depends:1
+#3 [done]  streaming chat     proves: prompt → tokens stream into the browser from /v1/chat/completions; busy device shows queued state, Stop aborts   via:graft  depends:1  observed:e2e/chat.spec.ts (pong reply; incremental + Stop) + test-results/chat-stopped.png  attempts:3 (gateway timeouts behind another client on the shared 27B → tests now use a suite-loaded model)
 xflow A [done] 1,2  proves: load model → shows running on dashboard → unload → gone                      observed:e2e/models.spec.ts + test-results/dashboard-with-test-model.png  attempts:1  [immutable]
-xflow B [open] 2,3  proves: load model → chat with it → reply streams                                   [immutable]
-whole-app: HTTPS sign-in → dashboard → load → chat → unload, one session, clean screenshots            [immutable]
+xflow B [done] 2,3  proves: load model → chat with it → reply streams observed:e2e/chat.spec.ts whole-app test (35B loaded via UI, reply "42") + test-results/chat-loaded-model.png  attempts:1  [immutable]
+#4 [open]  store              proves: browse/search store → Download → progress → model appears downloaded on device + Models page; Delete removes it   via:graft  depends:2
+#5 [open]  HF import          proves: paste HF URL → device inspect verdict (supported/reason/size/disk) shown; Import starts with stage progress; Cancel stops it (full import only with a user-named model)   via:graft  depends:2
+#6 [open]  HF compatibility   proves: list HF repos whose base_model is a supported base (from store families) → per-repo device check shows verdict   via:graft  depends:5
+xflow C [open] 4,2  proves: download store model → load → unload → delete, device state back to before                     [immutable]
+whole-app: HTTPS sign-in → dashboard → load → chat → unload, one session, clean screenshots observed:e2e/chat.spec.ts "whole app + xflow B" green + test-results/whole-app-final.png  [immutable]
 assumed: wrapper auth = one admin password (env) + HMAC-signed HttpOnly/Secure cookie · test model for load/unload = Qwen/Qwen3-Embedding-0.6B (1% NPU) so the shared 27B model is never unloaded
-deferred: —   left: v2 list above   amend: —
+deferred: —   left: v2 list above minus store/import   amend: 2026-10-17 user re-gate "Can we add browsing and downloading from the app store, importing custom from HF (Is there also a way to show what on HF is compatable?)" → approved #4-#6 + xflow C, HF discovery via HF API + device inspect (outbound calls to huggingface.co), add Delete, test downloads with a small store model (PP-OCRv6-Small), HF import verified to inspect+start+cancel

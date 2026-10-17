@@ -21,6 +21,17 @@ export async function deviceGet<T>(pathname: string): Promise<T> {
 	return (await response.json()) as T;
 }
 
+// POSTs to the device and reads the whole response (including event streams) before returning.
+export async function devicePost(pathname: string): Promise<string> {
+	const { baseUrl, authKey } = deviceTarget();
+	const response = await fetch(`${baseUrl}${pathname}`, {
+		method: "POST",
+		headers: { Authorization: `Bearer ${authKey}` },
+	});
+	expect(response.ok, `device POST ${pathname} -> ${response.status}`).toBe(true);
+	return response.text();
+}
+
 export async function runningModelIds(): Promise<string[]> {
 	const body = await deviceGet<{ running: string[] }>("/api/v1/models/running");
 	return body.running;
