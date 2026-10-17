@@ -6,6 +6,7 @@ export const paths = {
 		models: "/dashboard/models",
 		store: "/dashboard/store",
 		huggingFace: "/dashboard/hugging-face",
+		agents: "/dashboard/agents",
 		chat: "/dashboard/chat",
 	},
 } as const;

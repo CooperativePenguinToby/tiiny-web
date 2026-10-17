@@ -6,5 +6,6 @@ export const navItems = [
 	{ key: "models", title: "Models", href: paths.dashboard.models, icon: "cpu" },
 	{ key: "store", title: "Store", href: paths.dashboard.store, icon: "storefront" },
 	{ key: "hugging-face", title: "Hugging Face", href: paths.dashboard.huggingFace, icon: "download" },
+	{ key: "agents", title: "Agents", href: paths.dashboard.agents, icon: "robot" },
 	{ key: "chat", title: "Chat", href: paths.dashboard.chat, icon: "chat-circle-text" },
 ] satisfies NavItemConfig[];

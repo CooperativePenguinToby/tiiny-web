@@ -129,3 +129,43 @@ export interface ImportEvent {
 	error?: string | { message?: string };
 	error_code?: string;
 }
+
+export interface AgentDownload {
+	platform: string;
+	version: string;
+	sizeBytes: number;
+	url: string;
+	sha256: string;
+}
+
+// An agent from the device's agent store. Web agents run as containers on the device; the others
+// run on a computer and use the device's OpenAI-compatible API.
+export interface Agent {
+	appId: string;
+	name: string;
+	description: string;
+	iconUrl: string | null;
+	kind: "web" | "desktop";
+	recommendedModels: string[];
+	downloads: AgentDownload[];
+	cloudVersion: string | null;
+	service: {
+		id: string;
+		status: string;
+		version: string | null;
+		port: number | null;
+		// false when the agent only listens on the device's own loopback interface.
+		reachable: boolean;
+		proxy: { listening: boolean; error: string | null } | null;
+	} | null;
+}
+
+export interface AgentEvent {
+	status?: string;
+	phase?: string;
+	overall_progress?: number;
+	downloaded_bytes?: number;
+	total_bytes?: number;
+	message?: string;
+	error?: string | { message?: string } | null;
+}

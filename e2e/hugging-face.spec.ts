@@ -5,9 +5,9 @@ import { deviceGet, signIn } from "./helpers";
 // A small LoRA for the store's Z-Image-Turbo; the device reports it importable.
 const LORA_REPO = process.env.E2E_HF_LORA ?? "tarn59/pixel_art_style_lora_z_image_turbo";
 const LORA_BASE = process.env.E2E_HF_BASE ?? "Tongyi-MAI/Z-Image-Turbo";
-// A fine-tune the device accepts once its store base model is downloaded (which the test device lacks).
-const NEEDS_BASE_REPO = process.env.E2E_HF_NEEDS_BASE ?? "unsloth/Qwen3.5-9B";
-const NEEDS_BASE_BASE = process.env.E2E_HF_NEEDS_BASE_BASE ?? "Qwen/Qwen3.5-9B";
+// A LoRA the device accepts once its store base model is downloaded; that base must not be on the device.
+const NEEDS_BASE_REPO = process.env.E2E_HF_NEEDS_BASE ?? "xocialize/tryon-FLUX.2-klein-4B-lora";
+const NEEDS_BASE_BASE = process.env.E2E_HF_NEEDS_BASE_BASE ?? "black-forest-labs/FLUX.2-klein-4B";
 
 async function searchBase(page: Page, query: string): Promise<void> {
 	await signIn(page);
@@ -101,6 +101,11 @@ test("#6 the base list holds every store model, grouped by the device's verdict"
 });
 
 test("#5 a repo whose base model is not downloaded says which store model to get", async ({ page }) => {
+	const local = await deviceGet<{ data: { model_id: string }[] }>("/api/v1/models/?including_downloading=true");
+	expect(
+		local.data.map((model) => model.model_id),
+		`${NEEDS_BASE_BASE} must not be on the device (set E2E_HF_NEEDS_BASE / _BASE to another pair)`
+	).not.toContain(NEEDS_BASE_BASE);
 	await signIn(page);
 	await page.getByRole("link", { name: "Hugging Face" }).click();
 	await page.getByRole("textbox", { name: "Hugging Face repo" }).fill(NEEDS_BASE_REPO);

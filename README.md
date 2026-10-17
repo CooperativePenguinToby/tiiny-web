@@ -1,7 +1,7 @@
 # tiiny-web
 
 A LAN web UI for a Tiiny device: live device stats, loading/unloading/deleting models, downloading from the
-Tiiny store, importing models from Hugging Face, and streaming chat.
+Tiiny store, importing models from Hugging Face, managing the device's agents, and streaming chat.
 It talks to the device's own HTTP API (the same one the `tiiny` CLI uses); the device auth key stays on
 the server. Served over HTTPS only.
 
@@ -45,6 +45,12 @@ and every LAN address of the machine). Browsers will warn until you trust it or 
   download a large toolkit, and keep running on the device if you leave the page.
 - The device serves one inference request per model at a time and gives up on requests that wait too long
   behind other clients; the chat page shows that as a "device gave up waiting" error.
+
+- Agents installed on the device serve their own web UIs over plain HTTP without a login. This app opens
+  an HTTPS listener on the same port number for each one (e.g. `https://<this-machine>:18880` for Tiiny
+  Music) and forwards to the device only for signed-in browsers; those ports must be free on this machine.
+  Agents that listen only on the device's own loopback (Open WebUI, for example) cannot be opened from the
+  network and are shown that way. The device's own agent ports stay reachable on the LAN without a login.
 
 ## Development
 

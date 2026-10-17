@@ -42,7 +42,8 @@ test("whole app + xflow B: sign in, dashboard, load a chat model, chat with it, 
 
 	try {
 		await page.getByRole("link", { name: "Overview" }).click();
-		await expect(page.getByTestId(`running-${LOAD_MODEL}`)).toContainText(LOAD_MODEL);
+		// The dashboard's device status can take a while while the device is busy.
+		await expect(page.getByTestId(`running-${LOAD_MODEL}`)).toContainText(LOAD_MODEL, { timeout: 30_000 });
 		await page.getByRole("link", { name: "Chat" }).click();
 		await selectOption(page, "Model", target!.display_name);
 		await page.getByRole("textbox", { name: "Message" }).fill("What is 17 + 25? Answer with just the number.");

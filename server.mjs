@@ -10,6 +10,8 @@ import path from "node:path";
 import next from "next";
 import selfsigned from "selfsigned";
 
+import { startAgentProxies } from "./src/server/shared/agent-proxy.mjs";
+
 const dev = process.argv.includes("--dev");
 const host = process.env.HOST ?? "0.0.0.0";
 const port = Number(process.env.PORT ?? 8443);
@@ -94,3 +96,5 @@ const handle = app.getRequestHandler();
 createServer({ cert: tls.cert, key: tls.key }, (req, res) => handle(req, res)).listen(port, host, () => {
 	console.log(`tiiny-web: listening on https://${host}:${port} (${dev ? "dev" : "production"}, cert ${tls.source})`);
 });
+
+startAgentProxies({ tls, host, appPort: port });

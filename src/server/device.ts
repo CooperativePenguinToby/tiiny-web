@@ -1,8 +1,6 @@
-import { readFileSync } from "node:fs";
-import { homedir } from "node:os";
-import path from "node:path";
-
 import { Agent, fetch as undiciFetch } from "undici";
+
+import { resolveDeviceTarget } from "./shared/device-target.mjs";
 
 // The one client for the Tiiny device HTTP API. Everything the web UI shows or does goes
 // through here; the device auth key never leaves the server.
@@ -16,37 +14,15 @@ export class DeviceError extends Error {
 	}
 }
 
-interface DeviceTarget {
-	baseUrl: string;
-	authKey: string;
-}
-
-interface CliConfig {
-	deviceAddress?: string;
-	account?: { authKey?: string };
-}
-
-function readCliConfig(): CliConfig {
-	const file = process.env.TIINY_CONFIG ?? path.join(homedir(), ".local", "tiiny", "config.json");
-	try {
-		return JSON.parse(readFileSync(file, "utf8")) as CliConfig;
-	} catch {
-		return {};
-	}
-}
-
-function resolveTarget(): DeviceTarget {
-	const cli = readCliConfig();
-	const address = cli.deviceAddress?.includes(":") ? `[${cli.deviceAddress}]` : cli.deviceAddress;
-	const baseUrl = process.env.TIINY_DEVICE_URL ?? (address ? `http://${address}` : undefined);
-	const authKey = process.env.TIINY_AUTH_KEY ?? cli.account?.authKey;
-	if (!baseUrl || !authKey) {
+function resolveTarget(): { baseUrl: string; authKey: string } {
+	const target = resolveDeviceTarget();
+	if (!target) {
 		throw new DeviceError(
 			"Device not configured: set TIINY_DEVICE_URL and TIINY_AUTH_KEY, or sign in with the tiiny CLI first",
 			503
 		);
 	}
-	return { baseUrl: baseUrl.replace(/\/$/, ""), authKey };
+	return target;
 }
 
 const msEnv = (name: string, fallback: number): number => Number(process.env[name] ?? fallback);
@@ -58,6 +34,8 @@ const streamAgent = new Agent({
 	bodyTimeout: msEnv("TIINY_STREAM_IDLE_MS", 5 * 60_000),
 });
 const requestAgent = new Agent({ headersTimeout: 15_000, bodyTimeout: 15_000 });
+// Container start/stop/delete on the device answer only once the operation is under way (~20 s).
+const slowAgent = new Agent({ headersTimeout: 5 * 60_000, bodyTimeout: 5 * 60_000 });
 
 async function deviceErrorFrom(response: Response): Promise<DeviceError> {
 	const text = await response.text();
@@ -78,7 +56,7 @@ async function deviceErrorFrom(response: Response): Promise<DeviceError> {
 
 async function request(
 	pathname: string,
-	init: { method?: string; body?: unknown; signal?: AbortSignal; stream?: boolean } = {}
+	init: { method?: string; body?: unknown; signal?: AbortSignal; stream?: boolean; slow?: boolean } = {}
 ): Promise<Response> {
 	const { baseUrl, authKey } = resolveTarget();
 	let response: Response;
@@ -91,7 +69,7 @@ async function request(
 			},
 			body: init.body === undefined ? undefined : JSON.stringify(init.body),
 			signal: init.signal,
-			dispatcher: init.stream ? streamAgent : requestAgent,
+			dispatcher: init.stream ? streamAgent : init.slow ? slowAgent : requestAgent,
 		})) as unknown as Response;
 	} catch (error) {
 		if (init.signal?.aborted) throw error;
@@ -102,7 +80,10 @@ async function request(
 	return response;
 }
 
-export async function deviceJson<T>(pathname: string, init?: { method?: string; body?: unknown }): Promise<T> {
+export async function deviceJson<T>(
+	pathname: string,
+	init?: { method?: string; body?: unknown; slow?: boolean }
+): Promise<T> {
 	const response = await request(pathname, init);
 	return (await response.json()) as T;
 }
