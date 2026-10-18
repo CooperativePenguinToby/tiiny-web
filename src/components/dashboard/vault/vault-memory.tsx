@@ -6,123 +6,19 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
-import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 
-import type { DailySummary, MemorySettings } from "@/types/device";
+import type { DailySummary } from "@/types/device";
 import { postJson } from "@/lib/api";
 import { responseError } from "@/lib/sse";
 import { usePolling } from "@/hooks/use-polling";
 import { ConfirmDialog } from "@/components/dashboard/settings/confirm-dialog";
 
 const errorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
-const pad = (value: number): string => String(value).padStart(2, "0");
-
-function SummarySettings(): React.JSX.Element {
-	const polled = usePolling<MemorySettings>("/api/vault/memory/settings", 60_000);
-	const [draft, setDraft] = React.useState<{ modelId: string; time: string } | null>(null);
-	const [saving, setSaving] = React.useState(false);
-	const [outcome, setOutcome] = React.useState<{ severity: "success" | "error"; message: string } | null>(null);
-	const settings = polled.data;
-
-	if (!settings) {
-		return polled.error ? (
-			<Alert severity="error">{polled.error}</Alert>
-		) : (
-			<CircularProgress aria-label="Loading summary settings" />
-		);
-	}
-	const value = draft ?? { modelId: settings.modelId, time: `${pad(settings.startHour)}:${pad(settings.startMinute)}` };
-	const changed =
-		draft !== null &&
-		(draft.modelId !== settings.modelId || draft.time !== `${pad(settings.startHour)}:${pad(settings.startMinute)}`);
-
-	const save = async (): Promise<void> => {
-		const [startHour, startMinute] = value.time.split(":").map(Number);
-		setSaving(true);
-		setOutcome(null);
-		try {
-			const response = await fetch("/api/vault/memory/settings", {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ modelId: value.modelId, startHour, startMinute }),
-			});
-			if (!response.ok) throw new Error(await responseError(response));
-			await polled.refresh();
-			setDraft(null);
-			setOutcome({ severity: "success", message: "Summary settings saved." });
-		} catch (error) {
-			setOutcome({ severity: "error", message: errorMessage(error) });
-		} finally {
-			setSaving(false);
-		}
-	};
-
-	return (
-		<Stack spacing={2}>
-			<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-				<Typography variant="body2">Daily summaries:</Typography>
-				<Chip
-					color={settings.enabled ? "success" : "default"}
-					data-testid="summary-state"
-					label={settings.enabled ? "On" : "Off"}
-					size="small"
-				/>
-			</Stack>
-			<Stack direction={{ sm: "row", xs: "column" }} spacing={2}>
-				<FormControl size="small" sx={{ minWidth: 260 }}>
-					<InputLabel id="summary-model-label" shrink>
-						Summary model
-					</InputLabel>
-					<Select
-						displayEmpty
-						label="Summary model"
-						notched
-						labelId="summary-model-label"
-						onChange={(event) => setDraft({ ...value, modelId: event.target.value })}
-						value={value.modelId}
-					>
-						<MenuItem value="">Off</MenuItem>
-						{settings.models.map((model) => (
-							<MenuItem key={model.modelId} value={model.modelId}>
-								{model.name}
-							</MenuItem>
-						))}
-					</Select>
-				</FormControl>
-				<TextField
-					label="Daily at"
-					onChange={(event) => setDraft({ ...value, time: event.target.value })}
-					size="small"
-					slotProps={{ htmlInput: { step: 60 }, inputLabel: { shrink: true } }}
-					type="time"
-					value={value.time}
-				/>
-				<Button disabled={!changed || saving || !value.time} onClick={() => void save()} variant="contained">
-					{saving ? "Saving…" : "Save"}
-				</Button>
-			</Stack>
-			<Typography color="text.secondary" variant="caption">
-				Each day the device summarises the day&apos;s conversations into Vault, so models can recall them in Task mode.
-				It loads the summary model while it works.
-			</Typography>
-			{outcome ? (
-				<Alert onClose={() => setOutcome(null)} severity={outcome.severity}>
-					{outcome.message}
-				</Alert>
-			) : null}
-		</Stack>
-	);
-}
 
 function SummaryItem({ summary, onDelete }: { summary: DailySummary; onDelete: () => void }): React.JSX.Element {
 	const [text, setText] = React.useState<string | null>(null);
@@ -189,15 +85,11 @@ export function VaultMemory(): React.JSX.Element {
 
 	return (
 		<Stack spacing={3}>
-			<Card data-testid="vault-summary-settings">
-				<CardHeader title="Daily summaries" />
-				<Divider />
-				<CardContent>
-					<SummarySettings />
-				</CardContent>
-			</Card>
 			<Card data-testid="vault-summaries">
-				<CardHeader subheader="Summaries of past conversations, kept in Vault" title="Chat history" />
+				<CardHeader
+					subheader="Daily summaries of past conversations, kept in Vault. Turn them on or off and set their time on the History page."
+					title="Chat history"
+				/>
 				<Divider />
 				<CardContent>
 					<Stack spacing={2}>

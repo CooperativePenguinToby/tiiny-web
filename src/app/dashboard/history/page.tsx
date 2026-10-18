@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 
 import { config } from "@/config";
 import { HistoryList } from "@/components/dashboard/history/history-list";
+import { SummarySettings } from "@/components/dashboard/history/summary-settings";
 
 export const metadata = { title: `History | ${config.site.name}` } satisfies Metadata;
 
@@ -17,6 +18,7 @@ export default function Page(): React.JSX.Element {
 					Conversations kept on the device, from this app and from TiinyOS.
 				</Typography>
 			</div>
+			<SummarySettings />
 			<HistoryList />
 		</Stack>
 	);

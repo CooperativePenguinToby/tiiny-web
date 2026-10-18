@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { CHAT_MODEL, deviceGet, kbCall, selectOption, signIn } from "./helpers";
+import { kbCall, signIn } from "./helpers";
 
 interface Schedule {
 	nightly_start_hour: number;
@@ -41,31 +41,44 @@ test("#16 the device's daily chat summaries are listed and readable", async ({ p
 	await page.screenshot({ path: "test-results/vault-history.png", fullPage: true });
 });
 
-test("#16 summary model and time are saved on the device", async ({ page }) => {
+test("#16 daily summaries are switched on and off and timed on the History page, in local time", async ({ page }) => {
 	const schedule = await kbCall<Schedule>("/kb/memory/schedule");
 	const model = await kbCall<{ model_id: string }>("/kb/memory/model");
-	const downloaded = await deviceGet<{ data: { model_id: string; display_name: string }[] }>(
-		"/api/v1/models/?including_downloading=false"
-	);
-	const target = downloaded.data.find((entry) => entry.model_id === CHAT_MODEL)!;
-	await openHistory(page);
-	const card = page.getByTestId("vault-summary-settings");
-	try {
-		await selectOption(page, "Summary model", target.display_name);
-		await card.getByLabel("Daily at").fill("02:30");
-		await card.getByRole("button", { name: "Save" }).click();
-		await expect(card.getByRole("alert")).toHaveText("Summary settings saved.");
-		await expect(card.getByTestId("summary-state")).toHaveText("On");
-		const saved = await kbCall<Schedule>("/kb/memory/schedule");
-		expect([saved.nightly_start_hour, saved.nightly_start_minute]).toEqual([2, 30]);
-		const savedModel = await kbCall<{ model_id: string; automatic_summary_enabled: boolean }>("/kb/memory/model");
-		expect(savedModel).toMatchObject({ model_id: CHAT_MODEL, automatic_summary_enabled: true });
+	const context = await kbCall<{ created_at: string }>("/kb/user-context");
+	const match = /([+-])(\d{2}):(\d{2})$/.exec(context.created_at)!;
+	const deviceOffset = (match[1] === "-" ? -1 : 1) * (Number(match[2]) * 60 + Number(match[3]));
+	// 03:00 here is this many minutes past midnight on the device's clock.
+	const localOffset = -new Date().getTimezoneOffset();
+	const expected = (((3 * 60 + deviceOffset - localOffset) % 1440) + 1440) % 1440;
 
-		await selectOption(page, "Summary model", "Off");
+	await signIn(page);
+	await page.getByRole("link", { name: "History" }).click();
+	const card = page.getByTestId("summary-settings");
+	const toggle = card.getByRole("checkbox", { name: "Daily summaries" });
+	try {
+		await expect(toggle).toBeChecked({ checked: model.model_id !== "" });
+		if (model.model_id !== "") {
+			await toggle.click();
+			await card.getByRole("button", { name: "Save" }).click();
+			await expect(card.getByRole("alert")).toHaveText("Daily summaries off.");
+			const off = await kbCall<{ model_id: string; automatic_summary_enabled: boolean }>("/kb/memory/model");
+			expect(off.automatic_summary_enabled).toBe(false);
+		}
+		await toggle.click();
+		await card.getByLabel("Time").fill("03:00");
+		await expect(card).toContainText(
+			`${String(Math.floor(expected / 60)).padStart(2, "0")}:${String(expected % 60).padStart(2, "0")} on the device`
+		);
 		await card.getByRole("button", { name: "Save" }).click();
-		await expect(card.getByTestId("summary-state")).toHaveText("Off");
-		const off = await kbCall<{ automatic_summary_enabled: boolean }>("/kb/memory/model");
-		expect(off.automatic_summary_enabled).toBe(false);
+		await expect(card.getByRole("alert")).toHaveText("Daily summaries on, at 03:00.");
+		const saved = await kbCall<Schedule>("/kb/memory/schedule");
+		expect(saved.nightly_start_hour * 60 + saved.nightly_start_minute).toBe(expected);
+		const on = await kbCall<{ model_id: string; automatic_summary_enabled: boolean }>("/kb/memory/model");
+		expect(on.automatic_summary_enabled).toBe(true);
+		expect(on.model_id).not.toBe("");
+		await page.reload();
+		await expect(card.getByLabel("Time")).toHaveValue("03:00");
+		await page.screenshot({ path: "test-results/history-summaries.png", fullPage: true });
 	} finally {
 		await kbCall("/kb/memory/schedule", {
 			method: "PUT",
@@ -79,9 +92,10 @@ test("#16 summary model and time are saved on the device", async ({ page }) => {
 		await kbCall("/kb/memory/model", { method: "PUT", body: { model_id: model.model_id } });
 	}
 	const restored = await kbCall<Schedule>("/kb/memory/schedule");
-	expect([restored.nightly_start_hour, restored.nightly_start_minute, restored.nightly_end_hour]).toEqual([
+	expect([restored.nightly_start_hour, restored.nightly_start_minute]).toEqual([
 		schedule.nightly_start_hour,
 		schedule.nightly_start_minute,
-		schedule.nightly_end_hour,
 	]);
+	const restoredModel = await kbCall<{ model_id: string }>("/kb/memory/model");
+	expect(restoredModel.model_id).toBe(model.model_id);
 });

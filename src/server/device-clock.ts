@@ -4,7 +4,7 @@ import { deviceJson } from "./device";
 // differ from this server's and the browser's. Its UTC offset shows in the timestamps it writes.
 let offsetPromise: Promise<number> | null = null;
 
-async function deviceUtcOffsetMinutes(): Promise<number> {
+export async function deviceUtcOffsetMinutes(): Promise<number> {
 	offsetPromise ??= deviceJson<{ created_at?: string }>("/kb/user-context", { service: "kb" }).then(
 		(context) => {
 			const match = /([+-])(\d{2}):(\d{2})$/.exec(context.created_at ?? "");

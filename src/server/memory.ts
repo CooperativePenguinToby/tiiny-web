@@ -1,6 +1,7 @@
 import type { DailySummary, MemorySettings } from "@/types/device";
 
 import { DeviceError, deviceJson } from "./device";
+import { deviceUtcOffsetMinutes } from "./device-clock";
 import { kbHeaders, listSources } from "./vault";
 
 // Model types whose models can chat (and so summarise).
@@ -37,16 +38,18 @@ interface Downloaded {
 
 export async function memorySettings(): Promise<MemorySettings> {
 	const headers = await kbHeaders();
-	const [schedule, model, downloaded] = await Promise.all([
+	const [schedule, model, downloaded, deviceOffsetMinutes] = await Promise.all([
 		deviceJson<Schedule>("/kb/memory/schedule", { service: "kb", headers }),
 		deviceJson<ModelSetting>("/kb/memory/model", { service: "kb", headers }),
 		deviceJson<Downloaded>("/api/v1/models/?including_downloading=false"),
+		deviceUtcOffsetMinutes(),
 	]);
 	return {
 		enabled: model.automatic_summary_enabled,
 		modelId: model.model_id,
 		startHour: schedule.nightly_start_hour,
 		startMinute: schedule.nightly_start_minute,
+		deviceOffsetMinutes,
 		models: downloaded.data
 			.filter((entry) => TEXT_TYPES.has(entry.type))
 			.map((entry) => ({ modelId: entry.model_id, name: entry.display_name })),
