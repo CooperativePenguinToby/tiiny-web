@@ -11,6 +11,7 @@ export const paths = {
 		history: "/dashboard/history",
 		vault: "/dashboard/vault",
 		connectors: "/dashboard/connectors",
+		playground: "/dashboard/playground",
 		settings: "/dashboard/settings",
 	},
 } as const;

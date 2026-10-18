@@ -130,7 +130,8 @@ export const holdChatModel = (): Promise<{ name: string; release: () => Promise<
 // Picks an option of a MUI select by its label.
 export async function selectOption(page: Page, label: string, option: string | RegExp): Promise<void> {
 	await page.getByRole("combobox", { name: label }).click();
-	await page.getByRole("option", { name: option, exact: typeof option === "string" }).click();
+	// A missing option fails quickly instead of waiting out the test.
+	await page.getByRole("option", { name: option, exact: typeof option === "string" }).click({ timeout: 30_000 });
 }
 
 // Vault wants the device serial alongside the key.

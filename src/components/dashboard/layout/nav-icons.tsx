@@ -4,6 +4,7 @@ import { ChatCircleTextIcon } from "@phosphor-icons/react/dist/ssr/ChatCircleTex
 import { ClockCounterClockwiseIcon } from "@phosphor-icons/react/dist/ssr/ClockCounterClockwise";
 import { CpuIcon } from "@phosphor-icons/react/dist/ssr/Cpu";
 import { DownloadSimpleIcon } from "@phosphor-icons/react/dist/ssr/DownloadSimple";
+import { FlaskIcon } from "@phosphor-icons/react/dist/ssr/Flask";
 import { GearSixIcon } from "@phosphor-icons/react/dist/ssr/GearSix";
 import { PlugsConnectedIcon } from "@phosphor-icons/react/dist/ssr/PlugsConnected";
 import { RobotIcon } from "@phosphor-icons/react/dist/ssr/Robot";
@@ -16,6 +17,7 @@ export const navIcons = {
 	"clock-counter-clockwise": ClockCounterClockwiseIcon,
 	cpu: CpuIcon,
 	download: DownloadSimpleIcon,
+	flask: FlaskIcon,
 	"gear-six": GearSixIcon,
 	"plugs-connected": PlugsConnectedIcon,
 	robot: RobotIcon,

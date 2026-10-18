@@ -457,3 +457,21 @@ export type TaskEvent =
 	| { type: "usage"; usage: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number } }
 	| { type: "error"; message: string }
 	| { type: "done" };
+
+export type PlaygroundKind = "asr" | "tts" | "ocr" | "embed" | "rerank" | "text";
+
+export interface PlaygroundModel {
+	modelId: string;
+	name: string;
+	kind: PlaygroundKind;
+	loaded: boolean;
+}
+
+export interface BenchResult {
+	promptTokens: number;
+	completionTokens: number;
+	firstTokenMs: number;
+	totalMs: number;
+	// Generated tokens per second after the first token.
+	tokensPerSecond: number;
+}
