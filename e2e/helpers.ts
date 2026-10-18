@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import type { LookupFunction } from "node:net";
 import { homedir } from "node:os";
 import path from "node:path";
+import { crc32, deflateSync } from "node:zlib";
 
 import { expect, type Page } from "@playwright/test";
 import { Agent, fetch as undiciFetch } from "undici";
@@ -216,4 +217,31 @@ export function forgetNewConversations(): { before: () => Promise<void>; after: 
 			}
 		},
 	};
+}
+
+// A solid-colour PNG, for tests that need a picture with a known content.
+export function solidPng(width: number, height: number, [red, green, blue]: [number, number, number]): Buffer {
+	const chunk = (type: string, data: Buffer): Buffer => {
+		const length = Buffer.alloc(4);
+		length.writeUInt32BE(data.length);
+		const body = Buffer.concat([Buffer.from(type, "ascii"), data]);
+		const crc = Buffer.alloc(4);
+		crc.writeUInt32BE(crc32(body));
+		return Buffer.concat([length, body, crc]);
+	};
+	const header = Buffer.alloc(13);
+	header.writeUInt32BE(width, 0);
+	header.writeUInt32BE(height, 4);
+	header.set([8, 2, 0, 0, 0], 8);
+	const row = Buffer.concat([
+		Buffer.from([0]),
+		Buffer.alloc(width * 3).map((_value, index) => [red, green, blue][index % 3]),
+	]);
+	const pixels = deflateSync(Buffer.concat(Array.from({ length: height }, () => row)));
+	return Buffer.concat([
+		Buffer.from("89504e470d0a1a0a", "hex"),
+		chunk("IHDR", header),
+		chunk("IDAT", pixels),
+		chunk("IEND", Buffer.alloc(0)),
+	]);
 }

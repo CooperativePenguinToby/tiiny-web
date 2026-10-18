@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import type { Conversation, ConversationSummary, StoredTurn, TurnToSave } from "@/types/device";
+import type { Attachment, Conversation, ConversationSummary, StoredTurn, TurnToSave } from "@/types/device";
 
 import { DeviceError, deviceId, deviceJson } from "./device";
 
@@ -34,6 +34,24 @@ interface RawBlock {
 	block_type: string;
 	position_in_message: number;
 	content_text: string | null;
+	metadata_json: Record<string, string> | null;
+}
+
+// Attachments are kept as "image" and "file" blocks next to the message text.
+function attachmentOf(block: RawBlock): Attachment | null {
+	const meta = block.metadata_json ?? {};
+	if (block.block_type === "image" && meta.media_id && meta.url) {
+		return {
+			kind: "image",
+			mediaId: meta.media_id,
+			url: meta.url,
+			name: meta.name ?? "image",
+			mimeType: meta.mime_type ?? "image/*",
+		};
+	}
+	if (block.block_type === "file")
+		return { kind: "document", name: meta.name ?? "file", text: block.content_text ?? "" };
+	return null;
 }
 
 const summary = (raw: RawConversation): ConversationSummary => ({
@@ -104,9 +122,11 @@ export async function readConversation(conversationId: string): Promise<Conversa
 				.map((block) => block.content_text ?? "")
 				.join("\n\n");
 		const reasoning = text("thinking");
+		const attachments = blocks.map((block) => attachmentOf(block)).filter((item) => item !== null);
 		return {
 			role: message.role,
 			content: text("main_text"),
+			...(attachments.length > 0 ? { attachments } : {}),
 			...(reasoning ? { reasoning } : {}),
 			modelId: message.model_id,
 			status: message.status,
@@ -174,6 +194,13 @@ export async function saveTurn(turn: TurnToSave): Promise<string> {
 			],
 			blocks: [
 				block(userId, "main_text", 1, turn.user),
+				...(turn.attachments ?? []).map((item, index) =>
+					item.kind === "image"
+						? block(userId, "image", index + 2, "", {
+								metadata_json: { media_id: item.mediaId, url: item.url, name: item.name, mime_type: item.mimeType },
+							})
+						: block(userId, "file", index + 2, item.text, { metadata_json: { name: item.name } })
+				),
 				...(reasoning
 					? [block(replyId, "thinking", 1, reasoning, { thinking_millsec: turn.assistant.thinkingMs ?? null })]
 					: []),

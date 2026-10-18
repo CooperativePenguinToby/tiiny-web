@@ -20,14 +20,17 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
+import { PaperclipIcon } from "@phosphor-icons/react/dist/ssr/Paperclip";
 import { PaperPlaneRightIcon } from "@phosphor-icons/react/dist/ssr/PaperPlaneRight";
 import { StopIcon } from "@phosphor-icons/react/dist/ssr/Stop";
 
-import type { ChatMessage, ChatModel, Conversation, ThinkingSetting, TurnToSave } from "@/types/device";
+import type { Attachment, ChatMessage, ChatModel, Conversation, ThinkingSetting, TurnToSave } from "@/types/device";
 import { paths } from "@/paths";
 import { postJson } from "@/lib/api";
 import { readSse, responseError } from "@/lib/sse";
 import { usePolling } from "@/hooks/use-polling";
+
+import { AttachmentChips, DOCUMENT_ACCEPT, MessageAttachments, useAttachments } from "./attachments";
 
 interface Turn extends ChatMessage {
 	reasoning?: string;
@@ -76,9 +79,15 @@ function MessageBubble({ turn }: { turn: Turn }): React.JSX.Element {
 			data-testid={`message-${turn.role}`}
 			sx={{ alignSelf: isUser ? "flex-end" : "flex-start", maxWidth: { xs: "100%", md: "80%" } }}
 		>
-			<Typography color="text.secondary" variant="caption">
+			<Typography
+				color="text.secondary"
+				component="div"
+				sx={{ textAlign: isUser ? "right" : "left" }}
+				variant="caption"
+			>
 				{isUser ? "You" : "Assistant"}
 			</Typography>
+			{turn.attachments?.length ? <MessageAttachments attachments={turn.attachments} /> : null}
 			{turn.reasoning ? (
 				<Accordion disableGutters sx={{ mb: 1 }} variant="outlined">
 					<AccordionSummary expandIcon={<CaretDownIcon />}>
@@ -130,6 +139,8 @@ export function ChatPanel(): React.JSX.Element {
 	const shownRef = React.useRef<string | null>(null);
 	const [opening, setOpening] = React.useState(false);
 	const [saveError, setSaveError] = React.useState<string | null>(null);
+	const files = useAttachments();
+	const fileInput = React.useRef<HTMLInputElement>(null);
 
 	React.useEffect(() => {
 		if (conversationId === shownRef.current) return;
@@ -149,6 +160,7 @@ export function ChatPanel(): React.JSX.Element {
 					conversation.turns.map((turn) => ({
 						role: turn.role,
 						content: turn.content,
+						...(turn.attachments ? { attachments: turn.attachments } : {}),
 						...(turn.reasoning ? { reasoning: turn.reasoning } : {}),
 						...(turn.status === "paused" ? { note: "Stopped." } : {}),
 					}))
@@ -178,13 +190,19 @@ export function ChatPanel(): React.JSX.Element {
 
 	const send = async (): Promise<void> => {
 		const text = draft.trim();
-		if (!text || !model || phase !== "idle") return;
+		const attachments = files.attachments;
+		if ((!text && attachments.length === 0) || files.uploading.length > 0 || !model || phase !== "idle") return;
 		const history: ChatMessage[] = [
-			...turns.map(({ role, content }) => ({ role, content })),
-			{ role: "user", content: text },
+			...turns.map(({ role, content, attachments: sent }) => ({
+				role,
+				content,
+				...(sent ? { attachments: sent } : {}),
+			})),
+			{ role: "user", content: text, ...(attachments.length > 0 ? { attachments } : {}) },
 		];
 		setTurns([...history, { role: "assistant", content: "" }]);
 		setDraft("");
+		files.clear();
 		setError(null);
 		setPhase("waiting");
 		const controller = new AbortController();
@@ -242,13 +260,14 @@ export function ChatPanel(): React.JSX.Element {
 		} finally {
 			abortRef.current = null;
 			// Saved before the next message can be sent, so that one joins the same conversation.
-			if (reply.content.trim()) await remember(text, reply, controller.signal.aborted);
+			if (reply.content.trim()) await remember(text, attachments, reply, controller.signal.aborted);
 			setPhase("idle");
 		}
 	};
 
 	const remember = async (
 		user: string,
+		attachments: Attachment[],
 		reply: { content: string; reasoning: string; usage: TurnToSave["usage"]; thinkingMs: number },
 		stopped: boolean
 	): Promise<void> => {
@@ -256,6 +275,7 @@ export function ChatPanel(): React.JSX.Element {
 			conversationId: shownRef.current,
 			modelId,
 			user,
+			...(attachments.length > 0 ? { attachments } : {}),
 			assistant: {
 				content: reply.content,
 				stopped,
@@ -392,6 +412,21 @@ export function ChatPanel(): React.JSX.Element {
 					{saveError}
 				</Alert>
 			) : null}
+			{files.error ? <Alert severity="error">{files.error}</Alert> : null}
+			<AttachmentChips attachments={files.attachments} onRemove={files.remove} uploading={files.uploading} />
+			<input
+				accept={model?.supportsVision ? `image/*,${DOCUMENT_ACCEPT}` : DOCUMENT_ACCEPT}
+				aria-label="Files to attach"
+				hidden
+				multiple
+				onChange={(event) => {
+					const picked = [...(event.target.files ?? [])];
+					event.target.value = "";
+					if (picked.length > 0) void files.add(picked);
+				}}
+				ref={fileInput}
+				type="file"
+			/>
 			<Stack
 				component="form"
 				direction="row"
@@ -402,6 +437,16 @@ export function ChatPanel(): React.JSX.Element {
 				spacing={2}
 				sx={{ alignItems: "flex-end" }}
 			>
+				<Button
+					aria-label={model?.supportsVision ? "Attach images or documents" : "Attach documents"}
+					disabled={busy}
+					onClick={() => fileInput.current?.click()}
+					sx={{ flexShrink: 0, minWidth: 0, px: 1.5 }}
+					title={model?.supportsVision ? "Attach images or documents" : "Attach documents"}
+					variant="outlined"
+				>
+					<PaperclipIcon />
+				</Button>
 				<TextField
 					disabled={busy}
 					fullWidth

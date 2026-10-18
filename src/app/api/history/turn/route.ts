@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { parseAttachment } from "@/server/chat";
 import { DeviceError } from "@/server/device";
 import { conversationIdFrom, saveTurn } from "@/server/history";
 import { apiRoute } from "@/server/route";
@@ -12,7 +13,7 @@ export const POST = apiRoute(async (request) => {
 	if (
 		typeof body.modelId !== "string" ||
 		typeof body.user !== "string" ||
-		!body.user.trim() ||
+		(!body.user.trim() && !body.attachments?.length) ||
 		typeof assistant?.content !== "string" ||
 		typeof assistant.stopped !== "boolean"
 	) {
@@ -22,6 +23,9 @@ export const POST = apiRoute(async (request) => {
 		conversationId: body.conversationId ? conversationIdFrom(body.conversationId) : null,
 		modelId: body.modelId,
 		user: body.user,
+		...(Array.isArray(body.attachments) && body.attachments.length > 0
+			? { attachments: body.attachments.map((item) => parseAttachment(item)) }
+			: {}),
 		assistant: {
 			content: assistant.content,
 			stopped: assistant.stopped,

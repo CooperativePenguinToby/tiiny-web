@@ -8,6 +8,7 @@ import type { ChatModel } from "@/types/device";
 interface OpenAiModel {
 	id: string;
 	supports_chat: boolean;
+	supports_vision?: boolean;
 	thinking?: { supported: boolean; toggleable: boolean; levels: string[]; default_level: string | null };
 }
 
@@ -23,6 +24,7 @@ export const GET = apiRoute(async () => {
 			modelId: model.id,
 			name: instances.get(model.id)?.display_name ?? model.id,
 			activeRequests: instances.get(model.id)?.active_request_count ?? 0,
+			supportsVision: model.supports_vision ?? false,
 			thinking: {
 				supported: model.thinking?.supported ?? false,
 				toggleable: model.thinking?.toggleable ?? false,

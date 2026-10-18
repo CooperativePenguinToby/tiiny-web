@@ -53,12 +53,20 @@ export interface ChatModel {
 	modelId: string;
 	name: string;
 	activeRequests: number;
+	supportsVision: boolean;
 	thinking: { supported: boolean; toggleable: boolean; levels: string[]; defaultLevel: string | null };
 }
+
+// A file sent with a chat message: images go to the device's media store (models fetch them from there),
+// documents are turned into text by the device.
+export type Attachment =
+	| { kind: "image"; mediaId: string; url: string; name: string; mimeType: string }
+	| { kind: "document"; name: string; text: string };
 
 export interface ChatMessage {
 	role: "user" | "assistant";
 	content: string;
+	attachments?: Attachment[];
 }
 
 // "off" disables thinking; otherwise a reasoning level the model supports.
@@ -311,6 +319,7 @@ export interface ConversationSummary {
 export interface StoredTurn {
 	role: "user" | "assistant";
 	content: string;
+	attachments?: Attachment[];
 	reasoning?: string;
 	modelId: string | null;
 	// "success", or "paused" for a reply that was stopped.
@@ -326,6 +335,7 @@ export interface TurnToSave {
 	conversationId: string | null;
 	modelId: string;
 	user: string;
+	attachments?: Attachment[];
 	assistant: { content: string; reasoning?: string; thinkingMs?: number; stopped: boolean };
 	usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
 }
