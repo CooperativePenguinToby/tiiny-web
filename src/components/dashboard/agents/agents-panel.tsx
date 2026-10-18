@@ -86,6 +86,11 @@ async function updateAgent(
 	await followAgentStream(response, onProgress);
 }
 
+// Cards in a row are equally tall; the content grows so every card's actions line up at the bottom.
+const CARD_SX = { height: "100%", display: "flex", flexDirection: "column" } as const;
+const CONTENT_SX = { flexGrow: 1 } as const;
+const ACTIONS_SX = { flexWrap: "wrap", gap: 1, px: 2, pb: 2, pt: 0 } as const;
+
 const STATUS_COLORS: Record<string, "success" | "warning" | "error"> = {
 	running: "success",
 	starting: "warning",
@@ -249,8 +254,8 @@ export function AgentsPanel(): React.JSX.Element {
 							const canOpen = running && service.port !== null && service.proxy?.listening;
 							return (
 								<Grid key={agent.appId} size={{ md: 6, xs: 12 }}>
-									<Card data-testid={`agent-${service.id}`} sx={{ height: "100%" }}>
-										<CardContent>
+									<Card data-testid={`agent-${service.id}`} sx={CARD_SX}>
+										<CardContent sx={CONTENT_SX}>
 											<Stack direction="row" spacing={2}>
 												<AgentIcon agent={agent} />
 												<Stack spacing={0.5} sx={{ minWidth: 0 }}>
@@ -290,7 +295,7 @@ export function AgentsPanel(): React.JSX.Element {
 												</Stack>
 											</Stack>
 										</CardContent>
-										<CardActions sx={{ flexWrap: "wrap", gap: 1, px: 2, pb: 2 }}>
+										<CardActions sx={ACTIONS_SX}>
 											{progress(agent) ?? (agent.install ? installState(agent, agent.install) : null) ?? (
 												<React.Fragment>
 													{service.update ? (
@@ -378,8 +383,8 @@ export function AgentsPanel(): React.JSX.Element {
 					<Grid container spacing={3}>
 						{installable.map((agent) => (
 							<Grid key={agent.appId} size={{ md: 6, lg: 4, xs: 12 }}>
-								<Card data-testid={`store-agent-${agent.appId}`} sx={{ height: "100%" }}>
-									<CardContent>
+								<Card data-testid={`store-agent-${agent.appId}`} sx={CARD_SX}>
+									<CardContent sx={CONTENT_SX}>
 										<Stack direction="row" spacing={2}>
 											<AgentIcon agent={agent} />
 											<Stack spacing={0.5} sx={{ minWidth: 0 }}>
@@ -394,7 +399,7 @@ export function AgentsPanel(): React.JSX.Element {
 											</Stack>
 										</Stack>
 									</CardContent>
-									<CardActions sx={{ px: 2, pb: 2 }}>
+									<CardActions sx={ACTIONS_SX}>
 										{progress(agent) ?? (agent.install ? installState(agent, agent.install) : null) ?? (
 											<Button disabled={busy !== null} onClick={() => void install(agent, false)} variant="contained">
 												Install on device
@@ -417,8 +422,8 @@ export function AgentsPanel(): React.JSX.Element {
 				<Grid container spacing={3}>
 					{desktop.map((agent) => (
 						<Grid key={agent.appId} size={{ md: 6, lg: 4, xs: 12 }}>
-							<Card data-testid={`desktop-agent-${agent.appId}`} sx={{ height: "100%" }}>
-								<CardContent>
+							<Card data-testid={`desktop-agent-${agent.appId}`} sx={CARD_SX}>
+								<CardContent sx={CONTENT_SX}>
 									<Stack direction="row" spacing={2}>
 										<AgentIcon agent={agent} />
 										<Stack spacing={0.5} sx={{ minWidth: 0 }}>
@@ -427,29 +432,30 @@ export function AgentsPanel(): React.JSX.Element {
 												{agent.description}
 											</Typography>
 											<RecommendedModels agent={agent} />
-											{agent.downloads.length === 0 ? (
-												<Typography color="text.secondary" variant="caption">
-													No downloads published.
-												</Typography>
-											) : (
-												agent.downloads.map((download) => (
-													<Typography key={download.platform} variant="caption">
-														<Link href={download.url} rel="noreferrer" target="_blank">
-															{download.platform} {download.version}
-														</Link>{" "}
-														· {formatBytes(download.sizeBytes)}
-														{download.sha256 ? (
-															<span title={`SHA-256 ${download.sha256}`}>
-																{" "}
-																· sha256 {download.sha256.slice(0, 12)}…
-															</span>
-														) : null}
-													</Typography>
-												))
-											)}
 										</Stack>
 									</Stack>
 								</CardContent>
+								<CardActions sx={ACTIONS_SX}>
+									<Stack spacing={0.5}>
+										{agent.downloads.length === 0 ? (
+											<Typography color="text.secondary" variant="caption">
+												No downloads published.
+											</Typography>
+										) : (
+											agent.downloads.map((download) => (
+												<Typography key={download.platform} variant="caption">
+													<Link href={download.url} rel="noreferrer" target="_blank">
+														{download.platform} {download.version}
+													</Link>{" "}
+													· {formatBytes(download.sizeBytes)}
+													{download.sha256 ? (
+														<span title={`SHA-256 ${download.sha256}`}> · sha256 {download.sha256.slice(0, 12)}…</span>
+													) : null}
+												</Typography>
+											))
+										)}
+									</Stack>
+								</CardActions>
 							</Card>
 						</Grid>
 					))}
