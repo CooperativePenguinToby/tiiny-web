@@ -8,6 +8,7 @@ import {
 	forgetNewConversations,
 	holdChatModel,
 	selectOption,
+	sendChat,
 	signIn,
 } from "./helpers";
 
@@ -63,9 +64,7 @@ test("#13 a chat from this app is counted for this app and its model", async ({ 
 		await signIn(page);
 		await page.getByRole("link", { name: "Chat" }).click();
 		await selectOption(page, "Model", model.name);
-		await page.getByRole("textbox", { name: "Message" }).fill("Reply with the single word: counted");
-		await page.getByRole("button", { name: "Send" }).click();
-		await expect(page.getByRole("button", { name: "Send" })).toBeVisible({ timeout: 5 * 60_000 });
+		await sendChat(page, "Reply with the single word: counted", 5 * 60_000);
 
 		await expect.poll(() => appTokens("Tiiny Web"), { timeout: 30_000 }).toBeGreaterThan(beforeTokens);
 		const after = await apps();

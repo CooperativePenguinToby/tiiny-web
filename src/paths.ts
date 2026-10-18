@@ -10,6 +10,7 @@ export const paths = {
 		chat: "/dashboard/chat",
 		history: "/dashboard/history",
 		vault: "/dashboard/vault",
+		connectors: "/dashboard/connectors",
 		settings: "/dashboard/settings",
 	},
 } as const;

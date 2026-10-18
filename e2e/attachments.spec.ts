@@ -1,6 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { forgetNewConversations, historyCall, holdChatModel, selectOption, signIn, solidPng } from "./helpers";
+import {
+	forgetNewConversations,
+	historyCall,
+	holdChatModel,
+	selectOption,
+	sendChat,
+	signIn,
+	solidPng,
+} from "./helpers";
 
 const REPLY = { timeout: 5 * 60_000 };
 const conversations = forgetNewConversations();
@@ -16,10 +24,7 @@ async function openChat(page: Page, modelName: string): Promise<void> {
 }
 
 async function sendAndWait(page: Page, text: string): Promise<string> {
-	await page.getByRole("textbox", { name: "Message" }).fill(text);
-	await page.getByRole("button", { name: "Send" }).click();
-	await expect(page.getByRole("button", { name: "Stop" })).toBeVisible();
-	await expect(page.getByRole("button", { name: "Send" })).toBeVisible(REPLY);
+	await sendChat(page, text, REPLY.timeout);
 	const reply = await lastReply(page).textContent();
 	return reply ?? "";
 }

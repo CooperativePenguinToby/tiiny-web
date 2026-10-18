@@ -8,6 +8,7 @@ import {
 	historyCall,
 	holdModel,
 	selectOption,
+	sendChat,
 	signIn,
 	storedMessages,
 } from "./helpers";
@@ -65,9 +66,7 @@ test("#19 + xflow I: draw a picture in chat, keep it in the conversation, then c
 
 		const before = await appTokens();
 		await selectOption(page, "Model", writer.name);
-		await page.getByRole("textbox", { name: "Message" }).fill("Name one fruit that is red. One word.");
-		await page.getByRole("button", { name: "Send" }).click();
-		await expect(page.getByRole("button", { name: "Send" })).toBeVisible(REPLY);
+		await sendChat(page, "Name one fruit that is red. One word.", REPLY.timeout);
 		await expect(page).toHaveURL(new RegExp(`c=${conversationId}`));
 		const both = await storedMessages(conversationId);
 		expect(both.map((message) => message.role)).toEqual(["user", "assistant", "user", "assistant"]);

@@ -10,6 +10,7 @@ import {
 	isRunning,
 	runningModelIds,
 	selectOption,
+	sendChat,
 	signIn,
 	userLoadedModels,
 } from "./helpers";
@@ -152,9 +153,7 @@ test("#20 choosing a model that is not loaded in chat loads it, making room when
 		await expect(page.getByTestId("chat-loading")).toBeHidden({ timeout: 5 * 60_000 });
 		expect(await runningModelIds()).toContain(CHAT_MODEL);
 		await expect(page.getByRole("combobox", { name: "Model" })).toHaveText(chatName);
-		await page.getByRole("textbox", { name: "Message" }).fill("Reply with the single word: ready");
-		await page.getByRole("button", { name: "Send" }).click();
-		await expect(page.getByRole("button", { name: "Send" })).toBeVisible({ timeout: 5 * 60_000 });
+		await sendChat(page, "Reply with the single word: ready", 5 * 60_000);
 		await expect(page.getByTestId("message-assistant").last().getByTestId("message-content")).not.toBeEmpty();
 
 		// Fill the NPU so the chat model no longer fits, then choose it again.

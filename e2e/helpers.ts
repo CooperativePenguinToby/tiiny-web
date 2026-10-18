@@ -291,3 +291,18 @@ export async function userLoadedModels(): Promise<string[]> {
 	const running = await runningModelIds();
 	return running.filter((modelId) => !managed.has(modelId));
 }
+
+// Sends a chat message and waits for the reply. The device runs its own jobs (daily summaries) on the same
+// models and refuses a request while one holds the model ("gave up waiting"); then this waits and resends
+// once, as a person would. Any other failure is left for the test to see.
+export async function sendChat(page: Page, text: string, timeout = 5 * 60_000): Promise<void> {
+	for (let attempt = 1; ; attempt += 1) {
+		await page.getByRole("textbox", { name: "Message" }).fill(text);
+		await page.getByRole("button", { name: "Send" }).click();
+		await expect(page.getByRole("button", { name: "Send" })).toBeVisible({ timeout });
+		const busy = page.getByRole("alert").filter({ hasText: "The device gave up waiting" });
+		if (attempt > 1 || !(await busy.isVisible())) return;
+		await busy.getByRole("button", { name: "Close" }).click();
+		await page.waitForTimeout(20_000);
+	}
+}

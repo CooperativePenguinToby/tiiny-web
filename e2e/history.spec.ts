@@ -6,6 +6,7 @@ import {
 	historyCall,
 	holdChatModel,
 	selectOption,
+	sendChat,
 	signIn,
 	storedMessages,
 } from "./helpers";
@@ -14,10 +15,7 @@ const REPLY = { timeout: 5 * 60_000 };
 const lastReply = (page: Page) => page.getByTestId("message-assistant").last().getByTestId("message-content");
 
 async function send(page: Page, text: string): Promise<void> {
-	await page.getByRole("textbox", { name: "Message" }).fill(text);
-	await page.getByRole("button", { name: "Send" }).click();
-	await expect(page.getByRole("button", { name: "Stop" })).toBeVisible();
-	await expect(page.getByRole("button", { name: "Send" })).toBeVisible(REPLY);
+	await sendChat(page, text, REPLY.timeout);
 }
 
 test("#17 + xflow E: a chat is kept in the device's history, found, reopened, continued and deleted", async ({

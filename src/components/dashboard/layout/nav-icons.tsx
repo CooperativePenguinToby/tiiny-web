@@ -5,6 +5,7 @@ import { ClockCounterClockwiseIcon } from "@phosphor-icons/react/dist/ssr/ClockC
 import { CpuIcon } from "@phosphor-icons/react/dist/ssr/Cpu";
 import { DownloadSimpleIcon } from "@phosphor-icons/react/dist/ssr/DownloadSimple";
 import { GearSixIcon } from "@phosphor-icons/react/dist/ssr/GearSix";
+import { PlugsConnectedIcon } from "@phosphor-icons/react/dist/ssr/PlugsConnected";
 import { RobotIcon } from "@phosphor-icons/react/dist/ssr/Robot";
 import { StorefrontIcon } from "@phosphor-icons/react/dist/ssr/Storefront";
 import { VaultIcon } from "@phosphor-icons/react/dist/ssr/Vault";
@@ -16,6 +17,7 @@ export const navIcons = {
 	cpu: CpuIcon,
 	download: DownloadSimpleIcon,
 	"gear-six": GearSixIcon,
+	"plugs-connected": PlugsConnectedIcon,
 	robot: RobotIcon,
 	storefront: StorefrontIcon,
 	vault: VaultIcon,
