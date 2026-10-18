@@ -227,3 +227,17 @@ export interface SystemUpdate {
 	progress: number;
 	error: string | null;
 }
+
+export interface TokenCounts {
+	promptTokens: number;
+	completionTokens: number;
+	totalTokens: number;
+	requests: number;
+}
+
+// Token usage the device recorded for one week (Monday first), per day × model and per app.
+export interface WeekUsage {
+	weekStart: string;
+	days: { date: string; models: Record<string, TokenCounts> }[];
+	apps: { app: string; totalTokens: number; models: Record<string, number> }[];
+}

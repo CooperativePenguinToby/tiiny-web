@@ -18,6 +18,7 @@ import { usePolling } from "@/hooks/use-polling";
 
 import { RunningModels } from "./running-models";
 import { StatCard } from "./stat-card";
+import { TokenUsage } from "./token-usage";
 
 export function DeviceOverview(): React.JSX.Element {
 	const { data, error, isLoading, refresh } = usePolling<DeviceStatus>("/api/device", 5000);
@@ -99,6 +100,7 @@ export function DeviceOverview(): React.JSX.Element {
 				</Grid>
 			</Grid>
 			<RunningModels models={data.running} />
+			<TokenUsage />
 		</Stack>
 	);
 }

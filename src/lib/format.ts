@@ -11,3 +11,8 @@ export function formatBytes(bytes: number): string {
 }
 
 export const percent = (part: number, whole: number): number => (whole > 0 ? (part / whole) * 100 : 0);
+
+const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
+
+// 15075773 → "15.1M"; small counts stay exact.
+export const formatCount = (value: number): string => compact.format(value);

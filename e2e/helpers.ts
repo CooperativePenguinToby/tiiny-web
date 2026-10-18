@@ -102,3 +102,29 @@ export function deviceApiKey(): string {
 export function deviceBaseUrl(): string {
 	return deviceTarget().baseUrl;
 }
+
+// A chat model the feature tests talk to. Loaded when needed and unloaded afterwards only if the test
+// loaded it, so a model someone else loaded stays as it was.
+export const CHAT_MODEL = process.env.E2E_CHAT_MODEL ?? "Qwen/Qwen3.5-9B";
+
+export async function holdChatModel(): Promise<{ name: string; release: () => Promise<void> }> {
+	const running = await runningModelIds();
+	const wasLoaded = running.includes(CHAT_MODEL);
+	if (!wasLoaded) await devicePost(`/api/v1/models/${CHAT_MODEL}/launch/stream`);
+	expect(await runningModelIds()).toContain(CHAT_MODEL);
+	const models = await deviceGet<{ data: { model_id: string; display_name: string }[] }>(
+		"/api/v1/models/?including_downloading=false"
+	);
+	return {
+		name: models.data.find((model) => model.model_id === CHAT_MODEL)!.display_name,
+		release: async () => {
+			if (!wasLoaded) await devicePost(`/api/v1/models/${CHAT_MODEL}/stop`);
+		},
+	};
+}
+
+// Picks an option of a MUI select by its label.
+export async function selectOption(page: Page, label: string, option: string | RegExp): Promise<void> {
+	await page.getByRole("combobox", { name: label }).click();
+	await page.getByRole("option", { name: option, exact: typeof option === "string" }).click();
+}

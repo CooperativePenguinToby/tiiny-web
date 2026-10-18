@@ -1,3 +1,4 @@
+import { APP_ID } from "@/server/app-identity";
 import { DeviceError, deviceStream } from "@/server/device";
 import { apiRoute, sseResponse } from "@/server/route";
 
@@ -31,6 +32,9 @@ export const POST = apiRoute(async (request) => {
 		model: modelId,
 		messages: messages.map(({ role, content }) => ({ role, content })),
 		stream: true,
+		// Lets the device attribute the tokens to this app, as TiinyOS does for its own chats.
+		app_id: APP_ID,
+		task_type: "Replying",
 		thinking_enabled: setting !== "off",
 		...(setting === "off" ? {} : { reasoning_effort: setting }),
 	};
