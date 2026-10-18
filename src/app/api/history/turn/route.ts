@@ -32,6 +32,18 @@ export const POST = apiRoute(async (request) => {
 			stopped: assistant.stopped,
 			...(typeof assistant.reasoning === "string" ? { reasoning: assistant.reasoning } : {}),
 			...(typeof assistant.thinkingMs === "number" ? { thinkingMs: assistant.thinkingMs } : {}),
+			...(Array.isArray(assistant.steps) && assistant.steps.length > 0
+				? {
+						steps: assistant.steps.slice(0, 50).map((step) => ({
+							id: String(step.id).slice(0, 100),
+							tool: String(step.tool).slice(0, 100),
+							label: String(step.label).slice(0, 300),
+							arguments: String(step.arguments ?? "").slice(0, 4000),
+							result: String(step.result ?? "").slice(0, 8000),
+							ok: step.ok !== false,
+						})),
+					}
+				: {}),
 			...(Array.isArray(assistant.attachments) && assistant.attachments.length > 0
 				? { attachments: assistant.attachments.map((item) => parseAttachment(item)) }
 				: {}),

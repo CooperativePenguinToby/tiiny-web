@@ -31,10 +31,15 @@ interface RawMessage {
 	seq_in_conversation: number;
 }
 interface RawBlock {
+	block_id: string;
 	block_type: string;
 	position_in_message: number;
 	content_text: string | null;
 	metadata_json: Record<string, string> | null;
+	tool_id: string | null;
+	tool_name: string | null;
+	tool_arguments_json: Record<string, unknown> | null;
+	error_json: unknown;
 }
 
 // Attachments are kept as "image" and "file" blocks next to the message text.
@@ -123,16 +128,40 @@ export async function readConversation(conversationId: string): Promise<Conversa
 				.join("\n\n");
 		const reasoning = text("thinking");
 		const attachments = blocks.map((block) => attachmentOf(block)).filter((item) => item !== null);
+		// Task mode steps are kept as "tool" blocks (TiinyOS stores its tool calls the same way).
+		const steps = blocks
+			.filter((block) => block.block_type === "tool")
+			.map((block) => ({
+				id: block.tool_id ?? block.block_id,
+				tool: block.tool_name ?? "tool",
+				label: block.metadata_json?.label ?? block.tool_name ?? "tool",
+				arguments: block.tool_arguments_json ? JSON.stringify(block.tool_arguments_json) : "",
+				result: block.content_text ?? "",
+				ok: !block.error_json,
+			}));
 		return {
 			role: message.role,
 			content: text("main_text"),
 			...(attachments.length > 0 ? { attachments } : {}),
+			...(steps.length > 0 ? { steps } : {}),
 			...(reasoning ? { reasoning } : {}),
 			modelId: message.model_id,
 			status: message.status,
 		};
 	});
 	return { ...summary(raw), turns };
+}
+
+// The service keeps tool arguments as a JSON object; models send them as JSON text.
+function argumentsObject(text: string): Record<string, unknown> {
+	try {
+		const parsed: unknown = JSON.parse(text || "{}");
+		return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+			? (parsed as Record<string, unknown>)
+			: { value: parsed };
+	} catch {
+		return { text };
+	}
 }
 
 // TiinyOS titles a new conversation with the start of its first message.
@@ -206,6 +235,15 @@ export async function saveTurn(turn: TurnToSave): Promise<string> {
 					: []),
 				block(replyId, "main_text", reasoning ? 2 : 1, turn.assistant.content),
 				...(turn.assistant.attachments ?? []).map((item, index) => attachmentBlock(replyId, item, index + 3)),
+				...(turn.assistant.steps ?? []).map((step, index) =>
+					block(replyId, "tool", 100 + index, step.result ?? "", {
+						tool_id: step.id,
+						tool_name: step.tool,
+						tool_arguments_json: argumentsObject(step.arguments),
+						metadata_json: { label: step.label },
+						error_json: step.ok === false ? { message: step.result ?? "" } : null,
+					})
+				),
 			],
 			files: [],
 			block_file_refs: [],

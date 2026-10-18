@@ -292,3 +292,55 @@ export async function mcpTools(id: string): Promise<McpTool[]> {
 export async function deleteMcpServer(id: string): Promise<void> {
 	await connector(`/v1/mcp/servers/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
+
+export interface McpToolSpec {
+	serverId: string;
+	serverName: string;
+	name: string;
+	description: string;
+	inputSchema: Record<string, unknown>;
+}
+
+// Tools of every enabled MCP server the device can reach, for Task mode.
+export async function connectedMcpTools(): Promise<McpToolSpec[]> {
+	const servers = await listMcpServers().catch(() => []);
+	const lists = await Promise.all(
+		servers
+			.filter((server) => server.enabled && server.connected)
+			.map(async (server) => {
+				const tools = await connector<{ name: string; description?: string; input_schema?: Record<string, unknown> }[]>(
+					`/v1/mcp/servers/${encodeURIComponent(server.id)}/tools`
+				).catch(() => []);
+				return tools.map((tool) => ({
+					serverId: server.id,
+					serverName: server.name,
+					name: tool.name,
+					description: tool.description ?? "",
+					inputSchema: tool.input_schema ?? { type: "object", properties: {} },
+				}));
+			})
+	);
+	return lists.flat();
+}
+
+interface ToolCallReply {
+	ok?: boolean;
+	content?: { type: string; text?: string }[];
+	error?: string;
+}
+
+export async function callMcpTool(serverId: string, tool: string, args: unknown): Promise<string> {
+	const reply = await deviceJson<ToolCallReply>(
+		`/v1/mcp/servers/${encodeURIComponent(serverId)}/tools/${encodeURIComponent(tool)}/call`,
+		{
+			method: "POST",
+			service: "connector",
+			headers: { "x-user-id": await deviceId() },
+			body: { arguments: args },
+			slow: true,
+		}
+	);
+	const text = (reply.content ?? []).map((part) => part.text ?? `[${part.type}]`).join("\n");
+	if (reply.ok === false) throw new Error(reply.error || text || "The tool failed");
+	return text;
+}

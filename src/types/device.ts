@@ -344,6 +344,7 @@ export interface StoredTurn {
 	role: "user" | "assistant";
 	content: string;
 	attachments?: Attachment[];
+	steps?: TaskStep[];
 	reasoning?: string;
 	modelId: string | null;
 	// "success", or "paused" for a reply that was stopped.
@@ -360,7 +361,15 @@ export interface TurnToSave {
 	modelId: string;
 	user: string;
 	attachments?: Attachment[];
-	assistant: { content: string; reasoning?: string; thinkingMs?: number; stopped: boolean; attachments?: Attachment[] };
+	assistant: {
+		content: string;
+		reasoning?: string;
+		thinkingMs?: number;
+		stopped: boolean;
+		attachments?: Attachment[];
+		// Task mode: the tools the model used, in order.
+		steps?: TaskStep[];
+	};
 	usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
 }
 
@@ -428,3 +437,23 @@ export interface McpTool {
 	name: string;
 	description: string;
 }
+
+// One tool the model used during a Task mode reply.
+export interface TaskStep {
+	id: string;
+	tool: string;
+	// Short description for people, e.g. "Searched Vault: lighthouse colour".
+	label: string;
+	arguments: string;
+	result?: string;
+	ok?: boolean;
+}
+
+// Events of /api/chat/task's stream.
+export type TaskEvent =
+	| { type: "delta"; content?: string; reasoning?: string }
+	| { type: "step"; step: TaskStep }
+	| { type: "step-result"; id: string; ok: boolean; result: string }
+	| { type: "usage"; usage: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number } }
+	| { type: "error"; message: string }
+	| { type: "done" };

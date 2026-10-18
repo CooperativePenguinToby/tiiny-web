@@ -24,6 +24,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 import { CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import { PaperclipIcon } from "@phosphor-icons/react/dist/ssr/Paperclip";
@@ -37,6 +39,8 @@ import {
 	type ChatModel,
 	type Conversation,
 	type ImageEvent,
+	type TaskEvent,
+	type TaskStep,
 	type ThinkingSetting,
 	type TurnToSave,
 } from "@/types/device";
@@ -47,11 +51,17 @@ import { readSse, responseError } from "@/lib/sse";
 import { usePolling } from "@/hooks/use-polling";
 
 import { AttachmentChips, DOCUMENT_ACCEPT, MessageAttachments, useAttachments } from "./attachments";
+import { TaskSteps } from "./task-steps";
 
 interface Turn extends ChatMessage {
 	reasoning?: string;
 	note?: string;
+	steps?: TaskStep[];
 }
+
+// Chat answers directly; Task lets the model work in steps with tools (Vault, web pages, MCP).
+type Mode = "chat" | "task";
+const MODE_KEY = "tiiny-chat-mode";
 
 type Phase = "idle" | "waiting" | "streaming";
 
@@ -69,6 +79,8 @@ interface Reply {
 	thinkingMs: number;
 	// Pictures an image model drew.
 	attachments: Attachment[];
+	// Tools used in Task mode.
+	steps: TaskStep[];
 }
 
 // The ?c= conversation id: chats are stored in the device's chat history as they happen.
@@ -116,6 +128,7 @@ function MessageBubble({ turn }: { turn: Turn }): React.JSX.Element {
 			{turn.attachments?.length ? (
 				<MessageAttachments align={isUser ? "end" : "start"} attachments={turn.attachments} />
 			) : null}
+			{turn.steps?.length ? <TaskSteps steps={turn.steps} /> : null}
 			{turn.reasoning ? (
 				<Accordion disableGutters sx={{ mb: 1 }} variant="outlined">
 					<AccordionSummary expandIcon={<CaretDownIcon />}>
@@ -171,6 +184,14 @@ export function ChatPanel(): React.JSX.Element {
 	const files = useAttachments();
 	const [imageSize, setImageSize] = React.useState<string>(IMAGE_SIZES[0]);
 	const [imageSteps, setImageSteps] = React.useState(9);
+	const [mode, setMode] = React.useState<Mode>("chat");
+	React.useEffect(() => {
+		if (globalThis.localStorage.getItem(MODE_KEY) === "task") setMode("task");
+	}, []);
+	const chooseMode = (next: Mode): void => {
+		setMode(next);
+		globalThis.localStorage.setItem(MODE_KEY, next);
+	};
 	const fileInput = React.useRef<HTMLInputElement>(null);
 
 	React.useEffect(() => {
@@ -192,6 +213,7 @@ export function ChatPanel(): React.JSX.Element {
 						role: turn.role,
 						content: turn.content,
 						...(turn.attachments ? { attachments: turn.attachments } : {}),
+						...(turn.steps ? { steps: turn.steps } : {}),
 						...(turn.reasoning ? { reasoning: turn.reasoning } : {}),
 						...(turn.status === "paused" ? { note: "Stopped." } : {}),
 					}))
@@ -308,10 +330,15 @@ export function ChatPanel(): React.JSX.Element {
 			thinkingFrom: 0,
 			thinkingMs: 0,
 			attachments: [],
+			steps: [],
 		};
 		try {
 			if (model.kind === "image") {
 				await draw(text, controller.signal, reply);
+				return;
+			}
+			if (mode === "task") {
+				interrupted = await work(history, controller.signal, reply);
 				return;
 			}
 			const response = await fetch("/api/chat", {
@@ -372,6 +399,59 @@ export function ChatPanel(): React.JSX.Element {
 		}
 	};
 
+	// Task mode: streams the reply and each tool step; resolves true if the model was interrupted.
+	const work = async (history: ChatMessage[], signal: AbortSignal, reply: Reply): Promise<boolean> => {
+		const response = await fetch("/api/chat/task", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ modelId, messages: history, thinking }),
+			signal,
+		});
+		if (!response.ok) throw new Error(await responseError(response));
+		const showSteps = (): void => updateLast((turn) => ({ ...turn, steps: [...reply.steps] }));
+		for await (const { data } of readSse(response)) {
+			const event = JSON.parse(data) as TaskEvent;
+			switch (event.type) {
+				case "delta": {
+					reply.content += event.content ?? "";
+					reply.reasoning += event.reasoning ?? "";
+					setPhase("streaming");
+					updateLast((turn) => ({
+						...turn,
+						content: turn.content + (event.content ?? ""),
+						reasoning: (turn.reasoning ?? "") + (event.reasoning ?? "") || undefined,
+					}));
+					break;
+				}
+				case "step": {
+					setPhase("streaming");
+					reply.steps.push(event.step);
+					showSteps();
+					break;
+				}
+				case "step-result": {
+					reply.steps = reply.steps.map((step) =>
+						step.id === event.id ? { ...step, ok: event.ok, result: event.result } : step
+					);
+					showSteps();
+					break;
+				}
+				case "usage": {
+					reply.usage = event.usage;
+					break;
+				}
+				case "error": {
+					if (event.message === "Interrupted.") return true;
+					throw new Error(event.message);
+				}
+				case "done": {
+					return false;
+				}
+			}
+		}
+		return false;
+	};
+
 	// Draws the prompt with an image model, then keeps the picture in the device's media store so the
 	// conversation can show it later.
 	const draw = async (prompt: string, signal: AbortSignal, reply: Reply): Promise<void> => {
@@ -423,6 +503,7 @@ export function ChatPanel(): React.JSX.Element {
 				...(reply.reasoning ? { reasoning: reply.reasoning } : {}),
 				...(reply.thinkingMs ? { thinkingMs: reply.thinkingMs } : {}),
 				...(reply.attachments.length > 0 ? { attachments: reply.attachments } : {}),
+				...(reply.steps.length > 0 ? { steps: reply.steps } : {}),
 			},
 			...(reply.usage ? { usage: reply.usage } : {}),
 		};
@@ -500,6 +581,24 @@ export function ChatPanel(): React.JSX.Element {
 						))}
 					</Select>
 				</FormControl>
+				{model?.kind === "chat" ? (
+					<ToggleButtonGroup
+						aria-label="Mode"
+						disabled={busy}
+						exclusive
+						onChange={(_event, next: Mode | null) => next && chooseMode(next)}
+						size="small"
+						sx={{ alignSelf: "center" }}
+						value={mode}
+					>
+						<ToggleButton title="The model answers directly" value="chat">
+							Chat
+						</ToggleButton>
+						<ToggleButton title="The model works in steps with Vault, web pages and MCP tools" value="task">
+							Task
+						</ToggleButton>
+					</ToggleButtonGroup>
+				) : null}
 				{model?.kind === "image" ? (
 					<>
 						<FormControl sx={{ minWidth: 160 }}>
