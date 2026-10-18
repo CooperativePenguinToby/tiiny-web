@@ -1,9 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-import { runningModelIds, signIn } from "./helpers";
+import { devicePost, runningModelIds, signIn } from "./helpers";
 
 // Small (1% NPU) model so the test never disturbs models other clients are using.
 const TEST_MODEL = process.env.E2E_TEST_MODEL ?? "Qwen/Qwen3-Embedding-0.6B";
+
+// A failed run must not leave the test model loaded for the next one.
+test.afterEach(async () => {
+	const running = await runningModelIds();
+	if (running.includes(TEST_MODEL)) await devicePost(`/api/v1/models/${TEST_MODEL}/stop`);
+});
 
 test("#2 + xflow A: load a model from the UI, see it on the dashboard, unload it", async ({ page }) => {
 	expect(await runningModelIds(), `${TEST_MODEL} must not be loaded before the test`).not.toContain(TEST_MODEL);
@@ -24,8 +30,9 @@ test("#2 + xflow A: load a model from the UI, see it on the dashboard, unload it
 	expect(await runningModelIds()).toContain(TEST_MODEL);
 	await page.screenshot({ path: "test-results/models-loaded.png", fullPage: true });
 
+	// The overview's first poll is one round of device calls, which the device sometimes answers slowly.
 	await page.getByRole("link", { name: "Overview" }).click();
-	await expect(page.getByTestId(`running-${TEST_MODEL}`)).toContainText(TEST_MODEL);
+	await expect(page.getByTestId(`running-${TEST_MODEL}`)).toContainText(TEST_MODEL, { timeout: 15_000 });
 	await page.screenshot({ path: "test-results/dashboard-with-test-model.png", fullPage: true });
 
 	await page.getByRole("link", { name: "Models" }).click();

@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import { config } from "@/config";
 import { ApiAccessCard } from "@/components/dashboard/settings/api-access-card";
 import { DeviceCard } from "@/components/dashboard/settings/device-card";
+import { NetworkCard } from "@/components/dashboard/settings/network-card";
 import { StorageCard } from "@/components/dashboard/settings/storage-card";
 
 export const metadata = { title: `Settings | ${config.site.name}` } satisfies Metadata;
@@ -28,7 +29,10 @@ export default function Page(): React.JSX.Element {
 					</Stack>
 				</Grid>
 				<Grid size={{ lg: 6, xs: 12 }}>
-					<StorageCard />
+					<Stack spacing={3}>
+						<StorageCard />
+						<NetworkCard />
+					</Stack>
 				</Grid>
 			</Grid>
 		</Stack>

@@ -191,3 +191,27 @@ export interface ApiAccess {
 	anthropic: string;
 	ollama: string;
 }
+
+export interface WifiNetwork {
+	ssid: string;
+	signal: number;
+	needsPassword: boolean;
+	saved: boolean;
+	autoJoin: boolean;
+	connected: boolean;
+	connecting: boolean;
+}
+
+// Wi-Fi state and interfaces; the network list is separate because the device scans to answer it.
+export interface NetworkOverview {
+	wifi: { enabled: boolean; connected: boolean; ssid: string | null; signal: number | null; error: string | null };
+	interfaces: { name: string; state: string; addresses: string[] }[];
+	// The interface this app reaches the device through; Wi-Fi changes that would drop it are refused.
+	linkInterface: string | null;
+}
+
+export type WifiAction =
+	| { action: "auto-join"; ssid: string; enabled: boolean }
+	| { action: "connect"; ssid: string; password?: string }
+	| { action: "forget"; ssid: string }
+	| { action: "radio"; enabled: boolean };

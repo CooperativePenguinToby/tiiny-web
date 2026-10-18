@@ -1,5 +1,6 @@
 import { lookup } from "node:dns";
 import type { LookupFunction } from "node:net";
+
 import { Agent, fetch as undiciFetch, type FormData } from "undici";
 
 import { resolveDeviceTarget } from "./shared/device-target.mjs";
