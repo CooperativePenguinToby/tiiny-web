@@ -64,4 +64,5 @@ BASE_URL=https://localhost:8443 ADMIN_PASSWORD=... npm run test:e2e   # against 
 The e2e tests use your installed Google Chrome (`PW_CHANNEL` to override) and drive the real device: they load
 and unload `Qwen/Qwen3-Embedding-0.6B` and `Qwen/Qwen3.6-35B-A3B`, download and delete
 `PaddlePaddle/PP-OCRv6-Small`, and start then cancel a LoRA import (override with the `E2E_*` variables in
-`e2e/`). Each test checks the device is back to its starting state.
+`e2e/`). Each test checks the device is back to its starting state. `e2e/agent-install.spec.ts` installs a
+real agent and leaves it installed, so it only runs with `E2E_INSTALL_AGENT=<app id>` (e.g. `sillytavern`).

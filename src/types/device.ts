@@ -154,8 +154,9 @@ export interface Agent {
 		status: string;
 		version: string | null;
 		port: number | null;
-		// false when the agent only listens on the device's own loopback interface.
-		reachable: boolean;
+		// false when the agent only listens on the device's own loopback interface; null when unknown
+		// (the device reports port bindings only while the agent runs).
+		reachable: boolean | null;
 		proxy: { listening: boolean; error: string | null } | null;
 	} | null;
 }

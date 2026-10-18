@@ -158,7 +158,8 @@ export function AgentsPanel(): React.JSX.Element {
 						{installed.map((agent) => {
 							const service = agent.service!;
 							const running = service.status === "running";
-							const canOpen = running && service.port !== null && service.reachable && service.proxy?.listening;
+							const canOpen =
+								running && service.port !== null && service.reachable === true && service.proxy?.listening;
 							return (
 								<Grid key={agent.appId} size={{ md: 6, xs: 12 }}>
 									<Card data-testid={`agent-${service.id}`} sx={{ height: "100%" }}>
@@ -190,7 +191,7 @@ export function AgentsPanel(): React.JSX.Element {
 															or Stop to reset it.
 														</Typography>
 													) : null}
-													{service.port !== null && !service.reachable ? (
+													{service.port !== null && service.reachable === false ? (
 														<Typography color="text.secondary" variant="caption">
 															This agent only listens on the device itself, so it can&apos;t be opened from the network.
 														</Typography>
