@@ -8,6 +8,7 @@ import { config } from "@/config";
 import { ApiAccessCard } from "@/components/dashboard/settings/api-access-card";
 import { DeviceCard } from "@/components/dashboard/settings/device-card";
 import { NetworkCard } from "@/components/dashboard/settings/network-card";
+import { PersonalizationCard } from "@/components/dashboard/settings/personalization-card";
 import { PowerCard } from "@/components/dashboard/settings/power-card";
 import { StorageCard } from "@/components/dashboard/settings/storage-card";
 
@@ -26,6 +27,7 @@ export default function Page(): React.JSX.Element {
 				<Grid size={{ lg: 6, xs: 12 }}>
 					<Stack spacing={3}>
 						<DeviceCard />
+						<PersonalizationCard />
 						<PowerCard />
 						<ApiAccessCard />
 					</Stack>

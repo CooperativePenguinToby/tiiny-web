@@ -241,3 +241,11 @@ export interface WeekUsage {
 	days: { date: string; models: Record<string, TokenCounts> }[];
 	apps: { app: string; totalTokens: number; models: Record<string, number> }[];
 }
+
+// What TiinyOS calls Personalization: given to models as context in Task mode.
+export interface Personalization {
+	userName: string;
+	occupation: string;
+	preferences: string;
+	recentFocus: string;
+}
