@@ -15,6 +15,7 @@ export const POST = apiRoute(async (request) => {
 		typeof body.user !== "string" ||
 		(!body.user.trim() && !body.attachments?.length) ||
 		typeof assistant?.content !== "string" ||
+		(!assistant.content.trim() && !assistant.attachments?.length) ||
 		typeof assistant.stopped !== "boolean"
 	) {
 		throw new DeviceError("Expected { modelId, user, assistant: { content, stopped } }", 400);
@@ -31,6 +32,9 @@ export const POST = apiRoute(async (request) => {
 			stopped: assistant.stopped,
 			...(typeof assistant.reasoning === "string" ? { reasoning: assistant.reasoning } : {}),
 			...(typeof assistant.thinkingMs === "number" ? { thinkingMs: assistant.thinkingMs } : {}),
+			...(Array.isArray(assistant.attachments) && assistant.attachments.length > 0
+				? { attachments: assistant.attachments.map((item) => parseAttachment(item)) }
+				: {}),
 		},
 		...(body.usage && typeof body.usage === "object" ? { usage: body.usage } : {}),
 	});

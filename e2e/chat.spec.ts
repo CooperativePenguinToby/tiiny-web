@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { deviceGet, devicePost, forgetNewConversations, runningModelIds, signIn } from "./helpers";
+import { deviceGet, devicePost, forgetNewConversations, runningModelIds, signIn, userLoadedModels } from "./helpers";
 
 // A chat model the xflow test loads itself; must fit in the NPU share that is currently free.
 const LOAD_MODEL = process.env.E2E_CHAT_LOAD_MODEL ?? "Qwen/Qwen3.6-35B-A3B";
@@ -25,7 +25,7 @@ test.afterEach(conversations.after);
 const lastReply = (page: Page) => page.getByTestId("message-assistant").last().getByTestId("message-content");
 
 test("whole app + xflow B: sign in, dashboard, load a chat model, chat with it, unload it", async ({ page }) => {
-	const before = await runningModelIds();
+	const before = await userLoadedModels();
 	expect(before, `${LOAD_MODEL} must not be loaded before the test`).not.toContain(LOAD_MODEL);
 	const models = await deviceGet<{ data: { model_id: string; npu_usage: number; display_name: string }[] }>(
 		"/api/v1/models/?including_downloading=false"
@@ -62,7 +62,8 @@ test("whole app + xflow B: sign in, dashboard, load a chat model, chat with it, 
 		await page.getByRole("dialog").getByRole("button", { name: "Unload" }).click();
 		await expect(page.getByRole("alert").filter({ hasText: "unloaded." })).toBeVisible({ timeout: 2 * 60_000 });
 	}
-	expect(await runningModelIds()).toEqual(before);
+	// The device may load its own Vault and summary models meanwhile.
+	expect(await userLoadedModels()).toEqual(before);
 	await page.getByRole("link", { name: "Overview" }).click();
 	// The card is there whether or not any model is loaded (the table only when one is).
 	await expect(page.getByText("Loaded models", { exact: true })).toBeVisible();

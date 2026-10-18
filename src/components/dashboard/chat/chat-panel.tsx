@@ -12,8 +12,14 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CircularProgress from "@mui/material/CircularProgress";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
+import LinearProgress from "@mui/material/LinearProgress";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
@@ -24,9 +30,19 @@ import { PaperclipIcon } from "@phosphor-icons/react/dist/ssr/Paperclip";
 import { PaperPlaneRightIcon } from "@phosphor-icons/react/dist/ssr/PaperPlaneRight";
 import { StopIcon } from "@phosphor-icons/react/dist/ssr/Stop";
 
-import type { Attachment, ChatMessage, ChatModel, Conversation, ThinkingSetting, TurnToSave } from "@/types/device";
+import {
+	IMAGE_SIZES,
+	type Attachment,
+	type ChatMessage,
+	type ChatModel,
+	type Conversation,
+	type ImageEvent,
+	type ThinkingSetting,
+	type TurnToSave,
+} from "@/types/device";
 import { paths } from "@/paths";
 import { postJson } from "@/lib/api";
+import { loadModel } from "@/lib/models";
 import { readSse, responseError } from "@/lib/sse";
 import { usePolling } from "@/hooks/use-polling";
 
@@ -42,7 +58,17 @@ type Phase = "idle" | "waiting" | "streaming";
 interface ChunkDelta {
 	choices?: { delta?: { content?: string | null; reasoning_content?: string | null } }[];
 	usage?: TurnToSave["usage"];
-	error?: { message?: string };
+	error?: { message?: string; type?: string };
+}
+
+interface Reply {
+	content: string;
+	reasoning: string;
+	usage: TurnToSave["usage"];
+	thinkingFrom: number;
+	thinkingMs: number;
+	// Pictures an image model drew.
+	attachments: Attachment[];
 }
 
 // The ?c= conversation id: chats are stored in the device's chat history as they happen.
@@ -87,7 +113,9 @@ function MessageBubble({ turn }: { turn: Turn }): React.JSX.Element {
 			>
 				{isUser ? "You" : "Assistant"}
 			</Typography>
-			{turn.attachments?.length ? <MessageAttachments attachments={turn.attachments} /> : null}
+			{turn.attachments?.length ? (
+				<MessageAttachments align={isUser ? "end" : "start"} attachments={turn.attachments} />
+			) : null}
 			{turn.reasoning ? (
 				<Accordion disableGutters sx={{ mb: 1 }} variant="outlined">
 					<AccordionSummary expandIcon={<CaretDownIcon />}>
@@ -104,6 +132,7 @@ function MessageBubble({ turn }: { turn: Turn }): React.JSX.Element {
 			) : null}
 			<Box
 				sx={{
+					display: !turn.content && turn.attachments?.length ? "none" : undefined,
 					bgcolor: isUser ? "var(--mui-palette-primary-main)" : "var(--mui-palette-background-level1)",
 					borderRadius: 2,
 					color: isUser ? "var(--mui-palette-primary-contrastText)" : "inherit",
@@ -140,6 +169,8 @@ export function ChatPanel(): React.JSX.Element {
 	const [opening, setOpening] = React.useState(false);
 	const [saveError, setSaveError] = React.useState<string | null>(null);
 	const files = useAttachments();
+	const [imageSize, setImageSize] = React.useState<string>(IMAGE_SIZES[0]);
+	const [imageSteps, setImageSteps] = React.useState(9);
 	const fileInput = React.useRef<HTMLInputElement>(null);
 
 	React.useEffect(() => {
@@ -174,14 +205,67 @@ export function ChatPanel(): React.JSX.Element {
 
 	const model = models.data?.find((candidate) => candidate.modelId === modelId) ?? null;
 
-	const chooseModel = React.useCallback((next: ChatModel | undefined): void => {
-		setModelId(next?.modelId ?? "");
-		setThinking(next && !next.thinking.toggleable && next.thinking.defaultLevel ? next.thinking.defaultLevel : "off");
-	}, []);
+	const [loading, setLoading] = React.useState<{ name: string; message: string; progress: number | null } | null>(null);
+	const [makeRoom, setMakeRoom] = React.useState<{
+		model: ChatModel;
+		unload: { modelId: string; name: string }[];
+	} | null>(null);
 
+	// Loads a model chosen in chat, first unloading the ones the device says must make room (as agreed).
+	const load = React.useCallback(
+		async (next: ChatModel, unloadFirst: { modelId: string; name: string }[]): Promise<void> => {
+			setError(null);
+			setLoading({ name: next.name, message: "Starting", progress: null });
+			try {
+				for (const other of unloadFirst) {
+					setLoading({ name: next.name, message: `Unloading ${other.name}`, progress: null });
+					await postJson("/api/models/unload", { modelId: other.modelId });
+				}
+				await loadModel(next.modelId, (message, progress) => setLoading({ name: next.name, message, progress }));
+			} catch (error_) {
+				setError(`Could not load ${next.name}: ${error_ instanceof Error ? error_.message : String(error_)}`);
+			} finally {
+				setLoading(null);
+				await models.refresh();
+			}
+		},
+		[models]
+	);
+
+	const ensureLoaded = React.useCallback(
+		async (next: ChatModel): Promise<void> => {
+			try {
+				const response = await fetch(`/api/models/unload-candidate?modelId=${encodeURIComponent(next.modelId)}`);
+				if (!response.ok) throw new Error(await responseError(response));
+				const plan = (await response.json()) as {
+					unloadRequired: boolean;
+					unload: { modelId: string; name: string }[];
+				};
+				if (plan.unloadRequired) setMakeRoom({ model: next, unload: plan.unload });
+				else await load(next, []);
+			} catch (error_) {
+				setError(`Could not load ${next.name}: ${error_ instanceof Error ? error_.message : String(error_)}`);
+			}
+		},
+		[load]
+	);
+
+	const chooseModel = React.useCallback(
+		(next: ChatModel | undefined, loadIt: boolean): void => {
+			setModelId(next?.modelId ?? "");
+			setThinking(next && !next.thinking.toggleable && next.thinking.defaultLevel ? next.thinking.defaultLevel : "off");
+			if (next && !next.loaded && loadIt) void ensureLoaded(next);
+		},
+		[ensureLoaded]
+	);
+
+	// Starts on a loaded model; with none loaded nothing is preselected, so picking one loads it.
 	React.useEffect(() => {
 		if (!models.data || models.data.some((candidate) => candidate.modelId === modelId)) return;
-		chooseModel(models.data[0]);
+		chooseModel(
+			models.data.find((candidate) => candidate.loaded),
+			false
+		);
 	}, [models.data, modelId, chooseModel]);
 
 	const updateLast = (update: (turn: Turn) => Turn): void => {
@@ -191,12 +275,21 @@ export function ChatPanel(): React.JSX.Element {
 	const send = async (): Promise<void> => {
 		const text = draft.trim();
 		const attachments = files.attachments;
-		if ((!text && attachments.length === 0) || files.uploading.length > 0 || !model || phase !== "idle") return;
+		if (
+			(!text && attachments.length === 0) ||
+			files.uploading.length > 0 ||
+			!model?.loaded ||
+			loading !== null ||
+			phase !== "idle"
+		) {
+			return;
+		}
 		const history: ChatMessage[] = [
+			// Pictures a model drew are not sent back to text models.
 			...turns.map(({ role, content, attachments: sent }) => ({
 				role,
 				content,
-				...(sent ? { attachments: sent } : {}),
+				...(sent && role === "user" ? { attachments: sent } : {}),
 			})),
 			{ role: "user", content: text, ...(attachments.length > 0 ? { attachments } : {}) },
 		];
@@ -207,14 +300,20 @@ export function ChatPanel(): React.JSX.Element {
 		setPhase("waiting");
 		const controller = new AbortController();
 		abortRef.current = controller;
-		const reply = {
+		let interrupted = false;
+		const reply: Reply = {
 			content: "",
 			reasoning: "",
-			usage: undefined as TurnToSave["usage"],
+			usage: undefined,
 			thinkingFrom: 0,
 			thinkingMs: 0,
+			attachments: [],
 		};
 		try {
+			if (model.kind === "image") {
+				await draw(text, controller.signal, reply);
+				return;
+			}
 			const response = await fetch("/api/chat", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -225,6 +324,11 @@ export function ChatPanel(): React.JSX.Element {
 			for await (const { data } of readSse(response)) {
 				if (data === "[DONE]") break;
 				const chunk = JSON.parse(data) as ChunkDelta;
+				// Someone interrupted the model (Models page, tiiny interrupt): keep what arrived, like a Stop.
+				if (chunk.error?.type === "interrupted") {
+					interrupted = true;
+					break;
+				}
 				if (chunk.error) {
 					const message = chunk.error.message ?? "The device reported an error";
 					// The device gives up on requests that wait too long behind other clients' requests.
@@ -260,17 +364,54 @@ export function ChatPanel(): React.JSX.Element {
 		} finally {
 			abortRef.current = null;
 			// Saved before the next message can be sent, so that one joins the same conversation.
-			if (reply.content.trim()) await remember(text, attachments, reply, controller.signal.aborted);
+			if (interrupted) updateLast((turn) => ({ ...turn, note: "Interrupted." }));
+			if (reply.content.trim() || reply.attachments.length > 0) {
+				await remember(text, attachments, reply, controller.signal.aborted || interrupted);
+			}
 			setPhase("idle");
 		}
 	};
 
-	const remember = async (
-		user: string,
-		attachments: Attachment[],
-		reply: { content: string; reasoning: string; usage: TurnToSave["usage"]; thinkingMs: number },
-		stopped: boolean
-	): Promise<void> => {
+	// Draws the prompt with an image model, then keeps the picture in the device's media store so the
+	// conversation can show it later.
+	const draw = async (prompt: string, signal: AbortSignal, reply: Reply): Promise<void> => {
+		const response = await fetch("/api/images", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ modelId, prompt, size: imageSize, steps: imageSteps }),
+			signal,
+		});
+		if (!response.ok) throw new Error(await responseError(response));
+		let image: string | null = null;
+		for await (const { event, data } of readSse(response)) {
+			const update = JSON.parse(data) as ImageEvent;
+			if (event === "error" || update.status === "error" || update.error) {
+				throw new Error(update.error || update.message || "The device could not draw the picture");
+			}
+			if (update.total_steps) {
+				setPhase("streaming");
+				updateLast((turn) => ({ ...turn, note: `Drawing… step ${update.step ?? 0} of ${update.total_steps}` }));
+			}
+			if (update.image) image = update.image;
+		}
+		if (!image) throw new Error("The device finished without a picture");
+		// The device sends a data: URL (older firmware sent bare base64).
+		const base64 = image.startsWith("data:") ? image.slice(image.indexOf(",") + 1) : image;
+		const bytes = Uint8Array.from(atob(base64), (character) => character.codePointAt(0)!);
+		const form = new FormData();
+		form.append("file", new File([bytes], `image-${Date.now()}.png`, { type: "image/png" }));
+		const stored = await fetch("/api/chat/attachments", { method: "POST", body: form });
+		if (!stored.ok) throw new Error(await responseError(stored));
+		const picture = (await stored.json()) as Attachment;
+		reply.attachments.push(picture);
+		updateLast((turn) => ({
+			...turn,
+			attachments: [picture],
+			note: `${imageSize.replace("x", " × ")}, ${imageSteps} steps`,
+		}));
+	};
+
+	const remember = async (user: string, attachments: Attachment[], reply: Reply, stopped: boolean): Promise<void> => {
 		const turn: TurnToSave = {
 			conversationId: shownRef.current,
 			modelId,
@@ -281,6 +422,7 @@ export function ChatPanel(): React.JSX.Element {
 				stopped,
 				...(reply.reasoning ? { reasoning: reply.reasoning } : {}),
 				...(reply.thinkingMs ? { thinkingMs: reply.thinkingMs } : {}),
+				...(reply.attachments.length > 0 ? { attachments: reply.attachments } : {}),
 			},
 			...(reply.usage ? { usage: reply.usage } : {}),
 		};
@@ -314,35 +456,79 @@ export function ChatPanel(): React.JSX.Element {
 				}
 				severity={models.error ? "error" : "info"}
 			>
-				{models.error ?? "No chat model is loaded. Load one on the Models page."}
+				{models.error ?? "No chat or image model is downloaded. Get one from the Store, then load it."}
 			</Alert>
 		);
 	}
 
-	const busy = phase !== "idle";
+	const busy = phase !== "idle" || loading !== null;
 	const others = model?.activeRequests ?? 0;
 
 	return (
 		<Stack spacing={3}>
 			<Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
 				<FormControl sx={{ minWidth: 260 }}>
-					<InputLabel id="chat-model-label">Model</InputLabel>
+					<InputLabel id="chat-model-label" shrink>
+						Model
+					</InputLabel>
 					<Select
+						displayEmpty
+						notched
 						disabled={busy}
 						label="Model"
 						labelId="chat-model-label"
 						onChange={(event) =>
-							chooseModel(models.data?.find((candidate) => candidate.modelId === event.target.value))
+							chooseModel(
+								models.data?.find((candidate) => candidate.modelId === event.target.value),
+								true
+							)
 						}
+						renderValue={(value) => {
+							const chosen = models.data?.find((candidate) => candidate.modelId === value);
+							if (!chosen) return "Choose a model";
+							return chosen.loaded ? chosen.name : `${chosen.name} (not loaded)`;
+						}}
 						value={modelId}
 					>
+						<MenuItem disabled value="">
+							Choose a model
+						</MenuItem>
 						{models.data.map((candidate) => (
 							<MenuItem key={candidate.modelId} value={candidate.modelId}>
-								{candidate.name}
+								{candidate.loaded ? candidate.name : `${candidate.name} (not loaded)`}
 							</MenuItem>
 						))}
 					</Select>
 				</FormControl>
+				{model?.kind === "image" ? (
+					<>
+						<FormControl sx={{ minWidth: 160 }}>
+							<InputLabel id="image-size-label">Size</InputLabel>
+							<Select
+								disabled={busy}
+								label="Size"
+								labelId="image-size-label"
+								onChange={(event) => setImageSize(event.target.value)}
+								value={imageSize}
+							>
+								{IMAGE_SIZES.map((size) => (
+									<MenuItem key={size} value={size}>
+										{size.replace("x", " × ")}
+									</MenuItem>
+								))}
+							</Select>
+						</FormControl>
+						<TextField
+							disabled={busy}
+							label="Steps"
+							onChange={(event) => setImageSteps(Math.min(50, Math.max(1, Number(event.target.value) || 1)))}
+							slotProps={{ htmlInput: { min: 1, max: 50 } }}
+							sx={{ width: 100 }}
+							type="number"
+							value={imageSteps}
+						/>
+					</>
+				) : null}
 				{model?.thinking.supported ? (
 					<FormControl sx={{ minWidth: 180 }}>
 						<InputLabel id="chat-thinking-label">Thinking</InputLabel>
@@ -376,6 +562,52 @@ export function ChatPanel(): React.JSX.Element {
 					New chat
 				</Button>
 			</Stack>
+			{loading ? (
+				<Stack data-testid="chat-loading" role="status" spacing={0.5}>
+					<Typography variant="body2">
+						Loading {loading.name}: {loading.message}
+						{loading.progress === null ? "" : ` ${loading.progress.toFixed(0)}%`}
+					</Typography>
+					<LinearProgress
+						aria-label="Model loading"
+						value={loading.progress ?? 0}
+						variant={loading.progress === null ? "indeterminate" : "determinate"}
+					/>
+				</Stack>
+			) : model && !model.loaded ? (
+				<Alert
+					action={
+						<Button color="inherit" onClick={() => void ensureLoaded(model)} size="small">
+							Load
+						</Button>
+					}
+					severity="info"
+				>
+					{model.name} is not loaded.
+				</Alert>
+			) : null}
+			<Dialog onClose={() => setMakeRoom(null)} open={makeRoom !== null}>
+				<DialogTitle>Make room for {makeRoom?.model.name}?</DialogTitle>
+				<DialogContent>
+					<DialogContentText>
+						The device does not have enough free NPU memory. Unload{" "}
+						{makeRoom?.unload.map((other) => other.name).join(", ") || "other models"} first? Apps using them stop.
+					</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => setMakeRoom(null)}>Cancel</Button>
+					<Button
+						onClick={() => {
+							const plan = makeRoom!;
+							setMakeRoom(null);
+							void load(plan.model, plan.unload);
+						}}
+						variant="contained"
+					>
+						Unload and load
+					</Button>
+				</DialogActions>
+			</Dialog>
 			<Card>
 				<CardContent>
 					<Stack spacing={2} sx={{ minHeight: 240 }}>
@@ -439,7 +671,7 @@ export function ChatPanel(): React.JSX.Element {
 			>
 				<Button
 					aria-label={model?.supportsVision ? "Attach images or documents" : "Attach documents"}
-					disabled={busy}
+					disabled={busy || model?.kind === "image"}
 					onClick={() => fileInput.current?.click()}
 					sx={{ flexShrink: 0, minWidth: 0, px: 1.5 }}
 					title={model?.supportsVision ? "Attach images or documents" : "Attach documents"}
@@ -475,7 +707,7 @@ export function ChatPanel(): React.JSX.Element {
 					</Button>
 				) : (
 					<Button
-						disabled={!draft.trim() || !model}
+						disabled={(!draft.trim() && files.attachments.length === 0) || files.uploading.length > 0 || !model?.loaded}
 						startIcon={<PaperPlaneRightIcon />}
 						sx={{ flexShrink: 0 }}
 						type="submit"

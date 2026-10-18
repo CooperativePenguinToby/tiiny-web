@@ -3,6 +3,7 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
+import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import { FileTextIcon } from "@phosphor-icons/react/dist/ssr/FileText";
 
@@ -98,20 +99,38 @@ export function AttachmentChips({
 	);
 }
 
-// Attachments shown in a sent message: images as pictures, documents by name.
-export function MessageAttachments({ attachments }: { attachments: Attachment[] }): React.JSX.Element {
+// Attachments shown in a message: images as pictures (with a download link), documents by name.
+export function MessageAttachments({
+	attachments,
+	align,
+}: {
+	attachments: Attachment[];
+	align: "start" | "end";
+}): React.JSX.Element {
 	const images = attachments.filter((item) => item.kind === "image");
 	const documents = attachments.filter((item) => item.kind === "document");
 	return (
-		<Stack spacing={1} sx={{ mb: 1, alignItems: "flex-end" }}>
+		<Stack spacing={1} sx={{ mb: 1, alignItems: align === "end" ? "flex-end" : "flex-start" }}>
 			{images.map((image) => (
-				<Box
-					alt={image.name}
-					component="img"
-					key={image.mediaId}
-					src={thumbnail(image)}
-					sx={{ maxWidth: 240, maxHeight: 240, borderRadius: 2, objectFit: "contain" }}
-				/>
+				<Stack key={image.mediaId} spacing={0.5} sx={{ alignItems: "inherit" }}>
+					<Box
+						alt={image.name}
+						component="img"
+						onError={(event: React.SyntheticEvent<HTMLImageElement>) => {
+							event.currentTarget.alt = `${image.name} (no longer on the device)`;
+						}}
+						src={thumbnail(image)}
+						sx={{
+							maxWidth: align === "end" ? 240 : 512,
+							maxHeight: align === "end" ? 240 : 512,
+							borderRadius: 2,
+							objectFit: "contain",
+						}}
+					/>
+					<Link download={image.name} href={thumbnail(image)} variant="caption">
+						Download
+					</Link>
+				</Stack>
 			))}
 			{documents.length > 0 ? <AttachmentChips attachments={documents} uploading={[]} /> : null}
 		</Stack>

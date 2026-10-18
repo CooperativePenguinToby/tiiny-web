@@ -25,8 +25,11 @@ import Typography from "@mui/material/Typography";
 import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
 
 import type { DownloadEvent, StoreModel } from "@/types/device";
+import { postJson } from "@/lib/api";
 import { readSse, responseError } from "@/lib/sse";
 import { usePolling } from "@/hooks/use-polling";
+
+import { ModelDetailsDialog } from "./model-details";
 
 interface Progress {
 	modelId: string;
@@ -40,10 +43,11 @@ const STAGE_LABELS: Record<string, string> = {
 	loading_image: "Installing",
 };
 
+// Resolves "paused" when the download was paused (downloading again resumes it).
 async function downloadModel(
 	modelId: string,
 	onProgress: (stage: string, percent: number | null) => void
-): Promise<void> {
+): Promise<"downloaded" | "paused"> {
 	const response = await fetch("/api/store/download", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
@@ -55,7 +59,8 @@ async function downloadModel(
 		if (event === "error" || update.error || update.status === "failed" || update.status === "error") {
 			throw new Error(update.error || update.message || `Device reported ${update.status ?? event}`);
 		}
-		if (update.status === "downloaded" || event === "done") return;
+		if (update.status === "downloaded" || event === "done") return "downloaded";
+		if (update.status === "download_stop") return "paused";
 		onProgress(STAGE_LABELS[update.stage ?? ""] ?? "Starting", update.progress ?? null);
 	}
 	throw new Error("The download stream ended before the model was downloaded");
@@ -64,6 +69,8 @@ async function downloadModel(
 const statusChip = (model: StoreModel): React.JSX.Element => {
 	if (model.status === "running") return <Chip color="success" label="loaded" size="small" />;
 	if (model.status === "downloaded") return <Chip color="info" label="downloaded" size="small" />;
+	if (model.status === "download_stop")
+		return <Chip color="warning" label={`paused ${model.progress.toFixed(0)}%`} size="small" />;
 	if (model.status === "downloading")
 		return <Chip color="warning" label={`downloading ${model.progress.toFixed(0)}%`} size="small" />;
 	return <Chip label="not downloaded" size="small" />;
@@ -75,6 +82,7 @@ export function StoreTable(): React.JSX.Element {
 	const [type, setType] = React.useState<string>("all");
 	const [progress, setProgress] = React.useState<Progress | null>(null);
 	const [outcome, setOutcome] = React.useState<{ severity: "success" | "error"; message: string } | null>(null);
+	const [shown, setShown] = React.useState<StoreModel | null>(null);
 
 	const types = React.useMemo(() => [...new Set((data ?? []).map((model) => model.type))].sort(), [data]);
 	const visible = React.useMemo(() => {
@@ -90,13 +98,45 @@ export function StoreTable(): React.JSX.Element {
 		setOutcome(null);
 		setProgress({ modelId: model.modelId, stage: "Starting", percent: null });
 		try {
-			await downloadModel(model.modelId, (stage, percent) => setProgress({ modelId: model.modelId, stage, percent }));
-			setOutcome({ severity: "success", message: `${model.name} downloaded. Load it from the Models page.` });
+			const result = await downloadModel(model.modelId, (stage, percent) =>
+				setProgress({ modelId: model.modelId, stage, percent })
+			);
+			setOutcome(
+				result === "paused"
+					? { severity: "success", message: `${model.name} paused. Resume it any time.` }
+					: { severity: "success", message: `${model.name} downloaded. Load it from the Models page.` }
+			);
 		} catch (error_) {
 			const reason = error_ instanceof Error ? error_.message : String(error_);
 			setOutcome({ severity: "error", message: `Could not download ${model.name}: ${reason}` });
 		} finally {
 			setProgress(null);
+			await refresh();
+		}
+	};
+
+	const pause = async (model: StoreModel): Promise<void> => {
+		try {
+			await postJson("/api/store/pause", { modelId: model.modelId });
+		} catch (error_) {
+			setOutcome({
+				severity: "error",
+				message: `Could not pause ${model.name}: ${error_ instanceof Error ? error_.message : String(error_)}`,
+			});
+		}
+	};
+
+	const cancel = async (model: StoreModel): Promise<void> => {
+		setOutcome(null);
+		try {
+			await postJson("/api/models/delete", { modelId: model.modelId });
+			setOutcome({ severity: "success", message: `Download of ${model.name} cancelled.` });
+		} catch (error_) {
+			setOutcome({
+				severity: "error",
+				message: `Could not cancel ${model.name}: ${error_ instanceof Error ? error_.message : String(error_)}`,
+			});
+		} finally {
 			await refresh();
 		}
 	};
@@ -175,7 +215,13 @@ export function StoreTable(): React.JSX.Element {
 											<TableRow hover key={model.modelId} data-testid={`store-${model.modelId}`}>
 												<TableCell sx={{ maxWidth: 520 }}>
 													<Typography variant="subtitle2">
-														{model.name}
+														<Button
+															onClick={() => setShown(model)}
+															size="small"
+															sx={{ font: "inherit", minWidth: 0, p: 0, textTransform: "none" }}
+														>
+															{model.name}
+														</Button>
 														{model.trending ? <Chip label="trending" size="small" sx={{ ml: 1 }} /> : null}
 													</Typography>
 													<Typography color="text.secondary" variant="body2">
@@ -211,6 +257,24 @@ export function StoreTable(): React.JSX.Element {
 																value={active.percent ?? 0}
 																variant={active.percent === null ? "indeterminate" : "determinate"}
 															/>
+															<Box>
+																<Button onClick={() => void pause(model)} size="small">
+																	Pause
+																</Button>
+															</Box>
+														</Stack>
+													) : model.status === "download_stop" ? (
+														<Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end" }}>
+															<Button color="error" disabled={progress !== null} onClick={() => void cancel(model)}>
+																Cancel
+															</Button>
+															<Button
+																disabled={progress !== null}
+																onClick={() => void download(model)}
+																variant="contained"
+															>
+																Resume
+															</Button>
 														</Stack>
 													) : model.status === "not_downloaded" ? (
 														<Button
@@ -231,6 +295,7 @@ export function StoreTable(): React.JSX.Element {
 					)}
 				</Card>
 			) : null}
+			<ModelDetailsDialog model={shown} onClose={() => setShown(null)} />
 		</Stack>
 	);
 }

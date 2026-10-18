@@ -23,10 +23,13 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 
-import type { DownloadedModel, LaunchEvent, ModelList } from "@/types/device";
+import type { DownloadedModel, ModelList } from "@/types/device";
+import { postJson } from "@/lib/api";
 import { formatBytes } from "@/lib/format";
-import { readSse, responseError } from "@/lib/sse";
+import { loadModel } from "@/lib/models";
+import { responseError } from "@/lib/sse";
 import { usePolling } from "@/hooks/use-polling";
+import { ConfirmDialog } from "@/components/dashboard/settings/confirm-dialog";
 
 interface Operation {
 	modelId: string;
@@ -38,27 +41,6 @@ interface Operation {
 interface Outcome {
 	severity: "success" | "error";
 	message: string;
-}
-
-async function loadModel(
-	modelId: string,
-	onProgress: (message: string, progress: number | null) => void
-): Promise<void> {
-	const response = await fetch("/api/models/load", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ modelId }),
-	});
-	if (!response.ok) throw new Error(await responseError(response));
-	for await (const { event, data } of readSse(response)) {
-		const update = JSON.parse(data) as LaunchEvent;
-		if (event === "error" || update.startup_error || update.status === "failed" || update.status === "error") {
-			throw new Error(update.startup_error || update.result?.message || `Device reported ${update.status ?? event}`);
-		}
-		const progress = update.progress ?? update.result?.progress ?? null;
-		onProgress(update.startup_message || update.result?.message || update.status || event, progress);
-		if (update.status === "running" && progress === 100) return;
-	}
 }
 
 async function postModel(action: "unload" | "delete", modelId: string): Promise<void> {
@@ -106,6 +88,40 @@ export function ModelsTable(): React.JSX.Element {
 		[refresh]
 	);
 
+	const [confirmUnloadAll, setConfirmUnloadAll] = React.useState(false);
+	const [bulk, setBulk] = React.useState(false);
+
+	const unloadAll = async (): Promise<void> => {
+		setConfirmUnloadAll(false);
+		setBulk(true);
+		setOutcome(null);
+		try {
+			await postJson("/api/models/unload-all");
+			setOutcome({ severity: "success", message: "All models unloaded." });
+		} catch (error_) {
+			setOutcome({
+				severity: "error",
+				message: `Could not unload all models: ${error_ instanceof Error ? error_.message : String(error_)}`,
+			});
+		} finally {
+			setBulk(false);
+			await refresh();
+		}
+	};
+
+	const interrupt = async (model: DownloadedModel): Promise<void> => {
+		setOutcome(null);
+		try {
+			await postJson("/api/models/interrupt", { modelId: model.modelId });
+			setOutcome({ severity: "success", message: `Stopped what ${model.name} was working on.` });
+		} catch (error_) {
+			setOutcome({
+				severity: "error",
+				message: `Could not interrupt ${model.name}: ${error_ instanceof Error ? error_.message : String(error_)}`,
+			});
+		}
+	};
+
 	if (isLoading) {
 		return (
 			<Stack sx={{ alignItems: "center", py: 8 }}>
@@ -124,7 +140,19 @@ export function ModelsTable(): React.JSX.Element {
 			) : null}
 			{data ? (
 				<Card>
-					<CardHeader subheader={`${data.npuAvailablePercent}% of the NPU is free`} title="Downloaded models" />
+					<CardHeader
+						action={
+							<Button
+								color="error"
+								disabled={operation !== null || bulk || !data.models.some((model) => model.status === "running")}
+								onClick={() => setConfirmUnloadAll(true)}
+							>
+								{bulk ? "Unloading…" : "Unload all"}
+							</Button>
+						}
+						subheader={`${data.npuAvailablePercent}% of the NPU is free`}
+						title="Downloaded models"
+					/>
 					<Divider />
 					{data.models.length === 0 ? (
 						<Typography color="text.secondary" sx={{ p: 3 }} variant="body2">
@@ -181,14 +209,23 @@ export function ModelsTable(): React.JSX.Element {
 															/>
 														</Stack>
 													) : running ? (
-														<Button
-															color="error"
-															disabled={operation !== null}
-															onClick={() => setConfirm({ model, kind: "unload" })}
-															variant="outlined"
-														>
-															Unload
-														</Button>
+														<Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end" }}>
+															<Button
+																disabled={operation !== null || bulk}
+																onClick={() => void interrupt(model)}
+																title="Stop the requests this model is working on, from any app"
+															>
+																Interrupt
+															</Button>
+															<Button
+																color="error"
+																disabled={operation !== null || bulk}
+																onClick={() => setConfirm({ model, kind: "unload" })}
+																variant="outlined"
+															>
+																Unload
+															</Button>
+														</Stack>
 													) : (
 														<Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end" }}>
 															<Button
@@ -217,6 +254,14 @@ export function ModelsTable(): React.JSX.Element {
 					)}
 				</Card>
 			) : null}
+			<ConfirmDialog
+				confirmLabel="Unload all"
+				onCancel={() => setConfirmUnloadAll(false)}
+				onConfirm={() => void unloadAll()}
+				open={confirmUnloadAll}
+				text="Every loaded model is released from the NPU. Requests in progress, from this app or other clients, stop."
+				title="Unload all models?"
+			/>
 			<Dialog onClose={() => setConfirm(null)} open={confirm !== null}>
 				<DialogTitle>
 					{confirm?.kind === "delete" ? "Delete" : "Unload"} {confirm?.model.name}?

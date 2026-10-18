@@ -109,21 +109,23 @@ export function deviceBaseUrl(): string {
 // loaded it, so a model someone else loaded stays as it was.
 export const CHAT_MODEL = process.env.E2E_CHAT_MODEL ?? "Qwen/Qwen3.5-9B";
 
-export async function holdChatModel(): Promise<{ name: string; release: () => Promise<void> }> {
+export async function holdModel(modelId: string): Promise<{ name: string; release: () => Promise<void> }> {
 	const running = await runningModelIds();
-	const wasLoaded = running.includes(CHAT_MODEL);
-	if (!wasLoaded) await devicePost(`/api/v1/models/${CHAT_MODEL}/launch/stream`);
-	expect(await runningModelIds()).toContain(CHAT_MODEL);
+	const wasLoaded = running.includes(modelId);
+	if (!wasLoaded) await devicePost(`/api/v1/models/${modelId}/launch/stream`);
+	expect(await runningModelIds()).toContain(modelId);
 	const models = await deviceGet<{ data: { model_id: string; display_name: string }[] }>(
 		"/api/v1/models/?including_downloading=false"
 	);
 	return {
-		name: models.data.find((model) => model.model_id === CHAT_MODEL)!.display_name,
+		name: models.data.find((model) => model.model_id === modelId)!.display_name,
 		release: async () => {
-			if (!wasLoaded) await devicePost(`/api/v1/models/${CHAT_MODEL}/stop`);
+			if (!wasLoaded) await devicePost(`/api/v1/models/${modelId}/stop`);
 		},
 	};
 }
+
+export const holdChatModel = (): Promise<{ name: string; release: () => Promise<void> }> => holdModel(CHAT_MODEL);
 
 // Picks an option of a MUI select by its label.
 export async function selectOption(page: Page, label: string, option: string | RegExp): Promise<void> {
@@ -244,4 +246,48 @@ export function solidPng(width: number, height: number, [red, green, blue]: [num
 		chunk("IDAT", pixels),
 		chunk("IEND", Buffer.alloc(0)),
 	]);
+}
+
+// POSTs JSON straight to the device and reads the whole response (including event streams) as text.
+export async function devicePostJson(pathname: string, body: unknown): Promise<string> {
+	const { baseUrl, authKey } = deviceTarget();
+	const response = await fetch(`${baseUrl}${pathname}`, {
+		method: "POST",
+		headers: { Authorization: `Bearer ${authKey}`, "Content-Type": "application/json" },
+		body: JSON.stringify(body),
+	});
+	expect(response.ok, `device POST ${pathname} -> ${response.status}`).toBe(true);
+	return response.text();
+}
+
+export async function deviceDelete(pathname: string): Promise<void> {
+	const { baseUrl, authKey } = deviceTarget();
+	const response = await fetch(`${baseUrl}${pathname}`, {
+		method: "DELETE",
+		headers: { Authorization: `Bearer ${authKey}` },
+	});
+	expect(response.ok, `device DELETE ${pathname} -> ${response.status}`).toBe(true);
+}
+
+// Monday of the device's current week; the device counts token usage per day in its own time zone.
+export async function deviceWeekStart(): Promise<string> {
+	const context = await deviceCall<{ created_at: string }>("kb", "/kb/user-context");
+	const match = /([+-])(\d{2}):(\d{2})$/.exec(context.created_at);
+	const offset = match ? (match[1] === "-" ? -1 : 1) * (Number(match[2]) * 60 + Number(match[3])) : 0;
+	const local = new Date(Date.now() + offset * 60_000);
+	local.setUTCDate(local.getUTCDate() - ((local.getUTCDay() + 6) % 7));
+	return local.toISOString().slice(0, 10);
+}
+
+// Models the device loads on its own: Vault's embedding model and, if daily summaries are on, the
+// summary model. Checks that a test left the loaded models as it found them ignore these.
+export async function deviceManagedModels(): Promise<string[]> {
+	const summary = await kbCall<{ model_id: string }>("/kb/memory/model");
+	return [EMBEDDING_MODEL, summary.model_id].filter(Boolean);
+}
+
+export async function userLoadedModels(): Promise<string[]> {
+	const managed = new Set(await deviceManagedModels());
+	const running = await runningModelIds();
+	return running.filter((modelId) => !managed.has(modelId));
 }

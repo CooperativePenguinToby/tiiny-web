@@ -25,6 +25,8 @@ test("#7 the agent store lists every agent: web agents to install, desktop agent
 	const cloud = await deviceGet<{ app_id: string; installed: boolean }[]>("/api/services/cloud/apps");
 	await signIn(page);
 	await page.getByRole("link", { name: "Agents" }).click();
+	// The device answers the agent catalogue slowly at times.
+	await expect(page.getByRole("heading", { name: "On this device" })).toBeVisible({ timeout: 60_000 });
 
 	for (const app of cloud.filter((entry) => !entry.installed)) {
 		await expect(page.getByTestId(`store-agent-wa-${app.app_id}`)).toContainText("Install on device");

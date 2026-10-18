@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { devicePost, runningModelIds, signIn } from "./helpers";
+import { devicePost, runningModelIds, signIn, userLoadedModels } from "./helpers";
 
 // Small (7% NPU) model so the test never disturbs models other clients are using. Not the embedding
 // model: the device loads that one by itself for Vault.
@@ -14,7 +14,7 @@ test.afterEach(async () => {
 
 test("#2 + xflow A: load a model from the UI, see it on the dashboard, unload it", async ({ page }) => {
 	expect(await runningModelIds(), `${TEST_MODEL} must not be loaded before the test`).not.toContain(TEST_MODEL);
-	const othersBefore = await runningModelIds();
+	const othersBefore = await userLoadedModels();
 
 	await signIn(page);
 	await page.getByRole("link", { name: "Models" }).click();
@@ -47,5 +47,5 @@ test("#2 + xflow A: load a model from the UI, see it on the dashboard, unload it
 	// The card is there whether or not any model is loaded (the table only when one is).
 	await expect(page.getByText("Loaded models", { exact: true })).toBeVisible();
 	await expect(page.getByTestId(`running-${TEST_MODEL}`)).toHaveCount(0);
-	expect(await runningModelIds()).toEqual(othersBefore);
+	expect(await userLoadedModels()).toEqual(othersBefore);
 });

@@ -1,7 +1,15 @@
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 
-import { CHAT_MODEL, deviceGet, forgetNewConversations, holdChatModel, selectOption, signIn } from "./helpers";
+import {
+	CHAT_MODEL,
+	deviceGet,
+	deviceWeekStart,
+	forgetNewConversations,
+	holdChatModel,
+	selectOption,
+	signIn,
+} from "./helpers";
 
 const conversations = forgetNewConversations();
 test.beforeEach(conversations.before);
@@ -10,21 +18,24 @@ test.afterEach(conversations.after);
 type Week = Record<string, Record<string, { total_tokens: number; request_count: number }>>;
 type Apps = Record<string, { total_tokens: number }>;
 
-const monday = dayjs()
-	.subtract((dayjs().day() + 6) % 7, "day")
-	.format("YYYY-MM-DD");
-const week = (): Promise<Week> => deviceGet<Week>(`/api/v1/statistics/week_usage?start_date=${monday}`);
+const week = async (): Promise<Week> =>
+	deviceGet<Week>(`/api/v1/statistics/week_usage?start_date=${await deviceWeekStart()}`);
 async function appTokens(app: string): Promise<number> {
 	const usage = await apps();
 	return usage[app]?.total_tokens ?? 0;
 }
-const apps = (): Promise<Apps> => deviceGet<Apps>(`/api/v1/statistics/app_week_usage?start_date=${monday}`);
+const apps = async (): Promise<Apps> =>
+	deviceGet<Apps>(`/api/v1/statistics/app_week_usage?start_date=${await deviceWeekStart()}`);
 
 test("#13 the overview shows this week's token usage as the device recorded it", async ({ page }) => {
 	const days = await week();
 	const byApp = await apps();
 	await signIn(page);
 	const card = page.getByTestId("token-usage");
+	// The week the device is in, by its own clock (which may be ahead of this computer's).
+	await expect(card.getByTestId("usage-week")).toHaveText(
+		new RegExp(`^${dayjs(await deviceWeekStart()).format("D MMM")} – `)
+	);
 	for (const date of Object.keys(days)) await expect(card.getByTestId(`usage-day-${date}`)).toBeAttached();
 	await page.screenshot({ path: "test-results/usage-chart.png", fullPage: true });
 

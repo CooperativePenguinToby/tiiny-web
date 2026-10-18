@@ -52,6 +52,11 @@ export interface LaunchEvent {
 export interface ChatModel {
 	modelId: string;
 	name: string;
+	// "image" models (text-to-image) draw a picture from the prompt instead of replying.
+	kind: "chat" | "image";
+	// Downloaded but not loaded models are listed too; choosing one in chat loads it.
+	loaded: boolean;
+	npuUsage: number;
 	activeRequests: number;
 	supportsVision: boolean;
 	thinking: { supported: boolean; toggleable: boolean; levels: string[]; defaultLevel: string | null };
@@ -84,6 +89,18 @@ export interface StoreModel {
 	likes: number;
 	downloads: number;
 	trending: boolean;
+	details: ModelDetails;
+}
+
+// What the store says about a model beyond its listing, as TiinyOS shows on its model details page.
+export interface ModelDetails {
+	input: string;
+	output: string;
+	contextWindow: number | null;
+	recommendRank: number | null;
+	image: { size: string; steps: number | null; guidanceScale: string | null } | null;
+	thinking: { supported: boolean; toggleable: boolean; levels: string[]; defaultLevel: string | null };
+	loadSeconds: number | null;
 }
 
 // One parsed event from the device's model download stream, as forwarded to the browser.
@@ -157,12 +174,17 @@ export interface Agent {
 	recommendedModels: string[];
 	downloads: AgentDownload[];
 	cloudVersion: string | null;
+	// While the agent is being installed: whether the download runs or is paused, and how far it got.
+	install: { state: "running" | "paused"; percent: number } | null;
 	service: {
 		id: string;
 		status: string;
 		version: string | null;
 		port: number | null;
 		proxy: { listening: boolean; error: string | null } | null;
+		// A newer version from the agent store, if the device reports one.
+		update: { latestVersion: string } | null;
+		usage: { cpuPercent: number; memoryBytes: number } | null;
 	} | null;
 }
 
@@ -246,6 +268,8 @@ export interface TokenCounts {
 // Token usage the device recorded for one week (Monday first), per day × model and per app.
 export interface WeekUsage {
 	weekStart: string;
+	// Monday of the device's current week (the device counts days in its own time zone).
+	currentWeekStart: string;
 	days: { date: string; models: Record<string, TokenCounts> }[];
 	apps: { app: string; totalTokens: number; models: Record<string, number> }[];
 }
@@ -336,6 +360,71 @@ export interface TurnToSave {
 	modelId: string;
 	user: string;
 	attachments?: Attachment[];
-	assistant: { content: string; reasoning?: string; thinkingMs?: number; stopped: boolean };
+	assistant: { content: string; reasoning?: string; thinkingMs?: number; stopped: boolean; attachments?: Attachment[] };
 	usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
+}
+
+// Sizes the device's image models accept (width × height); all are multiples of 16 within its pixel limit.
+export const IMAGE_SIZES = [
+	"512x512",
+	"768x432",
+	"432x768",
+	"768x480",
+	"480x768",
+	"640x480",
+	"480x640",
+	"1024x1024",
+	"1280x960",
+	"960x1280",
+	"1536x864",
+	"864x1536",
+	"1536x960",
+	"960x1536",
+] as const;
+
+// One parsed event from the device's image stream, as forwarded to the browser.
+export interface ImageEvent {
+	status?: string;
+	step?: number;
+	total_steps?: number;
+	progress?: number;
+	image?: string;
+	error?: string;
+	message?: string;
+}
+
+// A connector of the device (it lets models act on an outside service in Task mode).
+export interface Connector {
+	key: ConnectorKey;
+	name: string;
+	category: "email" | "calendar" | "messaging";
+	connected: boolean;
+	// Account or bot name once connected, or the device's explanation otherwise.
+	detail: string;
+}
+
+export type ConnectorKey =
+	| "gmail"
+	| "google-calendar"
+	| "outlook-mail"
+	| "outlook-calendar"
+	| "email"
+	| "telegram"
+	| "discord"
+	| "x"
+	| "whatsapp";
+
+export interface McpServer {
+	id: string;
+	name: string;
+	transport: string;
+	target: string;
+	enabled: boolean;
+	connected: boolean | null;
+	detail: string;
+}
+
+export interface McpTool {
+	name: string;
+	description: string;
 }

@@ -73,6 +73,8 @@ test("#18 an attached document is read by the device and the answer uses it", as
 		await expect(page.getByTestId("attachments").getByText("inventory.md", { exact: true })).toBeVisible({
 			timeout: 30_000,
 		});
+		// An attachment alone is enough to send.
+		await expect(page.getByRole("button", { name: "Send" })).toBeEnabled();
 		const reply = await sendAndWait(
 			page,
 			"How many crates of cloudberries does the warehouse hold? Answer with the number only."

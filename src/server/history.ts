@@ -172,6 +172,12 @@ export async function saveTurn(turn: TurnToSave): Promise<string> {
 		content_text: content,
 		...extra,
 	});
+	const attachmentBlock = (messageId: string, item: Attachment, position: number) =>
+		item.kind === "image"
+			? block(messageId, "image", position, "", {
+					metadata_json: { media_id: item.mediaId, url: item.url, name: item.name, mime_type: item.mimeType },
+				})
+			: block(messageId, "file", position, item.text, { metadata_json: { name: item.name } });
 	const reasoning = turn.assistant.reasoning?.trim();
 	await history("/turns/insert", {
 		method: "POST",
@@ -194,17 +200,12 @@ export async function saveTurn(turn: TurnToSave): Promise<string> {
 			],
 			blocks: [
 				block(userId, "main_text", 1, turn.user),
-				...(turn.attachments ?? []).map((item, index) =>
-					item.kind === "image"
-						? block(userId, "image", index + 2, "", {
-								metadata_json: { media_id: item.mediaId, url: item.url, name: item.name, mime_type: item.mimeType },
-							})
-						: block(userId, "file", index + 2, item.text, { metadata_json: { name: item.name } })
-				),
+				...(turn.attachments ?? []).map((item, index) => attachmentBlock(userId, item, index + 2)),
 				...(reasoning
 					? [block(replyId, "thinking", 1, reasoning, { thinking_millsec: turn.assistant.thinkingMs ?? null })]
 					: []),
 				block(replyId, "main_text", reasoning ? 2 : 1, turn.assistant.content),
+				...(turn.assistant.attachments ?? []).map((item, index) => attachmentBlock(replyId, item, index + 3)),
 			],
 			files: [],
 			block_file_refs: [],

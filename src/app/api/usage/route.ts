@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { DeviceError, deviceJson } from "@/server/device";
+import { deviceWeekStart } from "@/server/device-clock";
 import { apiRoute } from "@/server/route";
 
 import type { WeekUsage } from "@/types/device";
@@ -10,9 +11,11 @@ type DeviceWeek = Record<
 >;
 type DeviceApps = Record<string, { total_tokens: number; models: Record<string, number> }>;
 
-// GET ?week=YYYY-MM-DD (a Monday). The device counts tokens of text-generation models only.
+// GET [?week=YYYY-MM-DD, a Monday; default the device's current week]. The device counts tokens of
+// text-generation models only.
 export const GET = apiRoute(async (request) => {
-	const week = new URL(request.url).searchParams.get("week") ?? "";
+	const currentWeekStart = await deviceWeekStart();
+	const week = new URL(request.url).searchParams.get("week") ?? currentWeekStart;
 	if (!/^\d{4}-\d{2}-\d{2}$/.test(week)) throw new DeviceError("week must be a date like 2026-10-12", 400);
 	const query = `start_date=${week}`;
 	const [days, apps] = await Promise.all([
@@ -21,6 +24,7 @@ export const GET = apiRoute(async (request) => {
 	]);
 	const body: WeekUsage = {
 		weekStart: week,
+		currentWeekStart,
 		days: Object.entries(days)
 			.sort(([a], [b]) => a.localeCompare(b))
 			.map(([date, models]) => ({

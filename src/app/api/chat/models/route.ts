@@ -5,32 +5,47 @@ import { apiRoute } from "@/server/route";
 
 import type { ChatModel } from "@/types/device";
 
-interface OpenAiModel {
-	id: string;
-	supports_chat: boolean;
-	supports_vision?: boolean;
+interface DownloadedModel {
+	model_id: string;
+	display_name: string;
+	type: string;
+	status: string;
+	input?: string;
+	npu_usage: number;
 	thinking?: { supported: boolean; toggleable: boolean; levels: string[]; default_level: string | null };
 }
 
+const CHAT_TYPES = new Set(["Text Generation", "Image-Text-to-Text"]);
+const IMAGE_TYPES = new Set(["Text-to-Image"]);
+
+// Every downloaded model chat can use: text models reply, text-to-image models draw. Loaded ones first.
 export const GET = apiRoute(async () => {
-	const [models, running] = await Promise.all([
-		deviceJson<{ data: OpenAiModel[] }>("/v1/models"),
+	const [downloaded, running] = await Promise.all([
+		deviceJson<{ data: DownloadedModel[] }>("/api/v1/models/?including_downloading=false"),
 		deviceJson<RunningModels>("/api/v1/models/running"),
 	]);
 	const instances = new Map(running.instances.running.map((instance) => [instance.model_id, instance]));
-	const body: ChatModel[] = models.data
-		.filter((model) => model.supports_chat)
-		.map((model) => ({
-			modelId: model.id,
-			name: instances.get(model.id)?.display_name ?? model.id,
-			activeRequests: instances.get(model.id)?.active_request_count ?? 0,
-			supportsVision: model.supports_vision ?? false,
-			thinking: {
-				supported: model.thinking?.supported ?? false,
-				toggleable: model.thinking?.toggleable ?? false,
-				levels: model.thinking?.levels ?? [],
-				defaultLevel: model.thinking?.default_level ?? null,
-			},
-		}));
+	const body: ChatModel[] = downloaded.data
+		.filter((model) => CHAT_TYPES.has(model.type) || IMAGE_TYPES.has(model.type))
+		.map((model) => {
+			const kind = IMAGE_TYPES.has(model.type) ? "image" : "chat";
+			const instance = instances.get(model.model_id);
+			return {
+				modelId: model.model_id,
+				name: model.display_name,
+				kind,
+				loaded: instance?.status === "running",
+				npuUsage: model.npu_usage,
+				activeRequests: instance?.active_request_count ?? 0,
+				supportsVision: kind === "chat" && (model.input ?? "").split(",").includes("Image"),
+				thinking: {
+					supported: kind === "chat" && (model.thinking?.supported ?? false),
+					toggleable: model.thinking?.toggleable ?? false,
+					levels: model.thinking?.levels ?? [],
+					defaultLevel: model.thinking?.default_level ?? null,
+				},
+			} satisfies ChatModel;
+		})
+		.sort((a, b) => Number(b.loaded) - Number(a.loaded));
 	return NextResponse.json(body);
 });

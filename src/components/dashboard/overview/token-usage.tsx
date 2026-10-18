@@ -153,17 +153,23 @@ function WeekTable({ usage }: { usage: WeekUsage }): React.JSX.Element {
 }
 
 export function TokenUsage(): React.JSX.Element {
-	const [week, setWeek] = React.useState(() => mondayOf(dayjs()));
+	// null: the device's current week (it counts days in its own time zone).
+	const [chosen, setChosen] = React.useState<dayjs.Dayjs | null>(null);
 	const [asTable, setAsTable] = React.useState(false);
-	const { data, error, isLoading } = usePolling<WeekUsage>(`/api/usage?week=${week.format("YYYY-MM-DD")}`, 30_000);
-	const usage = data?.weekStart === week.format("YYYY-MM-DD") ? data : null;
+	const { data, error, isLoading } = usePolling<WeekUsage>(
+		chosen ? `/api/usage?week=${chosen.format("YYYY-MM-DD")}` : "/api/usage",
+		30_000
+	);
+	const usage = data && (chosen === null || data.weekStart === chosen.format("YYYY-MM-DD")) ? data : null;
+	const week = chosen ?? dayjs(usage?.weekStart ?? mondayOf(dayjs()).format("YYYY-MM-DD"));
+	const setWeek = (next: dayjs.Dayjs): void => setChosen(next);
 	const weekTokens = usage
 		? usage.days.reduce((sum, day) => sum + dayTotal(day.models, Object.keys(day.models)), 0)
 		: 0;
 	const weekRequests = usage
 		? usage.days.reduce((sum, day) => sum + Object.values(day.models).reduce((s, c) => s + c.requests, 0), 0)
 		: 0;
-	const isCurrentWeek = week.isSame(mondayOf(dayjs()), "day");
+	const isCurrentWeek = usage ? usage.weekStart === usage.currentWeekStart : chosen === null;
 
 	return (
 		<Grid container spacing={3}>

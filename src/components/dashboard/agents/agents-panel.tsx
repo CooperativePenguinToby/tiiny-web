@@ -29,6 +29,8 @@ interface Busy {
 	appId: string;
 	message: string;
 	percent: number | null;
+	// Installs can be paused from the progress bar.
+	installing?: boolean;
 }
 
 async function post(path: string, body: Record<string, string>): Promise<void> {
@@ -40,25 +42,48 @@ async function post(path: string, body: Record<string, string>): Promise<void> {
 	if (!response.ok) throw new Error(await responseError(response));
 }
 
+// Installs (or, with resume, continues installing) an agent; resolves "paused" if the install was paused.
 async function installAgent(
 	appId: string,
-	onProgress: (message: string, percent: number | null) => void
-): Promise<void> {
-	const response = await fetch("/api/agents/install", {
+	onProgress: (message: string, percent: number | null) => void,
+	resume = false
+): Promise<"done" | "paused"> {
+	const response = await fetch(resume ? "/api/agents/install/resume" : "/api/agents/install", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ appId }),
 	});
+	return followAgentStream(response, onProgress);
+}
+
+// Follows the device's install or update stream until it reports completion.
+async function followAgentStream(
+	response: Response,
+	onProgress: (message: string, percent: number | null) => void
+): Promise<"done" | "paused"> {
 	if (!response.ok) throw new Error(await responseError(response));
 	for await (const { event, data } of readSse(response)) {
 		const update = JSON.parse(data) as AgentEvent;
 		const failure =
 			typeof update.error === "string" ? update.error : (update.error?.message ?? (event === "error" ? data : null));
-		if (failure || update.status === "failed" || update.status === "error")
-			throw new Error(failure ?? "Install failed");
-		if (update.status === "completed" || event === "done") return;
-		onProgress(update.message || update.phase || update.status || "Installing", update.overall_progress ?? null);
+		if (failure || update.status === "failed" || update.status === "error") throw new Error(failure ?? "Failed");
+		if (update.status === "completed" || event === "done") return "done";
+		if (event === "paused") return "paused";
+		onProgress(update.message || update.phase || update.status || "Working", update.overall_progress ?? null);
 	}
+	return "done";
+}
+
+async function updateAgent(
+	serviceId: string,
+	onProgress: (message: string, percent: number | null) => void
+): Promise<void> {
+	const response = await fetch("/api/agents/update", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ serviceId }),
+	});
+	await followAgentStream(response, onProgress);
 }
 
 const STATUS_COLORS: Record<string, "success" | "warning" | "error"> = {
@@ -93,12 +118,19 @@ export function AgentsPanel(): React.JSX.Element {
 	const [outcome, setOutcome] = React.useState<{ severity: "success" | "error"; message: string } | null>(null);
 	const [confirmDelete, setConfirmDelete] = React.useState<Agent | null>(null);
 
-	const run = async (agent: Agent, label: string, action: () => Promise<void>, done: string): Promise<void> => {
+	// `action` may resolve "paused" (an install that was paused), reported instead of `done`.
+	const run = async (
+		agent: Agent,
+		label: string,
+		action: () => Promise<unknown>,
+		done: string,
+		installing = false
+	): Promise<void> => {
 		setOutcome(null);
-		setBusy({ appId: agent.appId, message: label, percent: null });
+		setBusy({ appId: agent.appId, message: label, percent: null, installing });
 		try {
-			await action();
-			setOutcome({ severity: "success", message: `${agent.name} ${done}.` });
+			const result = await action();
+			setOutcome({ severity: "success", message: `${agent.name} ${result === "paused" ? "install paused" : done}.` });
 		} catch (error_) {
 			setOutcome({
 				severity: "error",
@@ -123,6 +155,55 @@ export function AgentsPanel(): React.JSX.Element {
 	const installable = agents.filter((agent) => agent.kind === "web" && !agent.service && agent.cloudVersion);
 	const desktop = agents.filter((agent) => agent.kind === "desktop");
 
+	const pauseInstall = async (agent: Agent): Promise<void> => {
+		try {
+			await post("/api/agents/install/pause", { appId: agent.appId });
+		} catch (error_) {
+			setOutcome({
+				severity: "error",
+				message: `${agent.name}: ${error_ instanceof Error ? error_.message : String(error_)}`,
+			});
+		}
+	};
+
+	const install = (agent: Agent, resume: boolean): Promise<void> =>
+		run(
+			agent,
+			resume ? "Resuming install…" : "Starting install…",
+			() =>
+				installAgent(
+					agent.appId,
+					(message, percent) => setBusy({ appId: agent.appId, message, percent, installing: true }),
+					resume
+				),
+			"installed",
+			true
+		);
+
+	// An install in progress or paused: progress with Pause, or Resume and Cancel.
+	const installState = (agent: Agent, state: NonNullable<Agent["install"]>): React.JSX.Element => (
+		<Stack spacing={1} sx={{ width: "100%" }}>
+			<Typography color="text.secondary" role="status" variant="caption">
+				{state.state === "paused" ? "Install paused at" : "Installing"} {state.percent.toFixed(0)}%
+			</Typography>
+			<LinearProgress aria-label={`${agent.name} install`} value={state.percent} variant="determinate" />
+			<Stack direction="row" spacing={1}>
+				{state.state === "paused" ? (
+					<Button disabled={busy !== null} onClick={() => void install(agent, true)} variant="contained">
+						Resume
+					</Button>
+				) : (
+					<Button disabled={busy !== null} onClick={() => void pauseInstall(agent)}>
+						Pause
+					</Button>
+				)}
+				<Button color="error" disabled={busy !== null} onClick={() => setConfirmDelete(agent)}>
+					Cancel install
+				</Button>
+			</Stack>
+		</Stack>
+	);
+
 	const progress = (agent: Agent): React.JSX.Element | null =>
 		busy?.appId === agent.appId ? (
 			<Stack spacing={0.5} sx={{ width: "100%" }}>
@@ -135,6 +216,13 @@ export function AgentsPanel(): React.JSX.Element {
 					value={busy.percent ?? 0}
 					variant={busy.percent === null ? "indeterminate" : "determinate"}
 				/>
+				{busy.installing ? (
+					<Stack direction="row">
+						<Button onClick={() => void pauseInstall(agent)} size="small">
+							Pause
+						</Button>
+					</Stack>
+				) : null}
 			</Stack>
 		) : null;
 
@@ -179,10 +267,14 @@ export function AgentsPanel(): React.JSX.Element {
 													</Typography>
 													<Typography color="text.secondary" variant="caption">
 														Version {service.version ?? "unknown"}
-														{agent.cloudVersion && service.version && agent.cloudVersion !== service.version
-															? ` · ${agent.cloudVersion} available`
-															: ""}
+														{service.update ? ` · ${service.update.latestVersion} available` : ""}
 													</Typography>
+													{service.usage && running ? (
+														<Typography color="text.secondary" data-testid="agent-usage" variant="caption">
+															CPU {service.usage.cpuPercent.toFixed(1)}% · memory{" "}
+															{formatBytes(service.usage.memoryBytes)}
+														</Typography>
+													) : null}
 													<RecommendedModels agent={agent} />
 													{service.status === "error" ? (
 														<Typography color="error" variant="caption">
@@ -199,8 +291,27 @@ export function AgentsPanel(): React.JSX.Element {
 											</Stack>
 										</CardContent>
 										<CardActions sx={{ flexWrap: "wrap", gap: 1, px: 2, pb: 2 }}>
-											{progress(agent) ?? (
+											{progress(agent) ?? (agent.install ? installState(agent, agent.install) : null) ?? (
 												<React.Fragment>
+													{service.update ? (
+														<Button
+															disabled={busy !== null}
+															onClick={() =>
+																void run(
+																	agent,
+																	"Updating…",
+																	() =>
+																		updateAgent(service.id, (message, percent) =>
+																			setBusy({ appId: agent.appId, message, percent })
+																		),
+																	`updated to ${service.update!.latestVersion}`
+																)
+															}
+															variant="outlined"
+														>
+															Update
+														</Button>
+													) : null}
 													{canOpen ? (
 														<Button
 															component="a"
@@ -284,22 +395,8 @@ export function AgentsPanel(): React.JSX.Element {
 										</Stack>
 									</CardContent>
 									<CardActions sx={{ px: 2, pb: 2 }}>
-										{progress(agent) ?? (
-											<Button
-												disabled={busy !== null}
-												onClick={() =>
-													void run(
-														agent,
-														"Starting install…",
-														() =>
-															installAgent(agent.appId, (message, percent) =>
-																setBusy({ appId: agent.appId, message, percent })
-															),
-														"installed"
-													)
-												}
-												variant="contained"
-											>
+										{progress(agent) ?? (agent.install ? installState(agent, agent.install) : null) ?? (
+											<Button disabled={busy !== null} onClick={() => void install(agent, false)} variant="contained">
 												Install on device
 											</Button>
 										)}
@@ -373,13 +470,10 @@ export function AgentsPanel(): React.JSX.Element {
 						onClick={() => {
 							const agent = confirmDelete;
 							setConfirmDelete(null);
-							if (agent?.service) {
-								void run(
-									agent,
-									"Deleting…",
-									() => post("/api/agents/delete", { serviceId: agent.service!.id }),
-									"deleted"
-								);
+							if (agent) {
+								// An install paused before the device listed the agent is removed by its store id.
+								const serviceId = agent.service?.id ?? agent.appId.replace(/^wa-/, "");
+								void run(agent, "Deleting…", () => post("/api/agents/delete", { serviceId }), "deleted");
 							}
 						}}
 						variant="contained"

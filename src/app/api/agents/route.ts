@@ -33,20 +33,62 @@ interface Service {
 	ports?: { host_port: number; protocol: string }[];
 }
 
+interface UpdateCheck {
+	service_id: string;
+	latest_version: string;
+	update_available: boolean;
+}
+interface ResourceUsage {
+	service_id: string;
+	total_cpu_percent: number;
+	total_memory_usage_bytes: number;
+}
+
 type ProxyStates = Map<number, { listening: boolean; error: string | null }>;
 
 // Store web agents are named `wa-<cloud app id>`.
 const cloudId = (appId: string): string => appId.replace(/^wa-/, "");
 
 export const GET = apiRoute(async () => {
-	const [catalog, cloud, services] = await Promise.all([
+	const [catalog, cloud, services, updates, usage] = await Promise.all([
 		deviceJson<{ app: CatalogApp[] }>("/api/services/apps/metadata"),
 		deviceJson<CloudApp[]>("/api/services/cloud/apps"),
 		deviceJson<Service[]>("/api/services"),
+		// Both are extras: the list still loads if the device cannot answer them.
+		deviceJson<UpdateCheck[]>("/api/services/updates/check", { service: "agents" }).catch(() => []),
+		deviceJson<ResourceUsage[]>("/api/services/resource-usage", { service: "agents" }).catch(() => []),
 	]);
+	const updateById = new Map(updates.map((entry) => [entry.service_id, entry]));
+	const usageById = new Map(usage.map((entry) => [entry.service_id, entry]));
 	const proxies = (globalThis as { tiinyAgentProxies?: ProxyStates }).tiinyAgentProxies;
 	const cloudById = new Map(cloud.map((app) => [app.app_id, app]));
 	const serviceById = new Map(services.map((service) => [service.id, service]));
+
+	// An install's progress, and whether it is paused, is only in the download status. A very early pause
+	// can stop an install before the device lists the agent at all, so every web agent is asked.
+	const webApps = catalog.app.filter(
+		(app) => !app.coming_soon && app.platforms.some((platform) => platform.name === "web")
+	);
+	const installs = new Map(
+		await Promise.all(
+			webApps.map(async (app) => {
+				const status = await deviceJson<{ status: string; overall_progress: number }>(
+					`/api/services/download/${encodeURIComponent(cloudId(app.app_id))}/status`,
+					{ service: "agents" }
+				).catch(() => null);
+				const active = status && (status.status === "running" || status.status === "paused");
+				return [
+					app.app_id,
+					active
+						? {
+								state: status.status === "paused" ? ("paused" as const) : ("running" as const),
+								percent: status.overall_progress,
+							}
+						: null,
+				] as const;
+			})
+		)
+	);
 
 	const agents: Agent[] = await Promise.all(
 		catalog.app
@@ -75,6 +117,7 @@ export const GET = apiRoute(async () => {
 									sha256: platform.sha256sum ?? "",
 								})),
 					cloudVersion: cloudApp?.version ?? null,
+					install: installs.get(app.app_id) ?? null,
 					service: service
 						? {
 								id: service.id,
@@ -82,6 +125,15 @@ export const GET = apiRoute(async () => {
 								version: service.cloud_version,
 								port,
 								proxy: port === null ? null : (proxies?.get(port) ?? null),
+								update: updateById.get(service.id)?.update_available
+									? { latestVersion: updateById.get(service.id)!.latest_version }
+									: null,
+								usage: usageById.has(service.id)
+									? {
+											cpuPercent: usageById.get(service.id)!.total_cpu_percent,
+											memoryBytes: usageById.get(service.id)!.total_memory_usage_bytes,
+										}
+									: null,
 							}
 						: null,
 				};
