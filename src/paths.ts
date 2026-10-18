@@ -8,6 +8,7 @@ export const paths = {
 		huggingFace: "/dashboard/hugging-face",
 		agents: "/dashboard/agents",
 		chat: "/dashboard/chat",
+		vault: "/dashboard/vault",
 		settings: "/dashboard/settings",
 	},
 } as const;

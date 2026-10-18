@@ -128,3 +128,32 @@ export async function selectOption(page: Page, label: string, option: string | R
 	await page.getByRole("combobox", { name: label }).click();
 	await page.getByRole("option", { name: option, exact: typeof option === "string" }).click();
 }
+
+// Vault wants the device serial alongside the key.
+export async function kbCall<T>(pathname: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
+	const { device_id: serial } = await deviceCall<{ device_id: string }>("auth", "/api/v1/connect", {
+		method: "POST",
+		body: {},
+	});
+	return deviceCall<T>("kb", pathname, { ...init, headers: { "X-Device-Id": serial } });
+}
+
+export interface VaultSource {
+	source_id: string;
+	filename: string;
+	finalized: boolean;
+	size_bytes: number;
+}
+
+export async function vaultFiles(): Promise<VaultSource[]> {
+	const list = await kbCall<{ items: VaultSource[] }>("/kb/sources/files?limit=100&offset=0");
+	return list.items;
+}
+
+// Indexing loads the device's embedding model; tests unload it again if they caused the load.
+export const EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B";
+
+export async function isRunning(modelId: string): Promise<boolean> {
+	const running = await runningModelIds();
+	return running.includes(modelId);
+}

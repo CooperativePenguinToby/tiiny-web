@@ -2,8 +2,9 @@ import { expect, test } from "@playwright/test";
 
 import { devicePost, runningModelIds, signIn } from "./helpers";
 
-// Small (1% NPU) model so the test never disturbs models other clients are using.
-const TEST_MODEL = process.env.E2E_TEST_MODEL ?? "Qwen/Qwen3-Embedding-0.6B";
+// Small (7% NPU) model so the test never disturbs models other clients are using. Not the embedding
+// model: the device loads that one by itself for Vault.
+const TEST_MODEL = process.env.E2E_TEST_MODEL ?? "Qwen/Qwen3-ASR-1.7B";
 
 // A failed run must not leave the test model loaded for the next one.
 test.afterEach(async () => {

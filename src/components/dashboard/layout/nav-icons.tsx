@@ -6,6 +6,7 @@ import { DownloadSimpleIcon } from "@phosphor-icons/react/dist/ssr/DownloadSimpl
 import { GearSixIcon } from "@phosphor-icons/react/dist/ssr/GearSix";
 import { RobotIcon } from "@phosphor-icons/react/dist/ssr/Robot";
 import { StorefrontIcon } from "@phosphor-icons/react/dist/ssr/Storefront";
+import { VaultIcon } from "@phosphor-icons/react/dist/ssr/Vault";
 
 export const navIcons = {
 	"chart-pie": ChartPieIcon,
@@ -15,4 +16,5 @@ export const navIcons = {
 	"gear-six": GearSixIcon,
 	robot: RobotIcon,
 	storefront: StorefrontIcon,
+	vault: VaultIcon,
 } as Record<string, Icon>;

@@ -249,3 +249,37 @@ export interface Personalization {
 	preferences: string;
 	recentFocus: string;
 }
+
+export interface VaultFile {
+	sourceId: string;
+	filename: string;
+	sizeBytes: number;
+	addedAt: string;
+	indexed: boolean;
+	// The device's own vectorize status ("success", "failed"…) and error, if any.
+	indexStatus: string | null;
+	indexError: string | null;
+	chunks: number;
+}
+
+export interface VaultSearchResult {
+	entryId: string;
+	source: string;
+	content: string;
+	timestamp: string;
+}
+
+// One parsed event from the device's upload or indexing stream, as forwarded to the browser.
+export interface VaultEvent {
+	source_id?: string;
+	filename?: string | null;
+	stage?: string;
+	message?: string;
+	progress_percent?: number;
+	processed_chunks?: number;
+	total_chunks?: number;
+	success?: boolean;
+	finalized?: boolean;
+	error?: string;
+	error_type?: string;
+}
