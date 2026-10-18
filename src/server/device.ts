@@ -90,6 +90,8 @@ export interface DeviceRequest {
 	body?: unknown;
 	/** Multipart body; mutually exclusive with `body`. */
 	form?: FormData;
+	/** A body sent as is (its Content-Type goes in `headers`). */
+	raw?: Buffer;
 	signal?: AbortSignal;
 	stream?: boolean;
 	slow?: boolean;
@@ -109,7 +111,7 @@ async function request(pathname: string, init: DeviceRequest = {}): Promise<Resp
 				...(init.body === undefined ? {} : { "Content-Type": "application/json" }),
 				...init.headers,
 			},
-			body: init.form ?? (init.body === undefined ? undefined : JSON.stringify(init.body)),
+			body: init.raw ?? init.form ?? (init.body === undefined ? undefined : JSON.stringify(init.body)),
 			signal: init.signal,
 			dispatcher: init.stream ? streamAgent : init.slow ? slowAgent : requestAgent,
 		})) as unknown as Response;

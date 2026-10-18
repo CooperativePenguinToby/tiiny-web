@@ -327,8 +327,11 @@ export interface MemorySettings {
 	// What the device reports; it summarises only while a model is chosen.
 	enabled: boolean;
 	modelId: string;
+	// In the device's own time zone.
 	startHour: number;
 	startMinute: number;
+	// The device clock's UTC offset in minutes, to show the time in the user's zone.
+	deviceOffsetMinutes: number;
 	// Downloaded text-generation models that can write the summaries.
 	models: { modelId: string; name: string }[];
 }
@@ -474,4 +477,29 @@ export interface BenchResult {
 	totalMs: number;
 	// Generated tokens per second after the first token.
 	tokensPerSecond: number;
+}
+
+// A category of data the device can back up and restore (chat history, Vault…).
+export interface BackupCategory {
+	service: string;
+	name: string;
+	ready: boolean;
+	sizeBytes: number;
+	warnings: string[];
+}
+
+export interface BackupArchive {
+	categories: { service: string; name: string }[];
+	deviceId: string | null;
+	// Backups restore only onto the device that made them.
+	sameDevice: boolean;
+}
+
+// One event of the device's restore stream.
+export interface RestoreEvent {
+	service?: string;
+	code?: string;
+	message?: string;
+	warnings?: string[];
+	status?: string;
 }
