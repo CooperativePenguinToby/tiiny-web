@@ -43,7 +43,8 @@ test("#2 + xflow A: load a model from the UI, see it on the dashboard, unload it
 	expect(await runningModelIds()).not.toContain(TEST_MODEL);
 
 	await page.getByRole("link", { name: "Overview" }).click();
-	await expect(page.getByRole("table", { name: "Loaded models" })).toBeVisible();
+	// The card is there whether or not any model is loaded (the table only when one is).
+	await expect(page.getByText("Loaded models", { exact: true })).toBeVisible();
 	await expect(page.getByTestId(`running-${TEST_MODEL}`)).toHaveCount(0);
 	expect(await runningModelIds()).toEqual(othersBefore);
 });

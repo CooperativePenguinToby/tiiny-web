@@ -215,3 +215,15 @@ export type WifiAction =
 	| { action: "connect"; ssid: string; password?: string }
 	| { action: "forget"; ssid: string }
 	| { action: "radio"; enabled: boolean };
+
+export interface SystemUpdate {
+	currentVersion: string;
+	availableVersion: string;
+	updateAvailable: boolean;
+	required: boolean;
+	notes: string;
+	// Upgrade state on the device: idle, downloading, preparing, prepared, installing, rebooting, success, failed…
+	state: string;
+	progress: number;
+	error: string | null;
+}

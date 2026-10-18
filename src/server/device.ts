@@ -60,7 +60,8 @@ async function deviceErrorFrom(response: Response): Promise<DeviceError> {
 			(typeof body.error === "string" ? body.error : (body.error as { message?: string } | undefined)?.message) ??
 			text;
 	} catch {
-		// not JSON; keep the raw text
+		// Not JSON. The gateway answers with an HTML page while a service is down (e.g. during a restart).
+		if (/^\s*</.test(text)) message = response.statusText || "the service is unavailable";
 	}
 	return new DeviceError(`Device responded ${response.status}: ${message || response.statusText}`, response.status);
 }

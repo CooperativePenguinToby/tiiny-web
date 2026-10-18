@@ -32,7 +32,8 @@ test("whole app + xflow B: sign in, dashboard, load a chat model, chat with it, 
 	expect(target!.npu_usage, "model must fit in the free NPU share").toBeLessThanOrEqual(npu_available);
 
 	await signIn(page);
-	await expect(page.getByRole("table", { name: "Loaded models" })).toBeVisible();
+	// The card is there whether or not any model is loaded (the table only when one is).
+	await expect(page.getByText("Loaded models", { exact: true })).toBeVisible();
 	await expect(page.getByTestId(`running-${LOAD_MODEL}`)).toHaveCount(0);
 	await page.getByRole("link", { name: "Models" }).click();
 	const row = page.getByTestId(`model-${LOAD_MODEL}`);
@@ -59,7 +60,8 @@ test("whole app + xflow B: sign in, dashboard, load a chat model, chat with it, 
 	}
 	expect(await runningModelIds()).toEqual(before);
 	await page.getByRole("link", { name: "Overview" }).click();
-	await expect(page.getByRole("table", { name: "Loaded models" })).toBeVisible();
+	// The card is there whether or not any model is loaded (the table only when one is).
+	await expect(page.getByText("Loaded models", { exact: true })).toBeVisible();
 	await expect(page.getByTestId(`running-${LOAD_MODEL}`)).toHaveCount(0);
 	await page.screenshot({ path: "test-results/whole-app-final.png", fullPage: true });
 });
