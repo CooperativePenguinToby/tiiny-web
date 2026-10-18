@@ -2,8 +2,10 @@ import { expect, test } from "@playwright/test";
 
 import { deviceGet, signIn } from "./helpers";
 
-// Installed web agents on the test device: one only on the device's loopback, one on its LAN address.
-const LOOPBACK_AGENT = process.env.E2E_LOOPBACK_AGENT ?? "openwebui";
+// Installed web agents on the test device. Open WebUI listens only on the device's loopback and is
+// reached through the device gateway's virtual host; Tiiny Music must be running.
+const START_STOP_AGENT = process.env.E2E_START_STOP_AGENT ?? "openwebui";
+const START_STOP_AGENT_TITLE = process.env.E2E_START_STOP_AGENT_TITLE ?? "Open WebUI";
 const LAN_AGENT = process.env.E2E_LAN_AGENT ?? "tiinymusic";
 const LAN_AGENT_TITLE = process.env.E2E_LAN_AGENT_TITLE ?? "Tiiny Music";
 
@@ -60,37 +62,55 @@ test("#8 + xflow D: a LAN agent opens through the HTTPS proxy only with a sessio
 	await stranger.close();
 });
 
-test("#8 + xflow D: start and stop a device agent; a loopback-only agent is not offered to open", async ({ page }) => {
-	expect(await serviceStatus(LOOPBACK_AGENT), `${LOOPBACK_AGENT} must be stopped before the test`).toBe("stopped");
+test("#8 + xflow D: start Open WebUI, open it through the HTTPS proxy (websocket included), stop it", async ({
+	page,
+}) => {
+	// Leaves the agent as it found it: started and stopped only if it was stopped.
+	const initial = await serviceStatus(START_STOP_AGENT);
+	expect(["running", "stopped"]).toContain(initial);
 	await signIn(page);
 	await page.getByRole("link", { name: "Agents" }).click();
-	const card = page.getByTestId(`agent-${LOOPBACK_AGENT}`);
+	const card = page.getByTestId(`agent-${START_STOP_AGENT}`);
 	try {
-		await card.getByRole("button", { name: "Start" }).click();
-		await expect(page.getByRole("alert").filter({ hasText: "started." })).toBeVisible({ timeout: 3 * 60_000 });
-		await expect.poll(() => serviceStatus(LOOPBACK_AGENT), { timeout: 3 * 60_000 }).toBe("running");
+		if (initial === "stopped") {
+			await card.getByRole("button", { name: "Start" }).click();
+			await expect(page.getByRole("alert").filter({ hasText: "started." })).toBeVisible({ timeout: 3 * 60_000 });
+			await expect.poll(() => serviceStatus(START_STOP_AGENT), { timeout: 3 * 60_000 }).toBe("running");
+		}
 		await expect(card.locator(".MuiChip-label")).toHaveText("running", { timeout: 30_000 });
-		await expect(card).toContainText("only listens on the device itself");
-		await expect(card.getByRole("link", { name: "Open" })).toHaveCount(0);
-		await page.screenshot({ path: "test-results/agent-running.png", fullPage: true });
+		const open = card.getByRole("link", { name: "Open" });
+		await expect(open).toBeVisible({ timeout: 30_000 });
+
+		const [agentPage] = await Promise.all([page.context().waitForEvent("page"), open.click()]);
+		const socket = await agentPage.waitForEvent("websocket", {
+			predicate: (ws) => ws.url().includes("/ws/socket.io/"),
+			timeout: 2 * 60_000,
+		});
+		await socket.waitForEvent("framereceived", { timeout: 60_000 });
+		expect(socket.url()).toMatch(/^wss:\/\//);
+		await expect(agentPage).toHaveTitle(START_STOP_AGENT_TITLE, { timeout: 60_000 });
+		// Past Open WebUI's own sign-in: its chat input is up.
+		await expect(agentPage.locator("#chat-input")).toBeVisible({ timeout: 2 * 60_000 });
+		await agentPage.screenshot({ path: "test-results/agent-open-webui.png" });
+		await agentPage.close();
 	} finally {
-		// Stop is offered while the agent is running, starting, or in the device's error state.
-		await card.getByRole("button", { name: "Stop" }).click({ timeout: 60_000 });
-		await expect(page.getByRole("alert").filter({ hasText: "stopped." })).toBeVisible({ timeout: 3 * 60_000 });
+		if (initial === "stopped") {
+			await card.getByRole("button", { name: "Stop" }).click({ timeout: 60_000 });
+			await expect(page.getByRole("alert").filter({ hasText: "stopped." })).toBeVisible({ timeout: 3 * 60_000 });
+		}
 	}
-	await expect.poll(() => serviceStatus(LOOPBACK_AGENT), { timeout: 2 * 60_000 }).toBe("stopped");
-	await expect(card.locator(".MuiChip-label")).toHaveText("stopped", { timeout: 30_000 });
+	await expect.poll(() => serviceStatus(START_STOP_AGENT), { timeout: 2 * 60_000 }).toBe(initial);
 });
 
 test("#8 deleting an agent asks first; cancelling keeps it installed", async ({ page }) => {
 	await signIn(page);
 	await page.getByRole("link", { name: "Agents" }).click();
-	const card = page.getByTestId(`agent-${LOOPBACK_AGENT}`);
+	const card = page.getByTestId(`agent-${START_STOP_AGENT}`);
 	await card.getByRole("button", { name: "Delete" }).click();
 	const dialog = page.getByRole("dialog");
 	await expect(dialog).toContainText("removes the agent from the device");
 	await dialog.getByRole("button", { name: "Cancel" }).click();
 	await expect(dialog).toHaveCount(0);
-	expect(await serviceStatus(LOOPBACK_AGENT)).toBeDefined();
+	expect(await serviceStatus(START_STOP_AGENT)).toBeDefined();
 	await expect(card).toBeVisible();
 });

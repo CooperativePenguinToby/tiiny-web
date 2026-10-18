@@ -32,24 +32,11 @@ interface Service {
 	cloud_version: string | null;
 	ports?: { host_port: number; protocol: string }[];
 }
-interface ServiceStatus {
-	containers: { ports?: Record<string, { HostIp: string; HostPort: string }[]> }[];
-}
 
 type ProxyStates = Map<number, { listening: boolean; error: string | null }>;
 
 // Store web agents are named `wa-<cloud app id>`.
 const cloudId = (appId: string): string => appId.replace(/^wa-/, "");
-
-// Whether the agent's port is bound to the device's LAN side. The device only reports bindings for running
-// containers, so this is unknown (null) while the agent is stopped.
-async function reachableFromNetwork(serviceId: string, port: number): Promise<boolean | null> {
-	const status = await deviceJson<ServiceStatus>(`/api/services/${encodeURIComponent(serviceId)}/status`);
-	const bindings = status.containers.flatMap((container) => Object.values(container.ports ?? {}).flat());
-	const binding = bindings.find((entry) => Number(entry.HostPort) === port);
-	if (!binding) return null;
-	return binding.HostIp !== "127.0.0.1" && binding.HostIp !== "::1";
-}
 
 export const GET = apiRoute(async () => {
 	const [catalog, cloud, services] = await Promise.all([
@@ -94,7 +81,6 @@ export const GET = apiRoute(async () => {
 								status: service.status,
 								version: service.cloud_version,
 								port,
-								reachable: port === null ? false : await reachableFromNetwork(service.id, port),
 								proxy: port === null ? null : (proxies?.get(port) ?? null),
 							}
 						: null,

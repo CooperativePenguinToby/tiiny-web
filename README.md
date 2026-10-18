@@ -46,11 +46,12 @@ and every LAN address of the machine). Browsers will warn until you trust it or 
 - The device serves one inference request per model at a time and gives up on requests that wait too long
   behind other clients; the chat page shows that as a "device gave up waiting" error.
 
-- Agents installed on the device serve their own web UIs over plain HTTP without a login. This app opens
-  an HTTPS listener on the same port number for each one (e.g. `https://<this-machine>:18880` for Tiiny
-  Music) and forwards to the device only for signed-in browsers; those ports must be free on this machine.
-  Agents that listen only on the device's own loopback (Open WebUI, for example) cannot be opened from the
-  network and are shown that way. The device's own agent ports stay reachable on the LAN without a login.
+- Agents installed on the device serve their web UIs through the device's port 80 under the host name
+  `<agent>.agent.tiiny.local`, over plain HTTP and without a login (Open WebUI also runs with its own login
+  turned off). This app opens an HTTPS listener on each agent's port number (e.g.
+  `https://<this-machine>:18880` for Tiiny Music, `:9891` for Open WebUI) that forwards to that host name,
+  websockets included, only for signed-in browsers; those ports must be free on this machine. The device
+  itself still serves the agents to anyone on the LAN, so firewall the device if that matters.
 
 ## Development
 
