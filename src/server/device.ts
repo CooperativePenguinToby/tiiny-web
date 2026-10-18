@@ -1,4 +1,6 @@
-import { Agent, fetch as undiciFetch } from "undici";
+import { lookup } from "node:dns";
+import type { LookupFunction } from "node:net";
+import { Agent, fetch as undiciFetch, type FormData } from "undici";
 
 import { resolveDeviceTarget } from "./shared/device-target.mjs";
 
@@ -27,15 +29,23 @@ function resolveTarget(): { baseUrl: string; authKey: string } {
 
 const msEnv = (name: string, fallback: number): number => Number(process.env[name] ?? fallback);
 
+// The device gateway routes by host name to its services (fetch will not send a Host header of its
+// own), so requests name the service in the URL and every name resolves to the device's address.
+const deviceLookup: LookupFunction = (_hostname, options, callback) => {
+	lookup(new URL(resolveTarget().baseUrl).hostname.replaceAll(/^\[|\]$/g, ""), options, callback);
+};
+const connect = { lookup: deviceLookup };
+
 // Inference is serialized per model on the device and queued requests get no response
 // until their turn, so streams need a long wait for headers but a bounded gap between chunks.
 const streamAgent = new Agent({
+	connect,
 	headersTimeout: msEnv("TIINY_STREAM_WAIT_MS", 15 * 60_000),
 	bodyTimeout: msEnv("TIINY_STREAM_IDLE_MS", 5 * 60_000),
 });
-const requestAgent = new Agent({ headersTimeout: 15_000, bodyTimeout: 15_000 });
+const requestAgent = new Agent({ connect, headersTimeout: 15_000, bodyTimeout: 15_000 });
 // Container start/stop/delete on the device answer only once the operation is under way (~20 s).
-const slowAgent = new Agent({ headersTimeout: 5 * 60_000, bodyTimeout: 5 * 60_000 });
+const slowAgent = new Agent({ connect, headersTimeout: 5 * 60_000, bodyTimeout: 5 * 60_000 });
 
 async function deviceErrorFrom(response: Response): Promise<DeviceError> {
 	const text = await response.text();
@@ -54,20 +64,50 @@ async function deviceErrorFrom(response: Response): Promise<DeviceError> {
 	return new DeviceError(`Device responded ${response.status}: ${message || response.statusText}`, response.status);
 }
 
-async function request(
-	pathname: string,
-	init: { method?: string; body?: unknown; signal?: AbortSignal; stream?: boolean; slow?: boolean } = {}
-): Promise<Response> {
+// Host names of the device's services; the main API is served on the device's own address.
+const serviceHosts = {
+	main: undefined,
+	auth: "auth.api.tiiny",
+	kb: "kb.api.tiiny",
+	chatHistory: "chat-history.api.tiiny",
+	connector: "connector.api.tiiny",
+	wifi: "wifi.api.tiiny",
+	upgrade: "hardware-upgrade.api.tiiny",
+	agents: "agent-services.api.tiiny",
+	backup: "backup.managed.tiiny",
+	media: "p8800.api.tiiny",
+} as const;
+
+export type DeviceService = keyof typeof serviceHosts;
+
+export interface DeviceRequest {
+	method?: string;
+	service?: DeviceService;
+	headers?: Record<string, string>;
+	/** JSON body. */
+	body?: unknown;
+	/** Multipart body; mutually exclusive with `body`. */
+	form?: FormData;
+	signal?: AbortSignal;
+	stream?: boolean;
+	slow?: boolean;
+}
+
+async function request(pathname: string, init: DeviceRequest = {}): Promise<Response> {
 	const { baseUrl, authKey } = resolveTarget();
+	const host = serviceHosts[init.service ?? "main"];
+	const url = new URL(`${baseUrl}${pathname}`);
+	if (host) url.hostname = host;
 	let response: Response;
 	try {
-		response = (await undiciFetch(`${baseUrl}${pathname}`, {
+		response = (await undiciFetch(url, {
 			method: init.method ?? "GET",
 			headers: {
 				Authorization: `Bearer ${authKey}`,
 				...(init.body === undefined ? {} : { "Content-Type": "application/json" }),
+				...init.headers,
 			},
-			body: init.body === undefined ? undefined : JSON.stringify(init.body),
+			body: init.form ?? (init.body === undefined ? undefined : JSON.stringify(init.body)),
 			signal: init.signal,
 			dispatcher: init.stream ? streamAgent : init.slow ? slowAgent : requestAgent,
 		})) as unknown as Response;
@@ -80,17 +120,14 @@ async function request(
 	return response;
 }
 
-export async function deviceJson<T>(
-	pathname: string,
-	init?: { method?: string; body?: unknown; slow?: boolean }
-): Promise<T> {
+export async function deviceJson<T>(pathname: string, init?: Omit<DeviceRequest, "stream">): Promise<T> {
 	const response = await request(pathname, init);
 	return (await response.json()) as T;
 }
 
 export async function deviceStream(
 	pathname: string,
-	init: { method?: string; body?: unknown; signal?: AbortSignal }
+	init: Omit<DeviceRequest, "stream" | "slow">
 ): Promise<ReadableStream<Uint8Array>> {
 	const response = await request(pathname, { ...init, stream: true });
 	if (!response.body) throw new DeviceError("Device returned an empty stream", 502);
@@ -103,3 +140,25 @@ export const modelPath = (modelId: string): string =>
 		.split("/")
 		.map((segment) => encodeURIComponent(segment))
 		.join("/");
+
+// The raw response, for binary bodies (files, audio, images) whose headers matter too.
+export async function deviceResponse(pathname: string, init?: DeviceRequest): Promise<Response> {
+	return request(pathname, init);
+}
+
+// The device's serial number, which some services expect as `X-Device-Id`. Asked once per process.
+let deviceIdPromise: Promise<string> | null = null;
+export function deviceId(): Promise<string> {
+	deviceIdPromise ??= deviceJson<{ device_id: string }>("/api/v1/connect", {
+		method: "POST",
+		service: "auth",
+		body: {},
+	}).then(
+		(body) => body.device_id,
+		(error: unknown) => {
+			deviceIdPromise = null;
+			throw error;
+		}
+	);
+	return deviceIdPromise;
+}

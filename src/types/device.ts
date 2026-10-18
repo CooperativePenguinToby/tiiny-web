@@ -167,3 +167,27 @@ export interface AgentEvent {
 	message?: string;
 	error?: string | { message?: string } | null;
 }
+
+export interface DeviceInfo {
+	name: string;
+	serial: string;
+	model: string;
+	modelDate: string;
+	os: string;
+	specs: { label: string; value: string }[];
+}
+
+export interface StorageOverview {
+	totalBytes: number;
+	usedBytes: number;
+	categories: { name: string; sizeBytes: number }[];
+	models: { modelId: string; sizeBytes: number; protected: boolean }[];
+	agents: { serviceId: string; sizeBytes: number }[];
+}
+
+// How other apps reach the device's models over the LAN.
+export interface ApiAccess {
+	openai: string;
+	anthropic: string;
+	ollama: string;
+}

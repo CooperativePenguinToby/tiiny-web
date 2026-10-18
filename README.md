@@ -1,9 +1,10 @@
 # tiiny-web
 
 A LAN web UI for a Tiiny device: live device stats, loading/unloading/deleting models, downloading from the
-Tiiny store, importing models from Hugging Face, managing the device's agents, and streaming chat.
-It talks to the device's own HTTP API (the same one the `tiiny` CLI uses); the device auth key stays on
-the server. Served over HTTPS only.
+Tiiny store, importing models from Hugging Face, managing the device's agents, streaming chat, and the
+device's settings (device info, storage, API access).
+It talks to the device's own HTTP API (the same one the `tiiny` CLI and TiinyOS use); the device auth key stays
+on the server unless a signed-in user reveals it under Settings → API access. Served over HTTPS only.
 
 UI built on [Devias Material Kit React](https://github.com/devias-io/material-kit-react) (MIT, see
 `LICENSE-material-kit-react.md`).
