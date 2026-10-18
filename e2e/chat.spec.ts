@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { deviceGet, devicePost, runningModelIds, signIn } from "./helpers";
+import { deviceGet, devicePost, forgetNewConversations, runningModelIds, signIn } from "./helpers";
 
 // A chat model the xflow test loads itself; must fit in the NPU share that is currently free.
 const LOAD_MODEL = process.env.E2E_CHAT_LOAD_MODEL ?? "Qwen/Qwen3.6-35B-A3B";
@@ -17,6 +17,10 @@ async function selectOption(page: Page, label: string, option: string): Promise<
 	await page.getByRole("combobox", { name: label }).click();
 	await page.getByRole("option", { name: option, exact: true }).click();
 }
+
+const conversations = forgetNewConversations();
+test.beforeEach(conversations.before);
+test.afterEach(conversations.after);
 
 const lastReply = (page: Page) => page.getByTestId("message-assistant").last().getByTestId("message-content");
 

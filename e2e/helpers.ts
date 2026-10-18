@@ -161,3 +161,59 @@ export async function isRunning(modelId: string): Promise<boolean> {
 	const running = await runningModelIds();
 	return running.includes(modelId);
 }
+
+// The device's chat-history service, which identifies the owner by the device serial.
+export async function historyCall<T>(pathname: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
+	const { device_id: serial } = await deviceCall<{ device_id: string }>("auth", "/api/v1/connect", {
+		method: "POST",
+		body: {},
+	});
+	return deviceCall<T>("chatHistory", `/v1/chat${pathname}`, { ...init, headers: { "X-Device-Id": serial } });
+}
+
+export interface StoredMessage {
+	message_id: string;
+	role: string;
+	status: string;
+	model_id: string;
+}
+
+// A stored conversation's messages with their main text, in order.
+export async function storedMessages(conversationId: string): Promise<(StoredMessage & { text: string })[]> {
+	const { items } = await historyCall<{ items: (StoredMessage & { seq_in_conversation: number })[] }>(
+		`/conversations/${conversationId}/messages?limit=100&include_deleted=false`
+	);
+	const sorted = items.sort((a, b) => a.seq_in_conversation - b.seq_in_conversation);
+	return Promise.all(
+		sorted.map(async (message) => {
+			const blocks = await historyCall<{ items: { block_type: string; content_text: string }[] }>(
+				`/messages/${message.message_id}/blocks`
+			);
+			const text = blocks.items
+				.filter((block) => block.block_type === "main_text")
+				.map((block) => block.content_text)
+				.join("\n\n");
+			return { ...message, text };
+		})
+	);
+}
+
+export async function conversationIds(): Promise<string[]> {
+	const { items } = await historyCall<{ items: { conversation_id: string }[] }>("/conversations?limit=50");
+	return items.map((item) => item.conversation_id);
+}
+
+// Chats are stored in the device's history; tests that chat delete the conversations they created.
+export function forgetNewConversations(): { before: () => Promise<void>; after: () => Promise<void> } {
+	let known = new Set<string>();
+	return {
+		before: async () => {
+			known = new Set(await conversationIds());
+		},
+		after: async () => {
+			for (const id of await conversationIds()) {
+				if (!known.has(id)) await historyCall(`/conversations/${id}`, { method: "DELETE" });
+			}
+		},
+	};
+}

@@ -32,6 +32,7 @@ export const POST = apiRoute(async (request) => {
 		model: modelId,
 		messages: messages.map(({ role, content }) => ({ role, content })),
 		stream: true,
+		stream_options: { include_usage: true },
 		// Lets the device attribute the tokens to this app, as TiinyOS does for its own chats.
 		app_id: APP_ID,
 		task_type: "Replying",

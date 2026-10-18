@@ -1,7 +1,11 @@
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 
-import { CHAT_MODEL, deviceGet, holdChatModel, selectOption, signIn } from "./helpers";
+import { CHAT_MODEL, deviceGet, forgetNewConversations, holdChatModel, selectOption, signIn } from "./helpers";
+
+const conversations = forgetNewConversations();
+test.beforeEach(conversations.before);
+test.afterEach(conversations.after);
 
 type Week = Record<string, Record<string, { total_tokens: number; request_count: number }>>;
 type Apps = Record<string, { total_tokens: number }>;

@@ -300,3 +300,32 @@ export interface MemorySettings {
 	// Downloaded text-generation models that can write the summaries.
 	models: { modelId: string; name: string }[];
 }
+
+export interface ConversationSummary {
+	conversationId: string;
+	title: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface StoredTurn {
+	role: "user" | "assistant";
+	content: string;
+	reasoning?: string;
+	modelId: string | null;
+	// "success", or "paused" for a reply that was stopped.
+	status: string;
+}
+
+export interface Conversation extends ConversationSummary {
+	turns: StoredTurn[];
+}
+
+// One exchange to store: the user's message and the reply.
+export interface TurnToSave {
+	conversationId: string | null;
+	modelId: string;
+	user: string;
+	assistant: { content: string; reasoning?: string; thinkingMs?: number; stopped: boolean };
+	usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
+}

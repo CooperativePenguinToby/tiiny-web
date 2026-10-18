@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import RouterLink from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -22,8 +23,9 @@ import { CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import { PaperPlaneRightIcon } from "@phosphor-icons/react/dist/ssr/PaperPlaneRight";
 import { StopIcon } from "@phosphor-icons/react/dist/ssr/Stop";
 
-import type { ChatMessage, ChatModel, ThinkingSetting } from "@/types/device";
+import type { ChatMessage, ChatModel, Conversation, ThinkingSetting, TurnToSave } from "@/types/device";
 import { paths } from "@/paths";
+import { postJson } from "@/lib/api";
 import { readSse, responseError } from "@/lib/sse";
 import { usePolling } from "@/hooks/use-polling";
 
@@ -36,7 +38,21 @@ type Phase = "idle" | "waiting" | "streaming";
 
 interface ChunkDelta {
 	choices?: { delta?: { content?: string | null; reasoning_content?: string | null } }[];
+	usage?: TurnToSave["usage"];
 	error?: { message?: string };
+}
+
+// The ?c= conversation id: chats are stored in the device's chat history as they happen.
+function useConversationId(): [string | null, (id: string | null) => void] {
+	const router = useRouter();
+	const params = useSearchParams();
+	const id = params.get("c");
+	const setId = React.useCallback(
+		(next: string | null) =>
+			router.replace(next ? `${paths.dashboard.chat}?c=${encodeURIComponent(next)}` : paths.dashboard.chat),
+		[router]
+	);
+	return [id, setId];
 }
 
 function useElapsedSeconds(running: boolean): number {
@@ -109,6 +125,40 @@ export function ChatPanel(): React.JSX.Element {
 	const [error, setError] = React.useState<string | null>(null);
 	const abortRef = React.useRef<AbortController | null>(null);
 	const elapsed = useElapsedSeconds(phase === "waiting");
+	const [conversationId, setConversationId] = useConversationId();
+	// The conversation whose turns are on screen; differs from conversationId while one is being opened.
+	const shownRef = React.useRef<string | null>(null);
+	const [opening, setOpening] = React.useState(false);
+	const [saveError, setSaveError] = React.useState<string | null>(null);
+
+	React.useEffect(() => {
+		if (conversationId === shownRef.current) return;
+		shownRef.current = conversationId;
+		setError(null);
+		setSaveError(null);
+		if (!conversationId) {
+			setTurns([]);
+			return;
+		}
+		setOpening(true);
+		void fetch(`/api/history/${encodeURIComponent(conversationId)}`, { cache: "no-store" })
+			.then(async (response) => {
+				if (!response.ok) throw new Error(await responseError(response));
+				const conversation = (await response.json()) as Conversation;
+				setTurns(
+					conversation.turns.map((turn) => ({
+						role: turn.role,
+						content: turn.content,
+						...(turn.reasoning ? { reasoning: turn.reasoning } : {}),
+						...(turn.status === "paused" ? { note: "Stopped." } : {}),
+					}))
+				);
+			})
+			.catch((error_: unknown) =>
+				setError(`Could not open the conversation: ${error_ instanceof Error ? error_.message : String(error_)}`)
+			)
+			.finally(() => setOpening(false));
+	}, [conversationId]);
 
 	const model = models.data?.find((candidate) => candidate.modelId === modelId) ?? null;
 
@@ -139,6 +189,13 @@ export function ChatPanel(): React.JSX.Element {
 		setPhase("waiting");
 		const controller = new AbortController();
 		abortRef.current = controller;
+		const reply = {
+			content: "",
+			reasoning: "",
+			usage: undefined as TurnToSave["usage"],
+			thinkingFrom: 0,
+			thinkingMs: 0,
+		};
 		try {
 			const response = await fetch("/api/chat", {
 				method: "POST",
@@ -159,8 +216,14 @@ export function ChatPanel(): React.JSX.Element {
 							: message
 					);
 				}
+				if (chunk.usage) reply.usage = chunk.usage;
 				const delta = chunk.choices?.[0]?.delta;
 				if (!delta?.content && !delta?.reasoning_content) continue;
+				if (delta.reasoning_content && !reply.thinkingFrom) reply.thinkingFrom = Date.now();
+				if (delta.content && reply.thinkingFrom && !reply.thinkingMs)
+					reply.thinkingMs = Date.now() - reply.thinkingFrom;
+				reply.content += delta.content ?? "";
+				reply.reasoning += delta.reasoning_content ?? "";
 				setPhase("streaming");
 				updateLast((turn) => ({
 					...turn,
@@ -178,7 +241,38 @@ export function ChatPanel(): React.JSX.Element {
 			}
 		} finally {
 			abortRef.current = null;
+			// Saved before the next message can be sent, so that one joins the same conversation.
+			if (reply.content.trim()) await remember(text, reply, controller.signal.aborted);
 			setPhase("idle");
+		}
+	};
+
+	const remember = async (
+		user: string,
+		reply: { content: string; reasoning: string; usage: TurnToSave["usage"]; thinkingMs: number },
+		stopped: boolean
+	): Promise<void> => {
+		const turn: TurnToSave = {
+			conversationId: shownRef.current,
+			modelId,
+			user,
+			assistant: {
+				content: reply.content,
+				stopped,
+				...(reply.reasoning ? { reasoning: reply.reasoning } : {}),
+				...(reply.thinkingMs ? { thinkingMs: reply.thinkingMs } : {}),
+			},
+			...(reply.usage ? { usage: reply.usage } : {}),
+		};
+		try {
+			const saved = await postJson<{ conversationId: string }>("/api/history/turn", turn);
+			setSaveError(null);
+			if (saved.conversationId !== shownRef.current) {
+				shownRef.current = saved.conversationId;
+				setConversationId(saved.conversationId);
+			}
+		} catch (error_) {
+			setSaveError(`Not saved to history: ${error_ instanceof Error ? error_.message : String(error_)}`);
 		}
 	};
 
@@ -250,10 +344,13 @@ export function ChatPanel(): React.JSX.Element {
 				) : null}
 				<Box sx={{ flex: "1 1 auto" }} />
 				<Button
-					disabled={busy || turns.length === 0}
+					disabled={busy || (turns.length === 0 && !conversationId)}
 					onClick={() => {
+						shownRef.current = null;
 						setTurns([]);
 						setError(null);
+						setSaveError(null);
+						setConversationId(null);
 					}}
 				>
 					New chat
@@ -262,7 +359,9 @@ export function ChatPanel(): React.JSX.Element {
 			<Card>
 				<CardContent>
 					<Stack spacing={2} sx={{ minHeight: 240 }}>
-						{turns.length === 0 ? (
+						{opening ? (
+							<CircularProgress aria-label="Opening the conversation" sx={{ m: "auto" }} />
+						) : turns.length === 0 ? (
 							<Typography color="text.secondary" sx={{ m: "auto" }} variant="body2">
 								Send a message to start chatting with {model?.name ?? "the model"}.
 							</Typography>
@@ -286,6 +385,11 @@ export function ChatPanel(): React.JSX.Element {
 			{error ? (
 				<Alert onClose={() => setError(null)} severity="error">
 					{error}
+				</Alert>
+			) : null}
+			{saveError ? (
+				<Alert onClose={() => setSaveError(null)} severity="warning">
+					{saveError}
 				</Alert>
 			) : null}
 			<Stack

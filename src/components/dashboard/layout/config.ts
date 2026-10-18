@@ -8,6 +8,7 @@ export const navItems = [
 	{ key: "hugging-face", title: "Hugging Face", href: paths.dashboard.huggingFace, icon: "download" },
 	{ key: "agents", title: "Agents", href: paths.dashboard.agents, icon: "robot" },
 	{ key: "chat", title: "Chat", href: paths.dashboard.chat, icon: "chat-circle-text" },
+	{ key: "history", title: "History", href: paths.dashboard.history, icon: "clock-counter-clockwise" },
 	{ key: "vault", title: "Vault", href: paths.dashboard.vault, icon: "vault" },
 	{ key: "settings", title: "Settings", href: paths.dashboard.settings, icon: "gear-six" },
 ] satisfies NavItemConfig[];
