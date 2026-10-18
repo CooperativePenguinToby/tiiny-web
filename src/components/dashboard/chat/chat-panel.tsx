@@ -18,11 +18,13 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import InputLabel from "@mui/material/InputLabel";
 import LinearProgress from "@mui/material/LinearProgress";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
+import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
@@ -62,6 +64,12 @@ interface Turn extends ChatMessage {
 // Chat answers directly; Task lets the model work in steps with tools (Vault, web pages, MCP).
 type Mode = "chat" | "task";
 const MODE_KEY = "tiiny-chat-mode";
+// Which optional tools Task mode may use; each can be switched off on its own.
+interface TaskTools {
+	vault: boolean;
+	web: boolean;
+}
+const TOOLS_KEY = "tiiny-task-tools";
 
 type Phase = "idle" | "waiting" | "streaming";
 
@@ -185,9 +193,21 @@ export function ChatPanel(): React.JSX.Element {
 	const [imageSize, setImageSize] = React.useState<string>(IMAGE_SIZES[0]);
 	const [imageSteps, setImageSteps] = React.useState(9);
 	const [mode, setMode] = React.useState<Mode>("chat");
+	const [taskTools, setTaskTools] = React.useState<TaskTools>({ vault: true, web: true });
 	React.useEffect(() => {
 		if (globalThis.localStorage.getItem(MODE_KEY) === "task") setMode("task");
+		try {
+			const saved = JSON.parse(globalThis.localStorage.getItem(TOOLS_KEY) ?? "{}") as Partial<TaskTools>;
+			setTaskTools({ vault: saved.vault !== false, web: saved.web !== false });
+		} catch {
+			// keep both on
+		}
 	}, []);
+	const toggleTool = (tool: keyof TaskTools): void => {
+		const next = { ...taskTools, [tool]: !taskTools[tool] };
+		setTaskTools(next);
+		globalThis.localStorage.setItem(TOOLS_KEY, JSON.stringify(next));
+	};
 	const chooseMode = (next: Mode): void => {
 		setMode(next);
 		globalThis.localStorage.setItem(MODE_KEY, next);
@@ -404,7 +424,7 @@ export function ChatPanel(): React.JSX.Element {
 		const response = await fetch("/api/chat/task", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ modelId, messages: history, thinking }),
+			body: JSON.stringify({ modelId, messages: history, thinking, tools: taskTools }),
 			signal,
 		});
 		if (!response.ok) throw new Error(await responseError(response));
@@ -598,6 +618,24 @@ export function ChatPanel(): React.JSX.Element {
 							Task
 						</ToggleButton>
 					</ToggleButtonGroup>
+				) : null}
+				{model?.kind === "chat" && mode === "task" ? (
+					<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+						<FormControlLabel
+							control={
+								<Switch checked={taskTools.vault} disabled={busy} onChange={() => toggleTool("vault")} size="small" />
+							}
+							label="Vault"
+							title="Let the model search your Vault files and chat summaries"
+						/>
+						<FormControlLabel
+							control={
+								<Switch checked={taskTools.web} disabled={busy} onChange={() => toggleTool("web")} size="small" />
+							}
+							label="Web"
+							title="Let the model read web pages"
+						/>
+					</Stack>
 				) : null}
 				{model?.kind === "image" ? (
 					<>

@@ -195,3 +195,39 @@ test("xflow H: Task mode uses a tool of an MCP server running on the device", as
 		await model.release();
 	}
 });
+
+test("#23 Vault and Web can each be switched off for Task mode", async ({ page }) => {
+	test.setTimeout(15 * 60_000);
+	const original = await profile();
+	const model = await holdChatModel();
+	try {
+		await openTaskMode(page, model.name);
+		const web = page.getByRole("checkbox", { name: "Web" });
+		const vault = page.getByRole("checkbox", { name: "Vault" });
+		await expect(web).toBeChecked();
+		await expect(vault).toBeChecked();
+
+		await web.click();
+		await expect(web).not.toBeChecked();
+		await expect(vault).toBeChecked();
+		await sendChat(page, "Read https://example.com and tell me what that domain is for.", REPLY);
+		await expect(answer(page).getByTestId("message-content")).not.toBeEmpty();
+		await expect(answer(page).getByTestId("task-step").filter({ hasText: "Read example.com" })).toHaveCount(0);
+
+		await page.reload();
+		await expect(page.getByRole("checkbox", { name: "Web" })).not.toBeChecked();
+		await page.getByRole("checkbox", { name: "Web" }).click();
+		await page.getByRole("checkbox", { name: "Vault" }).click();
+		await expect(page.getByRole("checkbox", { name: "Vault" })).not.toBeChecked();
+		await page.getByRole("button", { name: "New chat" }).click();
+		await sendChat(page, "Search my Vault for any invoices and tell me what you find.", REPLY);
+		await expect(answer(page).getByTestId("message-content")).not.toBeEmpty();
+		await expect(answer(page).getByTestId("task-step").filter({ hasText: "Searched Vault" })).toHaveCount(0);
+		// Nothing in these requests asks to change the profile.
+		await expect(page.getByTestId("task-step").filter({ hasText: "Updated your" })).toHaveCount(0);
+		await page.screenshot({ path: "test-results/task-switches.png", fullPage: true });
+	} finally {
+		await model.release();
+	}
+	expect(await profile()).toEqual(original);
+});
