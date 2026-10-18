@@ -75,7 +75,7 @@ const serviceAgent = new Agent({ connect: { lookup: deviceLookup } });
 export async function deviceCall<T>(
 	service: DeviceService | "main",
 	pathname: string,
-	init: { method?: string; body?: unknown; headers?: Record<string, string> } = {}
+	init: { method?: string; body?: unknown; headers?: Record<string, string>; text?: boolean } = {}
 ): Promise<T> {
 	const { baseUrl, authKey } = deviceTarget();
 	const url = new URL(`${baseUrl}${pathname}`);
@@ -92,6 +92,7 @@ export async function deviceCall<T>(
 	});
 	const text = await response.text();
 	expect(response.ok, `device ${init.method ?? "GET"} ${service}${pathname} -> ${response.status} ${text}`).toBe(true);
+	if (init.text) return text as T;
 	return (text ? JSON.parse(text) : null) as T;
 }
 
@@ -130,7 +131,10 @@ export async function selectOption(page: Page, label: string, option: string | R
 }
 
 // Vault wants the device serial alongside the key.
-export async function kbCall<T>(pathname: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
+export async function kbCall<T>(
+	pathname: string,
+	init: { method?: string; body?: unknown; text?: boolean } = {}
+): Promise<T> {
 	const { device_id: serial } = await deviceCall<{ device_id: string }>("auth", "/api/v1/connect", {
 		method: "POST",
 		body: {},

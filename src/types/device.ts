@@ -283,3 +283,20 @@ export interface VaultEvent {
 	error?: string;
 	error_type?: string;
 }
+
+// A day of chats the device summarised into Vault ("Chat history" in TiinyOS).
+export interface DailySummary {
+	sourceId: string;
+	day: string;
+	preview: string;
+}
+
+export interface MemorySettings {
+	// What the device reports; it summarises only while a model is chosen.
+	enabled: boolean;
+	modelId: string;
+	startHour: number;
+	startMinute: number;
+	// Downloaded text-generation models that can write the summaries.
+	models: { modelId: string; name: string }[];
+}
