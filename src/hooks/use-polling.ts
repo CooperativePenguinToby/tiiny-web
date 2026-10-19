@@ -1,4 +1,7 @@
 import * as React from "react";
+import { useRouter } from "next/navigation";
+
+import { paths } from "@/paths";
 
 export interface Polled<T> {
 	data: T | null;
@@ -12,12 +15,13 @@ export function usePolling<T>(url: string, intervalMs: number): Polled<T> {
 	const [data, setData] = React.useState<T | null>(null);
 	const [error, setError] = React.useState<string | null>(null);
 	const [isLoading, setIsLoading] = React.useState<boolean>(true);
+	const router = useRouter();
 
 	const refresh = React.useCallback(async (): Promise<void> => {
 		try {
 			const response = await fetch(url, { cache: "no-store" });
 			if (response.status === 401) {
-				globalThis.location.assign("/auth/sign-in");
+				router.replace(paths.auth.signIn);
 				return;
 			}
 			const body = (await response.json()) as T & { error?: string };
@@ -29,7 +33,7 @@ export function usePolling<T>(url: string, intervalMs: number): Polled<T> {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [url]);
+	}, [url, router]);
 
 	React.useEffect(() => {
 		void refresh();

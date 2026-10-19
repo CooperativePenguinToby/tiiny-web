@@ -73,5 +73,5 @@ export default [
 		},
 	},
 	...compat.extends("plugin:react-hooks/recommended"),
-	...compat.config(pluginNext.configs.recommended),
+	pluginNext.configs.recommended,
 ];

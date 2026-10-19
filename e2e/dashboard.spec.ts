@@ -37,3 +37,10 @@ test("#1 dashboard shows live device stats and the models running on the device"
 	await page.goto("/dashboard");
 	await expect(page).toHaveURL(/\/auth\/sign-in$/);
 });
+
+test("an expired session sends the open dashboard to sign-in on its next poll", async ({ context, page }) => {
+	await signIn(page);
+	await expect(page.getByTestId("stat-Storage")).toContainText(/\d+%/);
+	await context.clearCookies();
+	await expect(page).toHaveURL(/\/auth\/sign-in$/, { timeout: 30_000 });
+});

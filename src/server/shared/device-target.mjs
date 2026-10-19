@@ -7,7 +7,7 @@ import path from "node:path";
 function readCliConfig() {
 	const file = process.env.TIINY_CONFIG ?? path.join(homedir(), ".local", "tiiny", "config.json");
 	try {
-		return JSON.parse(readFileSync(file, "utf8"));
+		return JSON.parse(readFileSync(/*turbopackIgnore: true*/ file, "utf8"));
 	} catch {
 		return {};
 	}
