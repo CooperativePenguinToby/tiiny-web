@@ -7,7 +7,7 @@
     "build": "node ./node_modules/next/dist/bin/next build",
     "start": "NODE_ENV=production node server.mjs",
     "lint": "node ./node_modules/eslint/bin/eslint.js .",
-    "typecheck": "node ./node_modules/typescript/bin/tsc --noEmit",
+    "typecheck": "node ./node_modules/@typescript/native/bin/tsc --noEmit",
     "format:write": "node ./node_modules/prettier/bin/prettier.cjs --write \"**/*.{js,jsx,mjs,ts,tsx,mdx}\" --cache",
     "format:check": "node ./node_modules/prettier/bin/prettier.cjs --check \"**/*.{js,jsx,mjs,ts,tsx,mdx}\" --cache",
     "test:e2e": "node ./node_modules/@playwright/test/cli.js test"
@@ -47,6 +47,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@typescript-eslint/parser": "8.71.2",
+    "@typescript/native": "npm:typescript@7.0.2",
     "eslint": "10.13.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-import-resolver-typescript": "4.4.5",
@@ -55,7 +56,7 @@
     "eslint-plugin-unicorn": "78.0.0",
     "globals": "17.13.0",
     "prettier": "3.9.10",
-    "typescript": "5.8.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "typescript-eslint": "8.71.2"
   }
 }
