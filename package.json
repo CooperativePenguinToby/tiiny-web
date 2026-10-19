@@ -2,6 +2,9 @@
   "name": "tiiny-web",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=26"
+  },
   "scripts": {
     "dev": "node server.mjs --dev",
     "build": "node ./node_modules/next/dist/bin/next build",
@@ -42,7 +45,7 @@
     "@ianvs/prettier-plugin-sort-imports": "4.7.1",
     "@next/eslint-plugin-next": "16.4.2",
     "@playwright/test": "^1.64.1",
-    "@types/node": "24.0.0",
+    "@types/node": "26.6.5",
     "@types/qrcode": "1.5.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",

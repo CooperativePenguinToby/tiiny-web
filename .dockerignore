@@ -1,0 +1,16 @@
+# Runtime state holds the TLS key and session secret; it belongs in the /data volume, never the image.
+data/
+node_modules/
+.next/
+test-results/
+playwright-report/
+e2e/
+.git/
+.gitignore
+.dockerignore
+Dockerfile
+compose.yaml
+*.tsbuildinfo
+next-env.d.ts
+npm-debug.log*
+.env*
