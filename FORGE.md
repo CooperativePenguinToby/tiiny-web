@@ -89,3 +89,4 @@ regression 2026-10-18 19:24: full e2e 68 passed, 2 opt-in skipped, after #25 and
 regression 2026-10-18 20:13: whole-app + vault specs 3 passed after the indexing retry
 regression 2026-10-18 23:52: full e2e 70 passed, 2 opt-in skipped, after upgrading to Next 16, MUI 9, ESLint 10, TypeScript 7 and zod 4
 regression 2026-10-19 00:30: full e2e 70 passed, 2 opt-in skipped, against the Docker image (dhi.io/node:26-alpine3.23-dev, Node 26.12.0)
+regression 2026-10-19 00:55: full e2e 70 passed, 2 opt-in skipped, against the standalone image on dhi.io/node:26-alpine3.23 (244 MB)

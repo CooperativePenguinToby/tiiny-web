@@ -1,30 +1,26 @@
 # syntax=docker/dockerfile:1
 
-# Build: installs every dependency, builds the Next.js app, then drops the dev dependencies.
+# Build: installs every dependency, builds the Next.js app and assembles the standalone output
+# (only the files the server actually loads; see scripts/standalone.mjs).
 FROM dhi.io/node:26-alpine3.23-dev AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build && npm prune --omit=dev
+RUN npm run build && node scripts/standalone.mjs && mkdir -p /data
 
-# Runtime: the custom HTTPS server (server.mjs) with the built app, running as the image's node user.
-FROM dhi.io/node:26-alpine3.23-dev
+# Runtime: the minimal hardened image (no shell or package manager), running as its non-root user 1000.
+FROM dhi.io/node:26-alpine3.23
 WORKDIR /app
 ENV NODE_ENV=production \
 	NEXT_TELEMETRY_DISABLED=1 \
 	HOST=0.0.0.0 \
 	PORT=8443 \
 	DATA_DIR=/data
-COPY --from=build /app/package.json /app/next.config.mjs /app/server.mjs ./
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/.next ./.next
-COPY --from=build /app/public ./public
-COPY --from=build /app/src/server/shared ./src/server/shared
+COPY --from=build --chown=1000:1000 /app/.next/standalone ./
 # The TLS certificate and key, and the session secret, are created here on first start.
-RUN mkdir -p /data && chown node:node /data
-USER node
+COPY --from=build --chown=1000:1000 /data /data
 VOLUME ["/data"]
 # The web UI. Each installed device agent also gets an HTTPS listener on its own port (e.g. 9891, 7866, 18880).
 EXPOSE 8443

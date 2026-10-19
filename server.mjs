@@ -89,6 +89,13 @@ process.env.SESSION_SECRET ??= await readOrCreateSecret(path.join(dataDirectory,
 	randomBytes(32).toString("hex")
 );
 
+if (!development) {
+	// Use the config serialized at build time, as Next's own standalone server.js does, so production
+	// (including the Docker image's traced standalone output) never needs next.config or build tooling.
+	const built = JSON.parse(await readFile(path.join(".next", "required-server-files.json"), "utf8"));
+	process.env.__NEXT_PRIVATE_STANDALONE_CONFIG = JSON.stringify(built.config);
+}
+
 const tls = await loadTls();
 const app = next({ dev: development, hostname: host, port });
 await app.prepare();
