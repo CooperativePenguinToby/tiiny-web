@@ -23,7 +23,7 @@ test("#14 personalization edits are stored on the device", async ({ page }) => {
 		recentFocus: `testing tiiny web ${stamp}`,
 	};
 	await signIn(page);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	const card = page.getByTestId("settings-personalization");
 	try {
 		await expect(card.getByLabel("Occupation")).toHaveValue(original.occupation);

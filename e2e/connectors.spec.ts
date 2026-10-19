@@ -98,7 +98,7 @@ test("#22 a custom MCP server is added on the device, lists its tools and is rem
 	const name = `e2e-${Date.now().toString(36)}`;
 	await openConnectors(page);
 	try {
-		await page.getByRole("button", { name: "Add MCP server" }).click();
+		await page.getByRole("link", { name: "Add MCP server" }).click();
 		const dialog = page.getByRole("dialog", { name: "Add an MCP server" });
 		await dialog.getByLabel("Name").fill(name);
 		await dialog.getByLabel("URL").fill(MCP_URL);

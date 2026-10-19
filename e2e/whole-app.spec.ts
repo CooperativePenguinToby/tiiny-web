@@ -56,7 +56,8 @@ test("whole app (parity): device settings → Vault file → Task mode answers f
 		const conversationId = new URL(page.url()).searchParams.get("c")!;
 		expect(await conversationIds()).toContain(conversationId);
 
-		await page.getByRole("link", { name: "History" }).click();
+		await page.getByRole("link", { name: "Chat" }).click();
+		await page.getByRole("tab", { name: "History" }).click();
 		await expect(page.getByTestId(`conversation-${conversationId}`)).toContainText("Search my Vault: at what altitude");
 
 		await page.getByRole("link", { name: "Chat" }).click();

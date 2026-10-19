@@ -31,7 +31,7 @@ test("#10 renaming the device changes its name on the device", async ({ page }) 
 	const original = originalInfo.device_name;
 	const name = `e2e ${Date.now().toString(36)}`;
 	await signIn(page);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	const card = page.getByTestId("settings-device");
 	try {
 		await card.getByRole("button", { name: "Rename" }).click();
@@ -63,7 +63,7 @@ test("#10 storage matches the device, and deleting asks first", async ({ page })
 	);
 	const agents = await deviceGet<{ apps: { name: string; size_bytes: number }[] }>("/api/v1/sys/storage/agent");
 	await signIn(page);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	const card = page.getByTestId("settings-storage");
 
 	await expect(card.getByTestId("storage-used")).toHaveText(
@@ -95,7 +95,7 @@ test("#10 storage matches the device, and deleting asks first", async ({ page })
 
 test("#10 API access shows LAN base URLs and reveals the device key only on request", async ({ page }) => {
 	await signIn(page);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	const card = page.getByTestId("settings-api");
 	await expect(card.getByTestId("api-base-OpenAI-compatible")).toHaveText(`${deviceBaseUrl()}/v1`);
 	await expect(card.getByTestId("api-base-Ollama")).toHaveText(deviceBaseUrl());

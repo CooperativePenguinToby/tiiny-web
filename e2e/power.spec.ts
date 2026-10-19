@@ -9,7 +9,7 @@ const setAutoPowerOn = (isEnabled: boolean): Promise<unknown> =>
 // confirmation is the evidence.
 test("#12 Auto power-on is switched on and off on the device", async ({ page }) => {
 	await signIn(page);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	const card = page.getByTestId("settings-power");
 	try {
 		await card.getByRole("button", { name: "Turn on" }).click();
@@ -27,7 +27,7 @@ test("#12 Auto power-on is switched on and off on the device", async ({ page }) 
 
 test("#12 checking for updates shows what the device's upgrade service reports", async ({ page }) => {
 	await signIn(page);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	const card = page.getByTestId("settings-power");
 	await card.getByRole("button", { name: "Check for updates" }).click();
 	const { data } = await deviceCall<{
@@ -43,7 +43,7 @@ test("#12 checking for updates shows what the device's upgrade service reports",
 
 test("#12 shutting down asks first; cancelling leaves the device on", async ({ page }) => {
 	await signIn(page);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	await page.getByTestId("settings-power").getByRole("button", { name: "Shut down" }).click();
 	const dialog = page.getByRole("dialog", { name: "Shut down the device?" });
 	await expect(dialog).toBeVisible();
@@ -58,7 +58,7 @@ test("#12 Restart reboots the device and the page follows it back", async ({ pag
 	test.skip(!process.env.E2E_REBOOT, "set E2E_REBOOT=1 to restart the device");
 	test.setTimeout(15 * 60_000);
 	await signIn(page);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	const card = page.getByTestId("settings-power");
 	await card.getByRole("button", { name: "Restart" }).click();
 	await page.getByRole("dialog", { name: "Restart the device?" }).getByRole("button", { name: "Restart" }).click();

@@ -4,20 +4,16 @@ import * as React from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CircularProgress from "@mui/material/CircularProgress";
-import Divider from "@mui/material/Divider";
 import Link from "@mui/material/Link";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
-import Tab from "@mui/material/Tab";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
@@ -26,14 +22,7 @@ import { postJson } from "@/lib/api";
 import { responseError } from "@/lib/sse";
 import { usePolling } from "@/hooks/use-polling";
 
-const TABS: { kind: PlaygroundKind; label: string; intro: string }[] = [
-	{ kind: "asr", label: "Speech to text", intro: "Transcribe a WAV recording with a speech recognition model." },
-	{ kind: "tts", label: "Text to speech", intro: "Turn text into speech with a voice model." },
-	{ kind: "ocr", label: "OCR", intro: "Read the text in an image." },
-	{ kind: "embed", label: "Embeddings", intro: "Turn texts into vectors and compare how similar they are." },
-	{ kind: "rerank", label: "Rerank", intro: "Order documents by how well they answer a query." },
-	{ kind: "text", label: "Benchmark", intro: "Measure how fast a text model generates, like tiiny bench." },
-];
+import { playgroundTabs } from "./tabs";
 
 const errorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
@@ -450,64 +439,44 @@ function Benchmark({ model }: { model: string }): React.JSX.Element {
 	);
 }
 
-export function Playground(): React.JSX.Element {
+export function Playground({ kind }: { kind: PlaygroundKind }): React.JSX.Element {
 	const models = usePolling<PlaygroundModel[]>("/api/playground/models", 15_000);
-	const [kind, setKind] = React.useState<PlaygroundKind>("asr");
-	const [chosen, setChosen] = React.useState<Partial<Record<PlaygroundKind, string>>>({});
-	const tab = TABS.find((entry) => entry.kind === kind)!;
+	const [chosenModel, setChosenModel] = React.useState<string>();
+	const tab = playgroundTabs.find((entry) => entry.kind === kind)!;
 	const available = (models.data ?? []).filter((model) => model.kind === kind);
-	const chosenModel = chosen[kind];
 	const model =
 		chosenModel && available.some((entry) => entry.modelId === chosenModel)
 			? chosenModel
 			: ((available.find((entry) => entry.loaded) ?? available[0])?.modelId ?? "");
 
 	return (
-		<Card>
-			<Tabs
-				onChange={(_event, value: PlaygroundKind) => setKind(value)}
-				scrollButtons="auto"
-				sx={{ px: 2 }}
-				value={kind}
-				variant="scrollable"
-			>
-				{TABS.map((entry) => (
-					<Tab key={entry.kind} label={entry.label} value={entry.kind} />
-				))}
-			</Tabs>
-			<Divider />
-			<CardContent>
-				<Stack spacing={2}>
-					<Typography
-						variant="body2"
-						sx={{
-							color: "text.secondary",
-						}}
-					>
-						{tab.intro}
-					</Typography>
-					{models.error ? <Alert severity="error">{models.error}</Alert> : null}
-					{models.data === null ? (
-						<CircularProgress aria-label="Loading models" />
-					) : available.length === 0 ? (
-						<Alert severity="info">No model for this is downloaded. Get one from the Store.</Alert>
-					) : (
-						<>
-							<ModelPicker
-								models={available}
-								onChange={(modelId) => setChosen({ ...chosen, [kind]: modelId })}
-								value={model}
-							/>
-							{kind === "asr" ? <SpeechToText key={model} model={model} /> : null}
-							{kind === "tts" ? <TextToSpeech key={model} model={model} /> : null}
-							{kind === "ocr" ? <Ocr key={model} model={model} /> : null}
-							{kind === "embed" ? <Embeddings key={model} model={model} /> : null}
-							{kind === "rerank" ? <Rerank key={model} model={model} /> : null}
-							{kind === "text" ? <Benchmark key={model} model={model} /> : null}
-						</>
-					)}
-				</Stack>
-			</CardContent>
-		</Card>
+		<CardContent>
+			<Stack spacing={2}>
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
+					{tab.intro}
+				</Typography>
+				{models.error ? <Alert severity="error">{models.error}</Alert> : null}
+				{models.data === null ? (
+					<CircularProgress aria-label="Loading models" />
+				) : available.length === 0 ? (
+					<Alert severity="info">No model for this is downloaded. Get one from the Store.</Alert>
+				) : (
+					<>
+						<ModelPicker models={available} onChange={setChosenModel} value={model} />
+						{kind === "asr" ? <SpeechToText key={model} model={model} /> : null}
+						{kind === "tts" ? <TextToSpeech key={model} model={model} /> : null}
+						{kind === "ocr" ? <Ocr key={model} model={model} /> : null}
+						{kind === "embed" ? <Embeddings key={model} model={model} /> : null}
+						{kind === "rerank" ? <Rerank key={model} model={model} /> : null}
+						{kind === "text" ? <Benchmark key={model} model={model} /> : null}
+					</>
+				)}
+			</Stack>
+		</CardContent>
 	);
 }

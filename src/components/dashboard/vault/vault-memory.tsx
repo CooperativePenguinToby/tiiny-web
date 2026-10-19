@@ -91,10 +91,7 @@ export function VaultMemory(): React.JSX.Element {
 	return (
 		<Stack spacing={3}>
 			<Card data-testid="vault-summaries">
-				<CardHeader
-					subheader="Daily summaries of past conversations, kept in Vault. Turn them on or off and set their time on the History page."
-					title="Chat history"
-				/>
+				<CardHeader subheader="Daily summaries of past conversations, kept in Vault." title="Chat history" />
 				<Divider />
 				<CardContent>
 					<Stack spacing={2}>

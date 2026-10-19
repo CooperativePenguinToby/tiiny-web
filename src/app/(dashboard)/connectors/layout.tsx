@@ -1,14 +1,15 @@
 import * as React from "react";
-import type { Metadata } from "next";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-import { config } from "@/config";
 import { ConnectorsPanel } from "@/components/dashboard/connectors/connectors-panel";
 
-export const metadata = { title: `Connectors | ${config.site.name}` } satisfies Metadata;
+interface LayoutProperties {
+	children: React.ReactNode;
+}
 
-export default function Page(): React.JSX.Element {
+// The panel stays mounted while the "Add an MCP server" dialog opens and closes at its own routes.
+export default function Layout({ children }: LayoutProperties): React.JSX.Element {
 	return (
 		<Stack spacing={3}>
 			<div>
@@ -23,6 +24,7 @@ export default function Page(): React.JSX.Element {
 				</Typography>
 			</div>
 			<ConnectorsPanel />
+			{children}
 		</Stack>
 	);
 }

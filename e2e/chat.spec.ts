@@ -9,7 +9,7 @@ const REPLY_TIMEOUT = 8 * 60_000; // the device may be serving other clients fir
 async function openChat(page: Page): Promise<void> {
 	await signIn(page);
 	await page.getByRole("link", { name: "Chat" }).click();
-	await expect(page).toHaveURL(/\/dashboard\/chat$/);
+	await expect(page).toHaveURL(/\/chat$/);
 	await expect(page.getByRole("combobox", { name: "Model" })).toBeVisible();
 }
 

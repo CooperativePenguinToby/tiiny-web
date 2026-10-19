@@ -47,7 +47,8 @@ test("#17 + xflow E: a chat is kept in the device's history, found, reopened, co
 		const conversation = await historyCall<{ title: string }>(`/conversations/${conversationId}`);
 		expect(conversation.title).toBe(`${first.slice(0, 50)}...`);
 
-		await page.getByRole("link", { name: "History" }).click();
+		await page.getByRole("link", { name: "Chat" }).click();
+		await page.getByRole("tab", { name: "History" }).click();
 		const row = page.getByTestId(`conversation-${conversationId}`);
 		await expect(row).toContainText(conversation.title);
 		await page.getByLabel("Search conversations").fill(stamp);
@@ -67,7 +68,8 @@ test("#17 + xflow E: a chat is kept in the device's history, found, reopened, co
 		expect(continued[2].text.trim()).toBe(second);
 		await page.screenshot({ path: "test-results/history-continued.png", fullPage: true });
 
-		await page.getByRole("link", { name: "History" }).click();
+		await page.getByRole("link", { name: "Chat" }).click();
+		await page.getByRole("tab", { name: "History" }).click();
 		await page.getByTestId(`conversation-${conversationId}`).getByRole("button", { name: "Delete" }).click();
 		await page.getByRole("dialog", { name: "Delete conversation?" }).getByRole("button", { name: "Delete" }).click();
 		await expect(page.getByTestId(`conversation-${conversationId}`)).toHaveCount(0);

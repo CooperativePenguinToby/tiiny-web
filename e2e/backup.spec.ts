@@ -16,7 +16,7 @@ test("#25 a backup is downloaded and chat history is restored from it", async ({
 	const ids = await conversationIds();
 	const before = ids.toSorted((a, b) => a.localeCompare(b));
 	await signIn(page);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	const card = page.getByTestId("settings-backup");
 	await expect(card.getByRole("checkbox", { name: /^Chat history/ })).toBeChecked({ timeout: 30_000 });
 	await expect(card.getByRole("checkbox", { name: /^Vault & personalization/ })).toBeChecked();
@@ -78,7 +78,7 @@ test("#25 a backup from another device is refused", async ({ page }) => {
 		original.toString("latin1").replaceAll(device, () => other),
 		"latin1"
 	);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	const card = page.getByTestId("settings-backup");
 	await card
 		.getByLabel("Backup file")

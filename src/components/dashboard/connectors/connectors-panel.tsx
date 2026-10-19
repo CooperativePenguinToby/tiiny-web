@@ -19,6 +19,7 @@ import { usePolling } from "@/hooks/use-polling";
 import { ConfirmDialog } from "@/components/dashboard/settings/confirm-dialog";
 
 import { ConnectDialog } from "./connect-dialog";
+import { ConnectorLogo } from "./connector-logo";
 import { McpServers } from "./mcp-servers";
 
 const OAUTH = new Set<Connector["key"]>(["gmail", "google-calendar", "outlook-mail", "outlook-calendar"]);
@@ -102,23 +103,35 @@ export function ConnectorsPanel(): React.JSX.Element {
 									<Card data-testid={`connector-${connector.key}`} sx={CARD_SX}>
 										<CardContent sx={{ flexGrow: 1 }}>
 											<Stack spacing={1}>
-												<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-													<Typography variant="subtitle1">{connector.name}</Typography>
-													<Chip
-														data-testid="connector-state"
-														color={connector.connected ? "success" : "default"}
-														label={connector.connected ? "Connected" : "Not connected"}
-														size="small"
-													/>
+												<Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
+													<ConnectorLogo connectorKey={connector.key} />
+													<div>
+														<Stack
+															direction="row"
+															spacing={1}
+															useFlexGap
+															sx={{ alignItems: "center", flexWrap: "wrap" }}
+														>
+															<Typography variant="subtitle1" sx={{ whiteSpace: "nowrap" }}>
+																{connector.name}
+															</Typography>
+															<Chip
+																data-testid="connector-state"
+																color={connector.connected ? "success" : "default"}
+																label={connector.connected ? "Connected" : "Not connected"}
+																size="small"
+															/>
+														</Stack>
+														<Typography
+															variant="caption"
+															sx={{
+																color: "text.secondary",
+															}}
+														>
+															{CATEGORY[connector.category]}
+														</Typography>
+													</div>
 												</Stack>
-												<Typography
-													variant="caption"
-													sx={{
-														color: "text.secondary",
-													}}
-												>
-													{CATEGORY[connector.category]}
-												</Typography>
 												<Typography
 													data-testid="connector-detail"
 													variant="body2"

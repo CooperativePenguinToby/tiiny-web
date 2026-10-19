@@ -18,7 +18,7 @@ test("#2 + xflow A: load a model from the UI, see it on the dashboard, unload it
 
 	await signIn(page);
 	await page.getByRole("link", { name: "Models" }).click();
-	await expect(page).toHaveURL(/\/dashboard\/models$/);
+	await expect(page).toHaveURL(/\/models$/);
 
 	const row = page.getByTestId(`model-${TEST_MODEL}`);
 	const status = row.locator(".MuiChip-label");

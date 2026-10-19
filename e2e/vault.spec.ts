@@ -77,7 +77,7 @@ test("#15 a file goes into Vault, is indexed, found, downloaded, renamed and del
 
 test("#15 files Vault does not accept are refused before upload", async ({ page }) => {
 	await signIn(page);
-	await page.goto("/dashboard/vault");
+	await page.goto("/vault");
 	const response = await page.request.post("/api/vault/upload", {
 		multipart: { files: { name: "program.exe", mimeType: "application/octet-stream", buffer: Buffer.from("MZ") } },
 	});

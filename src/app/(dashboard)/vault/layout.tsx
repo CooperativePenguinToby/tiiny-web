@@ -1,14 +1,15 @@
 import * as React from "react";
-import type { Metadata } from "next";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-import { config } from "@/config";
-import { VaultTabs } from "@/components/dashboard/vault/vault-tabs";
+import { paths } from "@/paths";
+import { RouteTabs } from "@/components/dashboard/layout/route-tabs";
 
-export const metadata = { title: `Vault | ${config.site.name}` } satisfies Metadata;
+interface LayoutProperties {
+	children: React.ReactNode;
+}
 
-export default function Page(): React.JSX.Element {
+export default function Layout({ children }: LayoutProperties): React.JSX.Element {
 	return (
 		<Stack spacing={3}>
 			<div>
@@ -23,7 +24,13 @@ export default function Page(): React.JSX.Element {
 					search.
 				</Typography>
 			</div>
-			<VaultTabs />
+			<RouteTabs
+				tabs={[
+					{ label: "Files", href: paths.dashboard.vault },
+					{ label: "Chat history", href: paths.dashboard.vaultChatHistory },
+				]}
+			/>
+			{children}
 		</Stack>
 	);
 }

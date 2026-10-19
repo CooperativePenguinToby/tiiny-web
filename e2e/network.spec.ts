@@ -33,7 +33,7 @@ test("#11 Network shows the device's Wi-Fi state, networks and interfaces", asyn
 		interfaces: { name: string; state: string; ipv4: { address: string }[] }[];
 	}>("wifi", "/api/v1/sys/network");
 	await signIn(page);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	const card = page.getByTestId("settings-network");
 
 	if (status.is_connected)
@@ -55,7 +55,7 @@ test("#11 changes that would cut this app off from the device are refused", asyn
 	const status = await wifiStatus();
 	test.skip(!status.is_connected, "the device is not on Wi-Fi");
 	await signIn(page);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	const card = page.getByTestId("settings-network");
 	await expect(card.getByTestId("interface-wlan0")).toContainText("This app's link");
 	await expect(card.getByRole("switch", { name: "Wi-Fi" })).toBeDisabled();
@@ -83,7 +83,7 @@ test("#11 auto-join can be switched for a saved network", async ({ page }) => {
 	test.skip(!saved, "no saved network other than the current one");
 	const original = saved!.is_auto_connect;
 	await signIn(page);
-	await page.goto("/dashboard/settings");
+	await page.goto("/settings");
 	const toggle = page.getByRole("switch", { name: `Auto-join ${saved!.wifi_name}` });
 	try {
 		await expect(toggle).toBeChecked({ checked: original, ...SCAN });

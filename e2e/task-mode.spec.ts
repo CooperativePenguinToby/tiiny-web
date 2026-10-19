@@ -135,7 +135,7 @@ test("xflow G + #23: Task mode knows the profile and updates it when asked", asy
 	const model = await holdChatModel();
 	try {
 		await signIn(page);
-		await page.goto("/dashboard/settings");
+		await page.goto("/settings");
 		const card = page.getByTestId("settings-personalization");
 		await card.getByLabel("Occupation").fill(occupation);
 		await card.getByRole("button", { name: "Save" }).click();
@@ -167,7 +167,7 @@ test("xflow H: Task mode uses a tool of an MCP server running on the device", as
 	try {
 		await signIn(page);
 		await page.getByRole("link", { name: "Connectors" }).click();
-		await page.getByRole("button", { name: "Add MCP server" }).click();
+		await page.getByRole("link", { name: "Add MCP server" }).click();
 		const dialog = page.getByRole("dialog", { name: "Add an MCP server" });
 		await dialog.getByLabel("Name").fill(serverName);
 		await dialog.getByLabel("URL").fill(MCP_URL);

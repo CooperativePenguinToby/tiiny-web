@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import RouterLink from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -13,15 +15,16 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { PlugIcon } from "@phosphor-icons/react/dist/ssr/Plug";
 
 import type { McpServer, McpTool } from "@/types/device";
+import { paths } from "@/paths";
 import { postJson } from "@/lib/api";
 import { responseError } from "@/lib/sse";
 import { usePolling } from "@/hooks/use-polling";
+import { RouteTabs } from "@/components/dashboard/layout/route-tabs";
 import { ConfirmDialog } from "@/components/dashboard/settings/confirm-dialog";
 
 const EXAMPLE = `{
@@ -32,16 +35,18 @@ const EXAMPLE = `{
 
 const errorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
+// Open at its own routes, one per way of adding: by URL, or from JSON.
 function AddServerDialog({
 	open,
+	mode,
 	onClose,
 	onAdded,
 }: {
 	open: boolean;
+	mode: "url" | "json";
 	onClose: () => void;
 	onAdded: () => void;
 }): React.JSX.Element {
-	const [mode, setMode] = React.useState<"url" | "json">("url");
 	const [name, setName] = React.useState("");
 	const [url, setUrl] = React.useState("");
 	const [json, setJson] = React.useState("");
@@ -83,10 +88,12 @@ function AddServerDialog({
 						The server runs on the device, so it must be reachable from there. Servers that need a desktop or a browser
 						will not work on the device.
 					</DialogContentText>
-					<Tabs onChange={(_event, value: "url" | "json") => setMode(value)} value={mode}>
-						<Tab label="By URL" value="url" />
-						<Tab label="From JSON" value="json" />
-					</Tabs>
+					<RouteTabs
+						tabs={[
+							{ label: "By URL", href: paths.dashboard.addMcpServer },
+							{ label: "From JSON", href: paths.dashboard.addMcpServerJson },
+						]}
+					/>
 					{mode === "url" ? (
 						<>
 							<TextField label="Name" onChange={(event) => setName(event.target.value)} size="small" value={name} />
@@ -162,7 +169,9 @@ function ServerTools({ id }: { id: string }): React.JSX.Element {
 
 export function McpServers(): React.JSX.Element {
 	const polled = usePolling<McpServer[]>("/api/mcp", 15_000);
-	const [adding, setAdding] = React.useState(false);
+	const pathname = usePathname();
+	const router = useRouter();
+	const isAdding = pathname === paths.dashboard.addMcpServer || pathname === paths.dashboard.addMcpServerJson;
 	const [shownTools, setShownTools] = React.useState<string | null>(null);
 	const [deleting, setDeleting] = React.useState<McpServer | null>(null);
 	const [outcome, setOutcome] = React.useState<{ severity: "success" | "error"; message: string } | null>(null);
@@ -183,7 +192,12 @@ export function McpServers(): React.JSX.Element {
 		<Stack spacing={2}>
 			<Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
 				<Typography variant="h6">Custom MCP servers</Typography>
-				<Button onClick={() => setAdding(true)} variant="contained">
+				<Button
+					component={RouterLink}
+					href={paths.dashboard.addMcpServer}
+					startIcon={<PlugIcon fontSize="var(--icon-fontSize-md)" />}
+					variant="contained"
+				>
 					Add MCP server
 				</Button>
 			</Stack>
@@ -220,6 +234,7 @@ export function McpServers(): React.JSX.Element {
 						{polled.data.map((server) => (
 							<Stack data-testid={`mcp-${server.name}`} key={server.id} spacing={1} sx={{ px: 3, py: 2 }}>
 								<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+									<PlugIcon aria-hidden color="var(--mui-palette-text-secondary)" fontSize={24} />
 									<Typography variant="subtitle2">{server.name}</Typography>
 									<Chip
 										color={server.connected ? "success" : "error"}
@@ -255,14 +270,15 @@ export function McpServers(): React.JSX.Element {
 				</Card>
 			)}
 			<AddServerDialog
-				key={String(adding)}
+				key={String(isAdding)}
+				mode={pathname === paths.dashboard.addMcpServerJson ? "json" : "url"}
 				onAdded={() => {
-					setAdding(false);
+					router.push(paths.dashboard.connectors);
 					setOutcome({ severity: "success", message: "MCP server added." });
 					void polled.refresh();
 				}}
-				onClose={() => setAdding(false)}
-				open={adding}
+				onClose={() => router.push(paths.dashboard.connectors)}
+				open={isAdding}
 			/>
 			<ConfirmDialog
 				confirmLabel="Remove"

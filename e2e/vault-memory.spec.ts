@@ -41,7 +41,7 @@ test("#16 the device's daily chat summaries are listed and readable", async ({ p
 	await page.screenshot({ path: "test-results/vault-history.png", fullPage: true });
 });
 
-test("#16 daily summaries are switched on and off and timed on the History page, in local time", async ({ page }) => {
+test("#16 daily summaries are switched on and off and timed in Vault, in local time", async ({ page }) => {
 	const schedule = await kbCall<Schedule>("/kb/memory/schedule");
 	const model = await kbCall<{ model_id: string }>("/kb/memory/model");
 	const context = await kbCall<{ created_at: string }>("/kb/user-context");
@@ -51,8 +51,7 @@ test("#16 daily summaries are switched on and off and timed on the History page,
 	const localOffset = -new Date().getTimezoneOffset();
 	const expected = (((3 * 60 + deviceOffset - localOffset) % 1440) + 1440) % 1440;
 
-	await signIn(page);
-	await page.getByRole("link", { name: "History" }).click();
+	await openHistory(page);
 	const card = page.getByTestId("summary-settings");
 	const toggle = card.getByRole("switch", { name: "Daily summaries" });
 	try {
