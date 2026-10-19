@@ -11,6 +11,18 @@ UI built on [Devias Material Kit React](https://github.com/devias-io/material-ki
 
 ## Run
 
+With Docker (the image is built on `dhi.io/node:26-alpine3.23` and runs as a non-root user):
+
+```sh
+cp .env.example .env   # fill in ADMIN_PASSWORD, TIINY_DEVICE_URL, TIINY_AUTH_KEY and optionally AGENT_DOMAIN
+docker compose up -d --build
+```
+
+The certificate and session secret live in the `tiiny-data` volume. Add a port line to `compose.yaml` for each
+agent you install, unless you use `AGENT_DOMAIN` (see Notes).
+
+Without Docker (Node 26):
+
 ```sh
 npm install
 npm run build
@@ -34,6 +46,7 @@ and every LAN address of the machine). Browsers will warn until you trust it or 
 | `TIINY_DEVICE_URL` | from the CLI config | e.g. `http://10.11.0.11`. |
 | `TIINY_AUTH_KEY` | from the CLI config | Device API key. |
 | `TIINY_CONFIG` | `~/.local/tiiny/config.json` | CLI config to read the two values above from. |
+| `AGENT_DOMAIN` | — | Also serve each agent at `https://<agent>.<AGENT_DOMAIN>` on the app's port, e.g. `tiiny.lan`. |
 | `TIINY_STREAM_WAIT_MS` | `900000` | How long a chat/load request may wait for the device to start answering. |
 | `TIINY_STREAM_IDLE_MS` | `300000` | Max gap between streamed chunks. |
 
@@ -53,6 +66,12 @@ and every LAN address of the machine). Browsers will warn until you trust it or 
   `https://<this-machine>:18880` for Tiiny Music, `:9891` for Open WebUI) that forwards to that host name,
   websockets included, only for signed-in browsers; those ports must be free on this machine. The device
   itself still serves the agents to anyone on the LAN, so firewall the device if that matters.
+- With `AGENT_DOMAIN` set, each agent is also served at `https://<agent>.<AGENT_DOMAIN>` on the app's own port
+  (e.g. `https://tiinymusic.tiiny.lan:8443`), so no agent ports are needed. `*.<AGENT_DOMAIN>` must resolve to
+  this machine (a wildcard DNS entry on your router, or hosts entries), and the generated certificate then
+  covers those names. The Agents page opens agents there through a one-time link (valid 60 seconds, usable
+  once) that signs the agent's host in; a browser without that refuses. Agents can't live under a path such
+  as `/agent/tiinymusic`: they load their files and APIs from the root of their host.
 
 ## Development
 
@@ -61,6 +80,7 @@ ADMIN_PASSWORD=dev npm run dev   # HTTPS dev server with hot reload (shares .nex
 npm run typecheck
 npm run lint
 BASE_URL=https://localhost:8443 ADMIN_PASSWORD=... npm run test:e2e   # against a running server + the real device
+E2E_AGENT_DOMAIN=tiiny.test ...                                         # when that server has AGENT_DOMAIN=tiiny.test
 ```
 
 The e2e tests use your installed Google Chrome (`PW_CHANNEL` to override) and drive the real device: they load

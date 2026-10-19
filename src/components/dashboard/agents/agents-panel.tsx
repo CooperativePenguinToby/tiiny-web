@@ -98,7 +98,11 @@ const STATUS_COLORS: Record<string, "success" | "warning" | "error"> = {
 };
 const STOPPABLE = new Set(["running", "starting", "error"]);
 
-const agentUrl = (port: number): string => `https://${location.hostname}:${port}/`;
+// Through the agent's subdomain when configured (a one-time link signs that host in), else its port.
+const agentUrl = (service: NonNullable<Agent["service"]>): string =>
+	service.subdomain
+		? `/api/agents/open?id=${encodeURIComponent(service.id)}`
+		: `https://${location.hostname}:${service.port}/`;
 
 function AgentIcon({ agent }: { agent: Agent }): React.JSX.Element {
 	return (
@@ -273,7 +277,8 @@ export function AgentsPanel(): React.JSX.Element {
 						{installed.map((agent) => {
 							const service = agent.service!;
 							const isRunning = service.status === "running";
-							const canOpen = isRunning && service.port !== null && service.proxy?.listening;
+							const canOpen =
+								isRunning && (service.subdomain !== null || (service.port !== null && service.proxy?.listening));
 							return (
 								<Grid key={agent.appId} size={{ md: 6, xs: 12 }}>
 									<Card data-testid={`agent-${service.id}`} sx={CARD_SX}>
@@ -358,7 +363,7 @@ export function AgentsPanel(): React.JSX.Element {
 													{canOpen ? (
 														<Button
 															component="a"
-															href={agentUrl(service.port!)}
+															href={agentUrl(service)}
 															rel="noreferrer"
 															target="_blank"
 															variant="contained"

@@ -1,0 +1,26 @@
+# tiiny-web: the web UI for a Tiiny device. Settings come from the environment or a .env file next to
+# this one (see .env.example).
+services:
+  tiiny-web:
+    build: .
+    image: tiiny-web
+    restart: unless-stopped
+    environment:
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD, the password for signing in}
+      TIINY_DEVICE_URL: ${TIINY_DEVICE_URL:?set TIINY_DEVICE_URL, e.g. http://10.11.0.11}
+      TIINY_AUTH_KEY: ${TIINY_AUTH_KEY:?set TIINY_AUTH_KEY, the device API key}
+      # Serves each agent at https://<agent>.<AGENT_DOMAIN>:8443 (e.g. tiinymusic.tiiny.lan), so no agent
+      # ports are needed. *.<AGENT_DOMAIN> must resolve to this host. Leave empty to use agent ports only.
+      AGENT_DOMAIN: ${AGENT_DOMAIN:-}
+    ports:
+      - "8443:8443"
+      # Agent ports, one per installed agent: needed only without AGENT_DOMAIN (both work together).
+      - "9891:9891" # Open WebUI
+      - "7866:7866" # SillyTavern
+      - "18880:18880" # Tiiny Music
+    volumes:
+      # The TLS certificate and key, and the session secret.
+      - tiiny-data:/data
+
+volumes:
+  tiiny-data:

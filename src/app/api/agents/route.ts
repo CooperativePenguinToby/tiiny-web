@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { deviceJson } from "@/server/device";
 import { apiRoute } from "@/server/route";
+import { agentDomain } from "@/server/shared/agent-domain.mjs";
 
 import type { Agent } from "@/types/device";
 
@@ -82,6 +83,7 @@ export const GET = apiRoute(async () => {
 	const updateById = new Map(updates.map((entry) => [entry.service_id, entry]));
 	const usageById = new Map(usage.map((entry) => [entry.service_id, entry]));
 	const proxies = (globalThis as { tiinyAgentProxies?: ProxyStates }).tiinyAgentProxies;
+	const domain = agentDomain();
 	const cloudById = new Map(cloud.map((app) => [app.app_id, app]));
 	const serviceById = new Map(services.map((service) => [service.id, service]));
 
@@ -143,6 +145,7 @@ export const GET = apiRoute(async () => {
 								version: service.cloud_version,
 								port,
 								proxy: port === null ? null : (proxies?.get(port) ?? null),
+								subdomain: domain && port !== null ? `${service.id}.${domain}` : null,
 								update: updateById.get(service.id)?.update_available
 									? { latestVersion: updateById.get(service.id)!.latest_version }
 									: null,

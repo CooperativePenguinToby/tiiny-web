@@ -183,6 +183,8 @@ export interface Agent {
 		version: string | null;
 		port: number | null;
 		proxy: { listening: boolean; error: string | null } | null;
+		// `<service id>.<AGENT_DOMAIN>` when agent subdomains are configured.
+		subdomain: string | null;
 		// A newer version from the agent store, if the device reports one.
 		update: { latestVersion: string } | null;
 		usage: { cpuPercent: number; memoryBytes: number } | null;

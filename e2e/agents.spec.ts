@@ -8,6 +8,8 @@ const START_STOP_AGENT = process.env.E2E_START_STOP_AGENT ?? "openwebui";
 const START_STOP_AGENT_TITLE = process.env.E2E_START_STOP_AGENT_TITLE ?? "Open WebUI";
 const LAN_AGENT = process.env.E2E_LAN_AGENT ?? "tiinymusic";
 const LAN_AGENT_TITLE = process.env.E2E_LAN_AGENT_TITLE ?? "Tiiny Music";
+// Set to the server's AGENT_DOMAIN when it serves agents at `<service id>.<domain>` (which must resolve here).
+const AGENT_DOMAIN = process.env.E2E_AGENT_DOMAIN;
 
 interface Service {
 	id: string;
@@ -43,6 +45,7 @@ test("#7 the agent store lists every agent: web agents to install, desktop agent
 });
 
 test("#8 + xflow D: a LAN agent opens through the HTTPS proxy only with a session", async ({ page, browser }) => {
+	test.skip(Boolean(AGENT_DOMAIN), "the server serves agents on subdomains; covered by the subdomain test");
 	expect(await serviceStatus(LAN_AGENT), `${LAN_AGENT} must be running`).toBe("running");
 	await signIn(page);
 	await page.getByRole("link", { name: "Agents" }).click();
@@ -54,6 +57,7 @@ test("#8 + xflow D: a LAN agent opens through the HTTPS proxy only with a sessio
 
 	const [agentPage] = await Promise.all([page.context().waitForEvent("page"), open.click()]);
 	await expect(agentPage).toHaveTitle(LAN_AGENT_TITLE, { timeout: 30_000 });
+	await expect(agentPage.getByText(LAN_AGENT_TITLE, { exact: true }).first()).toBeVisible({ timeout: 30_000 });
 	expect(new URL(agentPage.url()).protocol).toBe("https:");
 	await agentPage.screenshot({ path: "test-results/agent-proxied.png" });
 
@@ -64,6 +68,61 @@ test("#8 + xflow D: a LAN agent opens through the HTTPS proxy only with a sessio
 	await strangerPage.goto(href!);
 	await expect(strangerPage).toHaveURL(/:8443\/auth\/sign-in$/);
 	await stranger.close();
+});
+
+test("an agent opens on its subdomain through a one-time link, and on its port too", async ({ page, browser }) => {
+	test.skip(!AGENT_DOMAIN, "set E2E_AGENT_DOMAIN to the server's AGENT_DOMAIN");
+	expect(await serviceStatus(LAN_AGENT), `${LAN_AGENT} must be running`).toBe("running");
+	const appPort = new URL(process.env.BASE_URL ?? "https://localhost:8443").port;
+	const agentOrigin = `https://${LAN_AGENT}.${AGENT_DOMAIN}:${appPort}`;
+	await signIn(page);
+	await page.getByRole("link", { name: "Agents" }).click();
+	const open = page.getByTestId(`agent-${LAN_AGENT}`).getByRole("link", { name: "Open" });
+	await expect(open).toHaveAttribute("href", `/api/agents/open?id=${LAN_AGENT}`);
+
+	const [agentPage] = await Promise.all([page.context().waitForEvent("page"), open.click()]);
+	await expect(agentPage).toHaveTitle(LAN_AGENT_TITLE, { timeout: 30_000 });
+	expect(new URL(agentPage.url()).origin).toBe(agentOrigin);
+	// Rendered by the agent's own script, so its assets and API calls work on the subdomain too.
+	await expect(agentPage.getByText(LAN_AGENT_TITLE, { exact: true }).first()).toBeVisible({ timeout: 30_000 });
+	await agentPage.screenshot({ path: "test-results/agent-subdomain.png" });
+
+	// Without a session the agent host refuses; a handoff link works once only.
+	const stranger = await browser.newContext({ ignoreHTTPSErrors: true });
+	const strangerPage = await stranger.newPage();
+	const refused = await strangerPage.goto(`${agentOrigin}/`);
+	expect(refused?.status()).toBe(401);
+	await expect(strangerPage.locator("body")).toContainText("Sign in to tiiny-web");
+	// Links issued back to back (within the same second) are distinct, and each works.
+	const [first, handoff] = [
+		await page.request.get(`/api/agents/open?id=${LAN_AGENT}`, { maxRedirects: 0 }),
+		await page.request.get(`/api/agents/open?id=${LAN_AGENT}`, { maxRedirects: 0 }),
+	];
+	expect(handoff.status()).toBe(307);
+	const link = handoff.headers().location;
+	expect(link).not.toBe(first.headers().location);
+	expect(link.startsWith(`${agentOrigin}/.tiiny/handoff?token=`)).toBe(true);
+	await strangerPage.goto(link);
+	await expect(strangerPage).toHaveTitle(LAN_AGENT_TITLE, { timeout: 30_000 });
+	const replayContext = await browser.newContext({ ignoreHTTPSErrors: true });
+	const replayPage = await replayContext.newPage();
+	const replayed = await replayPage.goto(link);
+	expect(replayed?.status()).toBe(401);
+	await replayContext.close();
+	const otherContext = await browser.newContext({ ignoreHTTPSErrors: true });
+	const otherPage = await otherContext.newPage();
+	await otherPage.goto(first.headers().location);
+	await expect(otherPage).toHaveTitle(LAN_AGENT_TITLE, { timeout: 30_000 });
+	await otherContext.close();
+	await stranger.close();
+
+	// The agent's own port still works alongside its subdomain.
+	const deviceServices = await services();
+	const port = deviceServices.find((service) => service.id === LAN_AGENT)!.ports[0].host_port;
+	const direct = await page.context().newPage();
+	await direct.goto(`https://localhost:${port}/`);
+	await expect(direct).toHaveTitle(LAN_AGENT_TITLE, { timeout: 30_000 });
+	await expect(direct.getByText(LAN_AGENT_TITLE, { exact: true }).first()).toBeVisible({ timeout: 30_000 });
 });
 
 test("#8 + xflow D: start Open WebUI, open it through the HTTPS proxy (websocket included), stop it", async ({

@@ -41,3 +41,6 @@ next-env.d.ts
 # playwright
 /test-results/
 /playwright-report/
+
+# docker compose settings (secrets)
+.env

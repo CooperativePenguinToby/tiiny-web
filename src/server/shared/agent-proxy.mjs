@@ -1,17 +1,21 @@
 // HTTPS front doors for the device's web agents. The device's gateway (port 80) serves every agent's
 // web UI under the virtual host `<service id>.agent.tiiny.local`, whether the agent listens on the
-// device's LAN side or only on its loopback, and with no login. For each installed agent this opens an
-// HTTPS listener on the agent's port number here and forwards to that virtual host, but only for
-// browsers holding a valid wrapper session. Listener state is published on globalThis so the agents
-// API route (same process) can report it.
+// device's LAN side or only on its loopback, and with no login. Each installed agent is reachable two
+// ways, both forwarding to that virtual host and only for browsers holding a valid wrapper session:
+// - an HTTPS listener on the agent's port number here;
+// - when AGENT_DOMAIN is set, `https://<service id>.<AGENT_DOMAIN>` on the app's own port, entered
+//   through a one-time handoff link from the web UI (its session cookie cannot reach another host).
+// Listener state is published on globalThis so the agents API route (same process) can report it.
 import { createServer } from "node:https";
 
 import httpProxy from "http-proxy";
 
+import { agentDomain, HANDOFF_PATH } from "./agent-domain.mjs";
 import { resolveDeviceTarget } from "./device-target.mjs";
-import { isValidSessionToken, SESSION_COOKIE } from "./session-token.mjs";
+import { createSessionToken, isValidSessionToken, readHandoffToken, SESSION_COOKIE } from "./session-token.mjs";
 
 const REFRESH_MS = 30_000;
+const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
 
 /**
 @typedef {{ port: number; serviceId: string; listening: boolean; error: string | null }} ProxyState
@@ -29,6 +33,14 @@ const servers = new Map();
 Where each proxied request came in, for rewriting redirects. @type {WeakMap<object, { publicHost: string; deviceHost: string }>}
 */
 const origins = new WeakMap();
+/**
+Installed agents that have a web UI, by service id, for routing their subdomains. @type {Set<string>}
+*/
+const agentIds = new Set();
+/**
+Handoff tokens already exchanged, until they expire. @type {Map<string, number>}
+*/
+const usedHandoffs = new Map();
 // eslint-disable-next-line unicorn/no-global-object-property-assignment -- the agents API route reads this from Next's separately bundled server code; the global is the only channel shared with this custom server
 globalThis.tiinyAgentProxies = states;
 
@@ -64,6 +76,20 @@ function withoutSessionCookie(header = "") {
 export const agentVirtualHost = (serviceId) => `${serviceId}.agent.tiiny.local`;
 
 /**
+The installed agent a request's Host names under AGENT_DOMAIN, if any.
+@param {import("node:http").IncomingMessage} request
+@returns {string | null}
+*/
+function agentForHost(request) {
+	const domain = agentDomain();
+	if (!domain) return null;
+	const hostname = (request.headers.host ?? "").replace(/:\d+$/, "").toLowerCase();
+	if (!hostname.endsWith(`.${domain}`)) return null;
+	const label = hostname.slice(0, -(domain.length + 1));
+	return agentIds.has(label) ? label : null;
+}
+
+/**
 @param {import("node:http").IncomingMessage} request
 */
 function authorized(request) {
@@ -85,11 +111,15 @@ function retarget(request, serviceId, deviceHost) {
 }
 
 /**
-@param {{ tls: { cert: Buffer; key: Buffer }; host: string; appPort: number }} options
+@type {{ proxy: import("http-proxy") | null }}
 */
-export function startAgentProxies({ tls, host, appPort }) {
+const shared = { proxy: null };
+
+// The forwarder shared by the port listeners and the subdomain routes, created on first use.
+function agentProxy() {
+	if (shared.proxy) return shared.proxy;
 	const proxy = httpProxy.createProxyServer({ ws: true, xfwd: true });
-	// Redirects the agent sends to its virtual host (or the device) go back to this listener instead.
+	// Redirects the agent sends to its virtual host (or the device) go back to where the request came in.
 	proxy.on("proxyRes", (proxyResponse, request) => {
 		const location = proxyResponse.headers.location;
 		const origin = origins.get(request);
@@ -112,7 +142,85 @@ export function startAgentProxies({ tls, host, appPort }) {
 			response?.destroy();
 		}
 	});
+	shared.proxy = proxy;
+	return proxy;
+}
 
+/**
+@param {import("node:http").ServerResponse} response @param {string} message
+*/
+function refuse(response, message) {
+	response.writeHead(401, { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" });
+	response.end(message);
+}
+
+/**
+Exchanges a handoff link for a session cookie on this agent's host, then opens the agent.
+@param {import("node:http").IncomingMessage} request @param {import("node:http").ServerResponse} response
+@param {string} serviceId
+*/
+function handOff(request, response, serviceId) {
+	const now = Date.now() / 1000;
+	for (const [token, expires] of usedHandoffs) if (expires < now) usedHandoffs.delete(token);
+	const token = new URL(request.url ?? "/", "https://agent").searchParams.get("token") ?? "";
+	const handoff = readHandoffToken(token);
+	if (!handoff || handoff.serviceId !== serviceId || usedHandoffs.has(token)) {
+		refuse(response, "This link has expired. Open the agent again from tiiny-web's Agents page.");
+		return;
+	}
+	usedHandoffs.set(token, handoff.expires);
+	// Lax, not Strict: the handoff arrives from the web UI's host, and the redirect below must carry it.
+	const cookie = `${SESSION_COOKIE}=${createSessionToken(SESSION_MAX_AGE_SECONDS)}; Path=/; Max-Age=${SESSION_MAX_AGE_SECONDS}; HttpOnly; Secure; SameSite=Lax`;
+	response.writeHead(302, { location: "/", "set-cookie": cookie, "cache-control": "no-store" });
+	response.end();
+}
+
+/**
+Serves a request addressed to `<service id>.<AGENT_DOMAIN>`. Returns false when the request is not for
+an agent (it belongs to the web UI).
+@param {import("node:http").IncomingMessage} request @param {import("node:http").ServerResponse} response
+@returns {boolean}
+*/
+export function handleAgentRequest(request, response) {
+	const serviceId = agentForHost(request);
+	const device = serviceId ? resolveDeviceTarget() : null;
+	if (!serviceId || !device) return false;
+	if ((request.url ?? "").split("?", 1)[0] === HANDOFF_PATH) {
+		handOff(request, response, serviceId);
+		return true;
+	}
+	if (!authorized(request)) {
+		refuse(response, "Sign in to tiiny-web and open this agent from its Agents page.");
+		return true;
+	}
+	retarget(request, serviceId, new URL(device.baseUrl).hostname);
+	agentProxy().web(request, response, { target: device.baseUrl });
+	return true;
+}
+
+/**
+The websocket counterpart of handleAgentRequest.
+@param {import("node:http").IncomingMessage} request @param {import("node:stream").Duplex} socket
+@param {Buffer} head
+@returns {boolean}
+*/
+export function handleAgentUpgrade(request, socket, head) {
+	const serviceId = agentForHost(request);
+	const device = serviceId ? resolveDeviceTarget() : null;
+	if (!serviceId || !device) return false;
+	if (!authorized(request)) {
+		socket.end("HTTP/1.1 401 Unauthorized\r\n\r\n");
+		return true;
+	}
+	retarget(request, serviceId, new URL(device.baseUrl).hostname);
+	agentProxy().ws(request, socket, head, { target: device.baseUrl });
+	return true;
+}
+
+/**
+@param {{ tls: { cert: Buffer; key: Buffer }; host: string; appPort: number }} options
+*/
+export function startAgentProxies({ tls, host, appPort }) {
 	/**
 	@param {number} port @param {string} serviceId @param {string} deviceBaseUrl
 	*/
@@ -129,7 +237,7 @@ export function startAgentProxies({ tls, host, appPort }) {
 				return;
 			}
 			retarget(request, serviceId, deviceHost);
-			proxy.web(request, response, { target });
+			agentProxy().web(request, response, { target });
 		});
 		server.on("upgrade", (request, socket, head) => {
 			if (!authorized(request)) {
@@ -137,7 +245,7 @@ export function startAgentProxies({ tls, host, appPort }) {
 				return;
 			}
 			retarget(request, serviceId, deviceHost);
-			proxy.ws(request, socket, head, { target });
+			agentProxy().ws(request, socket, head, { target });
 		});
 		const state = { port, serviceId, listening: false, error: null };
 		states.set(port, state);
@@ -171,8 +279,10 @@ export function startAgentProxies({ tls, host, appPort }) {
 		@type {Map<number, string>}
 		*/
 		const wanted = new Map();
+		agentIds.clear();
 		for (const service of services) {
 			const ports = service.ports ?? [];
+			if (ports.some(({ protocol }) => protocol === "tcp")) agentIds.add(String(service.id).toLowerCase());
 			for (const { host_port: port, protocol } of ports) {
 				if (port !== appPort && protocol === "tcp" && Number.isSafeInteger(port)) wanted.set(port, service.id);
 			}

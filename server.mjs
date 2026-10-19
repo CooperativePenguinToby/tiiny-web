@@ -1,7 +1,7 @@
 // HTTPS-only entrypoint: serves the Next.js app over TLS with either a user-supplied
 // certificate (TLS_CERT_FILE + TLS_KEY_FILE) or a self-signed one generated on first run.
-import { randomBytes } from "node:crypto";
-import { existsSync } from "node:fs";
+import { randomBytes, X509Certificate } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
 import { chmod, mkdir, readFile, writeFile } from "node:fs/promises";
 import { createServer } from "node:https";
 import { hostname, networkInterfaces } from "node:os";
@@ -10,7 +10,8 @@ import path from "node:path";
 import next from "next";
 import { generate } from "selfsigned";
 
-import { startAgentProxies } from "./src/server/shared/agent-proxy.mjs";
+import { agentDomain } from "./src/server/shared/agent-domain.mjs";
+import { handleAgentRequest, handleAgentUpgrade, startAgentProxies } from "./src/server/shared/agent-proxy.mjs";
 
 const development = process.argv.includes("--dev");
 const host = process.env.HOST ?? "0.0.0.0";
@@ -38,6 +39,9 @@ function localAltNames() {
 		{ type: 7, ip: "127.0.0.1" },
 		{ type: 7, ip: "::1" },
 	];
+	// Agents are served at `<service id>.<AGENT_DOMAIN>`.
+	const domain = agentDomain();
+	if (domain) names.push({ type: 2, value: domain }, { type: 2, value: `*.${domain}` });
 	for (const addresses of Object.values(networkInterfaces())) {
 		if (!addresses) continue;
 		for (const address of addresses) {
@@ -58,7 +62,11 @@ async function loadTls() {
 	const tlsDirectory = path.join(dataDirectory, "tls");
 	const certPath = path.join(tlsDirectory, "cert.pem");
 	const keyPath = path.join(tlsDirectory, "key.pem");
-	if (!existsSync(certPath) || !existsSync(keyPath)) {
+	// A certificate generated before AGENT_DOMAIN was set (or changed) does not cover the agents' names.
+	const domain = agentDomain();
+	const coversDomain = () =>
+		!domain || (new X509Certificate(readFileSync(certPath)).subjectAltName ?? "").includes(`DNS:*.${domain}`);
+	if (!existsSync(certPath) || !existsSync(keyPath) || !coversDomain()) {
 		await mkdir(tlsDirectory, { recursive: true });
 		const notAfterDate = new Date();
 		notAfterDate.setFullYear(notAfterDate.getFullYear() + 2);
@@ -101,14 +109,17 @@ const app = next({ dev: development, hostname: host, port });
 await app.prepare();
 const handle = app.getRequestHandler();
 
-createServer({ cert: tls.cert, key: tls.key }, (request, response) => handle(request, response)).listen(
-	port,
-	host,
-	() => {
-		console.log(
-			`tiiny-web: listening on https://${host}:${port} (${development ? "dev" : "production"}, cert ${tls.source})`
-		);
-	}
-);
+const server = createServer({ cert: tls.cert, key: tls.key }, (request, response) => {
+	if (!handleAgentRequest(request, response)) void handle(request, response);
+});
+// Only agents use websockets on this port; anything else is refused as before.
+server.on("upgrade", (request, socket, head) => {
+	if (!handleAgentUpgrade(request, socket, head)) socket.destroy();
+});
+server.listen(port, host, () => {
+	console.log(
+		`tiiny-web: listening on https://${host}:${port} (${development ? "dev" : "production"}, cert ${tls.source})`
+	);
+});
 
 startAgentProxies({ tls, host, appPort: port });
