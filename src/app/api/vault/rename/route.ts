@@ -13,7 +13,7 @@ export const POST = apiRoute(async (request) => {
 	const { sourceId, filename } = input;
 	const id = sourceIdFrom(sourceId);
 	const name = typeof filename === "string" ? filename.trim() : "";
-	if (!name || name.length > 255 || /[\\/]/.test(name)) throw new DeviceError("Enter a file name without slashes", 400);
+	if (!name || name.length > 255 || /[\\/]/.test(name)) throw new DeviceError("errors.vault.invalidName", 400);
 	await deviceJson(`/kb/sources/${encodeURIComponent(id)}`, {
 		method: "PATCH",
 		service: "kb",

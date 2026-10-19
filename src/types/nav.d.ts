@@ -1,6 +1,9 @@
+import type { ParseKeys } from "i18next";
+
 export interface NavItemConfig {
 	key: string;
-	title?: string;
+	// Translation key of the label.
+	title?: ParseKeys;
 	disabled?: boolean;
 	external?: boolean;
 	label?: string;

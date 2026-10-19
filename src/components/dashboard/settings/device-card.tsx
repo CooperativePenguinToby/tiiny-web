@@ -13,6 +13,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
+import { useTranslation } from "react-i18next";
 
 import type { DeviceInfo } from "@/types/device";
 import { postJson } from "@/lib/api";
@@ -24,6 +25,7 @@ import { SectionState } from "./section-state";
 const MAX_NAME = 30;
 
 function NameEditor({ name, onSaved }: { name: string; onSaved: () => Promise<void> }): React.JSX.Element {
+	const { t } = useTranslation();
 	const [value, setValue] = React.useState<string | null>(null);
 	const [saving, setSaving] = React.useState(false);
 	const [error, setError] = React.useState<string | null>(null);
@@ -33,7 +35,7 @@ function NameEditor({ name, onSaved }: { name: string; onSaved: () => Promise<vo
 			<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
 				<span data-testid="device-name">{name}</span>
 				<Button onClick={() => setValue(name)} size="small">
-					Rename
+					{t("settings.device.rename")}
 				</Button>
 			</Stack>
 		);
@@ -59,16 +61,16 @@ function NameEditor({ name, onSaved }: { name: string; onSaved: () => Promise<vo
 				<TextField
 					error={isInvalid}
 					helperText={`${trimmed.length}/${MAX_NAME}`}
-					label="Device name"
+					label={t("settings.device.nameField")}
 					onChange={(event) => setValue(event.target.value)}
 					size="small"
 					value={value}
 				/>
 				<Button disabled={isInvalid || saving} onClick={() => void save()} variant="contained">
-					Save
+					{t("settings.actions.save")}
 				</Button>
 				<Button disabled={saving} onClick={() => setValue(null)}>
-					Cancel
+					{t("settings.actions.cancel")}
 				</Button>
 			</Stack>
 			{error ? <Alert severity="error">{error}</Alert> : null}
@@ -77,43 +79,44 @@ function NameEditor({ name, onSaved }: { name: string; onSaved: () => Promise<vo
 }
 
 export function DeviceCard(): React.JSX.Element {
+	const { t } = useTranslation();
 	const polled = usePolling<DeviceInfo>("/api/settings/device", 30_000);
 	return (
 		<Card data-testid="settings-device">
-			<CardHeader subheader="Reported by the device" title="My device" />
+			<CardHeader subheader={t("settings.device.subheader")} title={t("settings.device.title")} />
 			<Divider />
 			<CardContent>
-				<SectionState label="device information" polled={polled}>
+				<SectionState loadingLabel={t("settings.device.loading")} polled={polled}>
 					{(device) => (
 						<Table size="small">
 							<TableBody>
 								<TableRow>
-									<TableCell component="th">Name</TableCell>
+									<TableCell component="th">{t("settings.device.name")}</TableCell>
 									<TableCell>
 										<NameEditor name={device.name} onSaved={polled.refresh} />
 									</TableCell>
 								</TableRow>
 								<TableRow>
-									<TableCell component="th">Serial number</TableCell>
+									<TableCell component="th">{t("settings.device.serialNumber")}</TableCell>
 									<TableCell>
 										<span data-testid="device-serial">{device.serial}</span>{" "}
-										<CopyButton label="Copy serial number" text={device.serial} />
+										<CopyButton label={t("settings.device.copySerialNumber")} text={device.serial} />
 									</TableCell>
 								</TableRow>
 								<TableRow>
-									<TableCell component="th">Model</TableCell>
+									<TableCell component="th">{t("settings.device.model")}</TableCell>
 									<TableCell data-testid="device-model">
 										{device.model} ({device.modelDate})
 									</TableCell>
 								</TableRow>
 								<TableRow>
-									<TableCell component="th">TiinyOS service</TableCell>
+									<TableCell component="th">{t("settings.device.osService")}</TableCell>
 									<TableCell data-testid="device-os">{device.os}</TableCell>
 								</TableRow>
 								{device.specs.map((spec) => (
-									<TableRow key={spec.label}>
+									<TableRow key={spec.id}>
 										<TableCell component="th">{spec.label}</TableCell>
-										<TableCell data-testid={`device-spec-${spec.label}`}>{spec.value}</TableCell>
+										<TableCell data-testid={`device-spec-${spec.id}`}>{spec.value}</TableCell>
 									</TableRow>
 								))}
 							</TableBody>

@@ -34,8 +34,8 @@ export function parsePersonalization(body: unknown): Personalization {
 	const result = {} as Personalization;
 	for (const [field, limit] of Object.entries(PERSONALIZATION_LIMITS) as [keyof Personalization, number][]) {
 		const text = value[field];
-		if (typeof text !== "string") throw new DeviceError(`${field} must be text`, 400);
-		if (text.length > limit) throw new DeviceError(`${field} is longer than ${limit} characters`, 400);
+		if (typeof text !== "string") throw new DeviceError("errors.request.mustBeText", 400, { field });
+		if (text.length > limit) throw new DeviceError("errors.request.tooLong", 400, { field, count: limit });
 		result[field] = text.trim();
 	}
 	return result;

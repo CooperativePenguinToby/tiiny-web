@@ -1,3 +1,5 @@
+import type { ParseKeys, TFunction } from "i18next";
+
 import type { ChatMessage, Personalization, TaskEvent, TaskStep, ThinkingSetting } from "@/types/device";
 import { readSse } from "@/lib/sse";
 
@@ -120,20 +122,37 @@ interface PendingCall {
 	arguments: string;
 }
 
-function describe(call: PendingCall, arguments_: Record<string, unknown>, mcp: Map<string, McpToolSpec>): string {
+// What each profile field is called in a step's label.
+const UPDATED: Record<string, ParseKeys> = {
+	occupation: "server.task.updatedOccupation",
+	preferences: "server.task.updatedPreferences",
+	recent_focus: "server.task.updatedRecentFocus",
+};
+
+// The step's label in the user's language (the arguments come from the model).
+function describe(
+	call: PendingCall,
+	arguments_: Record<string, unknown>,
+	mcp: Map<string, McpToolSpec>,
+	t: TFunction
+): string {
 	switch (call.name) {
 		case "vault_search": {
-			return `Searched Vault: ${String(arguments_.query ?? "")}`;
+			return t("server.task.searchedVault", { query: String(arguments_.query ?? "") });
 		}
 		case "read_web_page": {
 			try {
-				return `Read ${new URL(String(arguments_.url)).hostname}`;
+				return t("server.task.readHost", { host: new URL(String(arguments_.url)).hostname });
 			} catch {
-				return "Read a web page";
+				return t("server.task.readWebPage");
 			}
 		}
 		case "update_profile": {
-			return `Updated your ${String(arguments_.field ?? "profile").replace("_", " ")}`;
+			if (arguments_.field === undefined || arguments_.field === null) return t("server.task.updatedProfile");
+			const field = String(arguments_.field);
+			return Object.hasOwn(UPDATED, field)
+				? t(UPDATED[field])
+				: t("server.task.updatedField", { field: field.replace("_", " ") });
 		}
 		default: {
 			const tool = mcp.get(call.name);
@@ -214,7 +233,10 @@ export async function* runTask(input: {
 	thinking: ThinkingSetting;
 	tools: TaskTools;
 	signal: AbortSignal;
+	// Translates the step labels and errors the user sees; what the model sees stays English.
+	t: TFunction;
 }): AsyncGenerator<TaskEvent> {
+	const { t } = input;
 	const [context, mcpTools] = await Promise.all([readProfileMarkdown(), connectedMcpTools()]);
 	const mcp = new Map(mcpTools.map((tool) => [toolName(tool.serverName, tool.name), tool]));
 	const allowed = BASE_TOOLS.filter(
@@ -269,13 +291,9 @@ export async function* runTask(input: {
 		for await (const data of completionData(stream)) {
 			const chunk = JSON.parse(data) as Chunk;
 			if (chunk.error) {
-				yield {
-					type: "error",
-					message:
-						chunk.error.type === "interrupted"
-							? "Interrupted."
-							: (chunk.error.message ?? "The device reported an error"),
-				};
+				yield chunk.error.type === "interrupted"
+					? { type: "error", message: t("errors.task.interrupted"), interrupted: true }
+					: { type: "error", message: chunk.error.message ?? t("errors.device.reportedError") };
 				return;
 			}
 			if (chunk.usage) {
@@ -327,7 +345,7 @@ export async function* runTask(input: {
 			const taskStep: TaskStep = {
 				id: call.id,
 				tool: call.name,
-				label: describe(call, arguments_, mcp),
+				label: describe(call, arguments_, mcp, t),
 				arguments: call.arguments,
 			};
 			yield { type: "step", step: taskStep };
@@ -345,5 +363,5 @@ export async function* runTask(input: {
 		}
 	}
 	yield { type: "usage", usage };
-	yield { type: "error", message: `Stopped after ${MAX_STEPS} steps without a final answer.` };
+	yield { type: "error", message: t("errors.task.tooManySteps", { count: MAX_STEPS }) };
 }

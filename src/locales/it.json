@@ -1,0 +1,1227 @@
+{
+	"nav": {
+		"overview": "Panoramica",
+		"models": "Modelli",
+		"agents": "Agenti",
+		"chat": "Chat",
+		"playground": "Playground",
+		"vault": "Vault",
+		"connectors": "Connettori",
+		"settings": "Impostazioni",
+		"openNavigation": "Apri navigazione",
+		"signOut": "Esci",
+		"language": "Lingua",
+		"languageCurrent": "Lingua: {{language}}"
+	},
+	"titles": {
+		"page": "{{page}} | {{site}}",
+		"notFound": "Non trovato",
+		"settings": "Impostazioni",
+		"overview": "Panoramica",
+		"agents": "Agenti",
+		"history": "Cronologia",
+		"signIn": "Accedi",
+		"playground": "Playground",
+		"connectors": "Connettori",
+		"models": "Modelli",
+		"store": "Store",
+		"chat": "Chat",
+		"vault": "Vault",
+		"huggingFace": "Hugging Face"
+	},
+	"errors": {
+		"notSignedIn": "Accesso non effettuato",
+		"internal": "Errore interno",
+		"unknownLanguage": "Lingua sconosciuta",
+		"incorrectPassword": "Password errata",
+		"passthrough": "{{message}}",
+		"request": {
+			"expected": "Previsto: {{shape}}",
+			"required": "{{field}} è obbligatorio",
+			"mustBeText": "{{field}} deve essere un testo",
+			"tooLong_one": "{{field}} supera {{count}} carattere",
+			"tooLong_many": "{{field}} supera {{count}} caratteri",
+			"tooLong_other": "{{field}} supera {{count}} caratteri",
+			"modelIdFormat": "{{field}} deve avere la forma Org/Name",
+			"modelIdLike": "{{field}} deve essere un ID modello nella forma Org/Name",
+			"range": "{{field}} deve essere compreso tra {{min}} e {{max}}",
+			"oneOf": "{{field}} deve essere uno tra {{options}}",
+			"dateFormat": "{{field}} deve essere una data come {{example}}",
+			"jsonList": "{{field}} deve essere una lista JSON",
+			"emptySearch": "Inserisci qualcosa da cercare"
+		},
+		"device": {
+			"notConfigured": "Dispositivo non configurato: imposta TIINY_DEVICE_URL e TIINY_AUTH_KEY, oppure accedi prima con la CLI tiiny",
+			"notConfiguredShort": "Dispositivo non configurato",
+			"responded": "Il dispositivo ha risposto {{status}}: {{message}}",
+			"respondedUnavailable": "Il dispositivo ha risposto {{status}}: il servizio non è disponibile",
+			"unreachable": "Dispositivo non raggiungibile su {{url}}: {{reason}}",
+			"emptyStream": "Il dispositivo ha restituito uno stream vuoto",
+			"refusedChange": "Il dispositivo ha rifiutato la modifica",
+			"reportedError": "Il dispositivo ha segnalato un errore"
+		},
+		"file": {
+			"tooLarge": "{{name}} supera {{megabytes}} MB"
+		},
+		"hf": {
+			"invalidRepo": "Inserisci un repository Hugging Face come org/name o il suo URL huggingface.co",
+			"unreachable": "Hugging Face non è raggiungibile: {{reason}}",
+			"responded": "Hugging Face ha risposto {{status}}"
+		},
+		"models": {
+			"didNotLoad": "Il modello non è stato caricato",
+			"didNotLoadStatus": "Il modello non è stato caricato ({{status}})",
+			"didNotLoadNoStatus": "Il modello non è stato caricato (nessuno stato)"
+		},
+		"connectors": {
+			"unknown": "Connettore sconosciuto",
+			"noAccountSignIn": "Questo connettore non accede con un account",
+			"accountSignIn": "Questo connettore accede con un account",
+			"tokenRejected": "Il dispositivo ha rifiutato il token",
+			"xLoginRejected": "X ha rifiutato l'accesso",
+			"mailLoginRefused": "Il server di posta ha rifiutato l'accesso",
+			"whatsappFailed": "Il dispositivo non è riuscito ad avviare WhatsApp",
+			"invalidMcpId": "ID server MCP non valido",
+			"mcpConfig": "Previsto un oggetto JSON come {{example}}"
+		},
+		"chat": {
+			"invalidAttachment": "Allegato non valido",
+			"tooManyAttachments_one": "Massimo {{count}} allegato",
+			"tooManyAttachments_many": "Massimo {{count}} allegati",
+			"tooManyAttachments_other": "Massimo {{count}} allegati",
+			"chooseFile": "Scegli un file",
+			"unsupportedFile": "{{name}}: allega immagini o file {{extensions}}",
+			"noText": "Il dispositivo non ha trovato testo in {{name}}",
+			"invalidMediaId": "ID media non valido"
+		},
+		"task": {
+			"interrupted": "Interrotto.",
+			"tooManySteps_one": "Interrotto dopo {{count}} passaggio senza una risposta finale.",
+			"tooManySteps_many": "Interrotto dopo {{count}} passaggi senza una risposta finale.",
+			"tooManySteps_other": "Interrotto dopo {{count}} passaggi senza una risposta finale."
+		},
+		"history": {
+			"invalidConversationId": "ID conversazione non valido"
+		},
+		"vault": {
+			"invalidSourceId": "ID origine non valido",
+			"chooseFiles": "Scegli almeno un file",
+			"tooManyFiles_one": "Carica al massimo {{count}} file alla volta",
+			"tooManyFiles_many": "Carica al massimo {{count}} file alla volta",
+			"tooManyFiles_other": "Carica al massimo {{count}} file alla volta",
+			"unsupportedFile": "{{name}}: Vault accetta file {{extensions}}",
+			"invalidName": "Inserisci un nome file senza barre"
+		},
+		"memory": {
+			"chooseTextModel": "Scegli un modello di testo scaricato"
+		},
+		"settings": {
+			"deviceNameLength_one": "Il nome del dispositivo deve avere da 1 a {{count}} carattere",
+			"deviceNameLength_many": "Il nome del dispositivo deve avere da 1 a {{count}} caratteri",
+			"deviceNameLength_other": "Il nome del dispositivo deve avere da 1 a {{count}} caratteri"
+		},
+		"agents": {
+			"noDomain": "I sottodomini degli agenti non sono configurati (AGENT_DOMAIN)"
+		},
+		"playground": {
+			"textRequired": "Il testo è obbligatorio",
+			"textTooLong_one": "Il testo supera {{count}} carattere",
+			"textTooLong_many": "Il testo supera {{count}} caratteri",
+			"textTooLong_other": "Il testo supera {{count}} caratteri",
+			"queryRequired": "La query è obbligatoria",
+			"queryTooLong_one": "La query supera {{count}} carattere",
+			"queryTooLong_many": "La query supera {{count}} caratteri",
+			"queryTooLong_other": "La query supera {{count}} caratteri",
+			"numberedTextRequired": "Il testo {{number}} è obbligatorio",
+			"numberedTextTooLong_one": "Il testo {{number}} supera {{count}} carattere",
+			"numberedTextTooLong_many": "Il testo {{number}} supera {{count}} caratteri",
+			"numberedTextTooLong_other": "Il testo {{number}} supera {{count}} caratteri",
+			"documentRequired": "Il documento {{number}} è obbligatorio",
+			"documentTooLong_one": "Il documento {{number}} supera {{count}} carattere",
+			"documentTooLong_many": "Il documento {{number}} supera {{count}} caratteri",
+			"documentTooLong_other": "Il documento {{number}} supera {{count}} caratteri",
+			"textCount": "Inserisci da {{min}} a {{max}} testi",
+			"documentCount": "Inserisci da {{min}} a {{max}} documenti",
+			"chooseAudio": "Scegli o registra un audio",
+			"audioTooLarge": "L'audio supera {{megabytes}} MB",
+			"wavOnly": "Il dispositivo può trascrivere solo audio WAV. Converti prima il file in WAV.",
+			"chooseImage": "Scegli un'immagine",
+			"imageTooLarge": "L'immagine supera {{megabytes}} MB"
+		},
+		"backup": {
+			"chooseFile": "Scegli un file di backup",
+			"chooseCategory": "Scegli almeno una categoria offerta dal dispositivo",
+			"unexpectedReply": "Risposta di backup inattesa ({{type}})",
+			"unexpectedReplyNoType": "Risposta di backup inattesa (nessun tipo)",
+			"noArchive": "Il backup del dispositivo non conteneva alcun archivio",
+			"notBackup": "Questo file non è un backup Tiiny",
+			"otherDevice": "Questo backup è stato creato su un altro dispositivo; può essere ripristinato solo lì",
+			"missing": "Il backup non contiene {{services}}"
+		},
+		"wifi": {
+			"unknownAction": "Azione Wi-Fi sconosciuta",
+			"wouldDropLink": "Questa app raggiunge il dispositivo tramite Wi-Fi, quindi questa modifica la disconnetterebbe. Effettuala da TiinyOS o con il dispositivo collegato via cavo."
+		},
+		"update": {
+			"upToDate": "TiinyOS è aggiornato",
+			"notReady": "Nessun aggiornamento scaricato è pronto per l'installazione",
+			"unknownAction": "Azione di aggiornamento sconosciuta"
+		},
+		"agentProxy": {
+			"noAnswer": "L'agente non ha risposto ({{reason}}). Potrebbe essere arrestato.",
+			"linkExpired": "Questo link è scaduto. Riapri l'agente dalla pagina Agenti di tiiny-web.",
+			"signIn": "Accedi a tiiny-web e apri questo agente dalla sua pagina Agenti."
+		}
+	},
+	"chat": {
+		"title": "Chat",
+		"tabs": {
+			"chat": "Chat",
+			"history": "Cronologia"
+		},
+		"intro": "Conversa con un modello caricato. Le chat sono conservate nella cronologia del dispositivo, condivisa con TiinyOS. Il dispositivo gestisce una richiesta alla volta per modello, quindi le risposte possono essere messe in coda.",
+		"message": {
+			"you": "Tu",
+			"assistant": "Assistente",
+			"thinking": "Ragionamento"
+		},
+		"notes": {
+			"stopped": "Interrotto.",
+			"noReply": "Nessuna risposta completa.",
+			"interrupted": "Interrotto.",
+			"drawing": "Disegno in corso… passaggio {{step}} di {{total}}",
+			"picture_one": "{{size}}, {{count}} passaggio",
+			"picture_many": "{{size}}, {{count}} passaggi",
+			"picture_other": "{{size}}, {{count}} passaggi"
+		},
+		"errors": {
+			"openConversation": "Impossibile aprire la conversazione: {{message}}",
+			"load": "Impossibile caricare {{name}}: {{message}}",
+			"device": "Il dispositivo ha segnalato un errore",
+			"gaveUp": "Il dispositivo ha smesso di attendere: il modello era occupato con altre richieste. Riprova. ({{message}})",
+			"drawFailed": "Il dispositivo non è riuscito a disegnare l'immagine",
+			"noPicture": "Il dispositivo ha terminato senza un'immagine",
+			"notSaved": "Non salvato nella cronologia: {{message}}"
+		},
+		"models": {
+			"loading": "Caricamento dei modelli di chat",
+			"none": "Nessun modello di chat o di immagini è scaricato. Scaricane uno dallo Store, poi caricalo.",
+			"modelsButton": "Modelli",
+			"label": "Modello",
+			"choose": "Scegli un modello",
+			"notLoadedOption": "{{name}} (non caricato)"
+		},
+		"loading": {
+			"starting": "Avvio",
+			"unloading": "Rilascio di {{name}}",
+			"status": "Caricamento di {{name}}: {{message}}",
+			"statusProgress": "Caricamento di {{name}}: {{message}} {{progress}}%",
+			"progressLabel": "Caricamento del modello",
+			"notLoaded": "{{name}} non è caricato.",
+			"load": "Carica"
+		},
+		"makeRoom": {
+			"title": "Liberare spazio per {{name}}?",
+			"text": "Il dispositivo non ha abbastanza memoria NPU libera. Rilasciare prima {{models}}? Le app che li usano si arrestano.",
+			"otherModels": "altri modelli",
+			"cancel": "Annulla",
+			"confirm": "Rilascia e carica"
+		},
+		"mode": {
+			"label": "Modalità",
+			"chat": "Chat",
+			"chatTitle": "Il modello risponde direttamente",
+			"task": "Attività",
+			"taskTitle": "Il modello lavora per passaggi con Vault, pagine web e strumenti MCP"
+		},
+		"tools": {
+			"vault": "Vault",
+			"vaultTitle": "Consenti al modello di cercare nei tuoi file Vault e nei riepiloghi delle chat",
+			"web": "Web",
+			"webTitle": "Consenti al modello di leggere pagine web"
+		},
+		"image": {
+			"size": "Dimensioni",
+			"steps": "Passaggi"
+		},
+		"thinking": {
+			"label": "Ragionamento",
+			"off": "Disattivato"
+		},
+		"newChat": "Nuova chat",
+		"conversation": {
+			"opening": "Apertura della conversazione",
+			"empty": "Invia un messaggio per iniziare a chattare con {{name}}.",
+			"theModel": "il modello",
+			"waiting": "In attesa del dispositivo · {{seconds}} s",
+			"waitingQueued_one": "In attesa del dispositivo · {{seconds}} s · il modello è occupato con {{count}} altra richiesta, la tua è in coda",
+			"waitingQueued_many": "In attesa del dispositivo · {{seconds}} s · il modello è occupato con altre {{count}} richieste, la tua è in coda",
+			"waitingQueued_other": "In attesa del dispositivo · {{seconds}} s · il modello è occupato con altre {{count}} richieste, la tua è in coda"
+		},
+		"composer": {
+			"files": "File da allegare",
+			"attachImagesOrDocuments": "Allega immagini o documenti",
+			"attachDocuments": "Allega documenti",
+			"message": "Messaggio",
+			"placeholder": "Invio per inviare, Maiusc+Invio per andare a capo",
+			"stop": "Interrompi",
+			"send": "Invia"
+		},
+		"attachments": {
+			"charactersRead_one": "{{characters}} carattere letto dal dispositivo",
+			"charactersRead_many": "{{characters}} caratteri letti dal dispositivo",
+			"charactersRead_other": "{{characters}} caratteri letti dal dispositivo",
+			"uploading": "{{name}}…",
+			"missing": "{{name}} (non più presente sul dispositivo)",
+			"download": "Scarica"
+		},
+		"task": {
+			"running": "{{label}} in corso",
+			"showResult": "Mostra risultato",
+			"hideResult": "Nascondi risultato"
+		},
+		"history": {
+			"intro": "Conversazioni conservate sul dispositivo, da questa app e da TiinyOS.",
+			"search": "Cerca nelle conversazioni",
+			"searchButton": "Cerca",
+			"searching": "Ricerca…",
+			"loading": "Caricamento delle conversazioni",
+			"noMatches": "Nessuna conversazione menziona “{{query}}”.",
+			"empty": "Ancora nessuna conversazione. Le tue chat vengono conservate qui.",
+			"untitled": "Senza titolo",
+			"delete": "Elimina",
+			"confirmTitle": "Eliminare la conversazione?",
+			"confirmText": "Eliminare “{{title}}” dal dispositivo? Viene rimossa anche da TiinyOS."
+		}
+	},
+	"auth": {
+		"layout": {
+			"welcome": "Benvenuto in <brand>Tiiny</brand>",
+			"tagline": "Monitora il dispositivo, gestisci i modelli caricati e chatta da qualsiasi browser della tua rete."
+		},
+		"signIn": {
+			"title": "Accedi",
+			"description": "Inserisci la password di amministratore configurata per questo server.",
+			"password": "Password",
+			"passwordRequired": "La password è obbligatoria",
+			"showPassword": "Mostra password",
+			"hidePassword": "Nascondi password",
+			"submit": "Accedi",
+			"submitting": "Accesso…",
+			"failed": "Accesso non riuscito ({{status}})",
+			"unreachable": "Impossibile raggiungere il server"
+		}
+	},
+	"core": {
+		"backHome": "Torna alla home",
+		"notFound": {
+			"heading": "404: la pagina che cerchi non è qui",
+			"hint": "Usa la navigazione per tornare alla dashboard."
+		},
+		"errors": {
+			"requestFailed": "Richiesta non riuscita ({{status}})",
+			"deviceReported": "Il dispositivo ha segnalato {{status}}"
+		}
+	},
+	"agents": {
+		"page": {
+			"title": "Agenti",
+			"description": "Gli agenti installati sul dispositivo si aprono qui tramite HTTPS, protetti dall'accesso di questa app."
+		},
+		"loading": "Caricamento degli agenti",
+		"recommendedModels_one": "Modello consigliato: {{models}}",
+		"recommendedModels_many": "Modelli consigliati: {{models}}",
+		"recommendedModels_other": "Modelli consigliati: {{models}}",
+		"stream": {
+			"failed": "Non riuscito",
+			"working": "In corso"
+		},
+		"progress": {
+			"percent": "{{message}} {{percent}}%",
+			"ariaLabel": "Avanzamento di {{name}}",
+			"startingInstall": "Avvio dell'installazione…",
+			"resumingInstall": "Ripresa dell'installazione…",
+			"updating": "Aggiornamento…",
+			"stopping": "Arresto…",
+			"starting": "Avvio…",
+			"deleting": "Eliminazione…"
+		},
+		"install": {
+			"paused": "Installazione in pausa al {{percent}}%",
+			"running": "Installazione {{percent}}%",
+			"ariaLabel": "Installazione di {{name}}"
+		},
+		"outcome": {
+			"installed": "{{name}} installato.",
+			"installPaused": "Installazione di {{name}} in pausa.",
+			"updated": "{{name}} aggiornato alla versione {{version}}.",
+			"stopped": "{{name}} arrestato.",
+			"started": "{{name}} avviato.",
+			"deleted": "{{name}} eliminato.",
+			"error": "{{name}}: {{message}}"
+		},
+		"actions": {
+			"resume": "Riprendi",
+			"pause": "Pausa",
+			"cancelInstall": "Annulla installazione",
+			"update": "Aggiorna",
+			"open": "Apri",
+			"stop": "Arresta",
+			"start": "Avvia",
+			"delete": "Elimina",
+			"installOnDevice": "Installa sul dispositivo",
+			"cancel": "Annulla"
+		},
+		"installed": {
+			"heading": "Su questo dispositivo",
+			"empty": "Nessun agente è installato sul dispositivo. Installane uno dallo store qui sotto.",
+			"version": "Versione {{version}}",
+			"versionWithUpdate": "Versione {{version}} · {{latest}} disponibile",
+			"unknownVersion": "sconosciuta",
+			"usage": "CPU {{cpu}}% · memoria {{memory}}",
+			"containersStopped": "Il dispositivo segnala che i container di questo agente si sono arrestati in modo imprevisto. Avvialo di nuovo, oppure arrestalo per reimpostarlo.",
+			"proxyError": "Proxy sulla porta {{port}}: {{error}}"
+		},
+		"store": {
+			"heading": "Store di agenti: esecuzione sul dispositivo",
+			"allInstalled": "Tutti gli agenti web dello store sono già installati.",
+			"version": "Versione {{version}}"
+		},
+		"desktop": {
+			"heading": "Store di agenti: esecuzione sul tuo computer",
+			"description": "Questi agenti vengono eseguiti su un computer e usano l'API compatibile con OpenAI del dispositivo. Puntali al dispositivo (ad esempio <code>http://&lt;device address&gt;/v1</code>) con la chiave ottenuta da <code>tiiny auth key</code>.",
+			"noDownloads": "Nessun download pubblicato."
+		},
+		"deleteDialog": {
+			"title": "Eliminare {{name}}?",
+			"text": "L'agente verrà rimosso dal dispositivo. Potrai reinstallarlo dallo store di agenti."
+		},
+		"status": {
+			"created": "creato",
+			"running": "in esecuzione",
+			"starting": "in avvio",
+			"stopped": "arrestato",
+			"exited": "terminato",
+			"paused": "in pausa",
+			"error": "errore"
+		}
+	},
+	"connectors": {
+		"page": {
+			"title": "Connettori",
+			"description": "Email, calendari, messaggistica e strumenti MCP che i modelli possono usare in modalità Attività."
+		},
+		"category": {
+			"email": "Email",
+			"calendar": "Calendario",
+			"messaging": "Messaggistica"
+		},
+		"state": {
+			"connected": "Connesso",
+			"notConnected": "Non connesso",
+			"notReachable": "Non raggiungibile"
+		},
+		"actions": {
+			"connect": "Connetti",
+			"disconnect": "Disconnetti",
+			"cancel": "Annulla",
+			"close": "Chiudi",
+			"remove": "Rimuovi"
+		},
+		"services": {
+			"heading": "Servizi",
+			"description": "I modelli usano i servizi connessi in modalità Attività, nei limiti di ciò che autorizzi. Le connessioni risiedono sul dispositivo e sono condivise con TiinyOS.",
+			"loading": "Caricamento dei connettori",
+			"waitingForSignIn": "In attesa che tu completi l'accesso… <link>Apri la pagina di accesso</link>"
+		},
+		"outcome": {
+			"connected": "{{name}} connesso: {{detail}}.",
+			"whatsappConnected": "WhatsApp connesso.",
+			"disconnected": "{{name}} disconnesso.",
+			"error": "{{name}}: {{message}}"
+		},
+		"disconnectDialog": {
+			"title": "Disconnettere?",
+			"text": "Disconnettere {{name}}? Il dispositivo dimentica l'accesso salvato e i modelli non potranno più usarlo."
+		},
+		"connect": {
+			"title": "Connetti {{name}}",
+			"telegramIntro": "Crea un bot con @BotFather in Telegram (/newbot) e incolla il token che ti fornisce.",
+			"discordIntro": "Crea un bot nel Discord Developer Portal, attiva Message Content Intent, invitalo nel tuo server e incolla il suo token.",
+			"xIntro": "Accedi a x.com in un browser e copia i cookie auth_token e ct0.",
+			"botToken": "Token del bot",
+			"channelId": "ID canale",
+			"channelIdHelp": "Il canale in cui il bot può leggere e pubblicare.",
+			"whatsappQrAlt": "Codice QR di associazione WhatsApp",
+			"whatsappIntro": "In WhatsApp sul telefono apri Impostazioni → Dispositivi collegati → Collega un dispositivo e scansiona questo codice.",
+			"newCode": "Nuovo codice",
+			"emailIntro": "Usa una password per le app (Gmail, Outlook e iCloud la richiedono quando la verifica in due passaggi è attiva).",
+			"provider": "Provider",
+			"otherProvider": "Altro",
+			"emailAddress": "Indirizzo email",
+			"appPassword": "Password per le app",
+			"imapServer": "Server IMAP",
+			"smtpServer": "Server SMTP",
+			"checking": "Verifica…"
+		},
+		"mcp": {
+			"heading": "Server MCP personalizzati",
+			"addServer": "Aggiungi server MCP",
+			"description": "Gli strumenti di questi server sono offerti ai modelli in modalità Attività. Vengono eseguiti sul dispositivo.",
+			"loading": "Caricamento dei server MCP",
+			"empty": "Ancora nessun server MCP.",
+			"tools": "Strumenti",
+			"hideTools": "Nascondi strumenti",
+			"loadingTools": "Caricamento degli strumenti",
+			"added": "Server MCP aggiunto.",
+			"removed": "{{name}} rimosso.",
+			"removeDialog": {
+				"title": "Rimuovere il server MCP?",
+				"text": "Rimuovere {{name}} dal dispositivo? I modelli non potranno più usare i suoi strumenti."
+			},
+			"addDialog": {
+				"title": "Aggiungi un server MCP",
+				"description": "Il server viene eseguito sul dispositivo, quindi deve essere raggiungibile da lì. I server che richiedono un desktop o un browser non funzioneranno sul dispositivo.",
+				"byUrl": "Tramite URL",
+				"fromJson": "Da JSON",
+				"name": "Nome",
+				"url": "URL",
+				"urlHelp": "Endpoint HTTP o SSE, ad es. {{example}}",
+				"config": "Configurazione MCP",
+				"invalidJson": "Questo non è un JSON valido",
+				"add": "Aggiungi",
+				"adding": "Aggiunta…"
+			}
+		}
+	},
+	"settings": {
+		"page": {
+			"title": "Impostazioni",
+			"subtitle": "Le impostazioni del dispositivo, come in TiinyOS."
+		},
+		"actions": {
+			"cancel": "Annulla",
+			"save": "Salva",
+			"saving": "Salvataggio…",
+			"retry": "Riprova",
+			"copy": "Copia",
+			"copied": "Copiato",
+			"delete": "Elimina",
+			"deleting": "Eliminazione…"
+		},
+		"section": {
+			"staleValues": "Vengono mostrati gli ultimi valori noti. {{error}}"
+		},
+		"device": {
+			"title": "Il mio dispositivo",
+			"subheader": "Dati forniti dal dispositivo",
+			"loading": "Caricamento delle informazioni sul dispositivo",
+			"name": "Nome",
+			"rename": "Rinomina",
+			"nameField": "Nome del dispositivo",
+			"serialNumber": "Numero di serie",
+			"copySerialNumber": "Copia numero di serie",
+			"model": "Modello",
+			"osService": "Servizio TiinyOS"
+		},
+		"personalization": {
+			"title": "Personalizzazione",
+			"subheader": "Il contesto su di te che il dispositivo fornisce ai modelli in modalità Attività",
+			"loading": "Caricamento della personalizzazione",
+			"fields": {
+				"userName": {
+					"label": "Nome",
+					"hint": "Come ti chiamano i modelli."
+				},
+				"occupation": {
+					"label": "Professione",
+					"hint": "Ad esempio: ingegnere software."
+				},
+				"preferences": {
+					"label": "Preferenze",
+					"hint": "Come preferisci le risposte."
+				},
+				"recentFocus": {
+					"label": "Attività recenti",
+					"hint": "Ciò su cui stai lavorando."
+				}
+			},
+			"fieldHelper": "{{hint}} {{length}}/{{limit}}",
+			"saved": "Salvato. I modelli lo vedranno dalla prossima conversazione in modalità Attività.",
+			"discardChanges": "Annulla modifiche"
+		},
+		"power": {
+			"title": "Sistema",
+			"subheader": "Alimentazione e aggiornamenti di TiinyOS",
+			"autoPowerOn": {
+				"title": "Accensione automatica",
+				"description": "Il dispositivo si accende da solo quando viene collegato all'alimentazione. Il dispositivo non indica se questa opzione è attiva (risulta sempre disattivata), quindi viene mostrato solo il risultato di una modifica.",
+				"turnOn": "Attiva",
+				"turnOff": "Disattiva",
+				"deviceReply": "Dispositivo: {{message}}"
+			},
+			"update": {
+				"title": "Aggiornamento di sistema",
+				"current": "TiinyOS {{version}}",
+				"available": "TiinyOS {{version}} · è disponibile la versione {{available}}",
+				"upToDate": "TiinyOS {{version}} · aggiornato",
+				"loading": "Caricamento dello stato dell'aggiornamento",
+				"inProgress": "Aggiornamento: {{state}}…",
+				"progress": "Avanzamento dell'aggiornamento",
+				"check": "Verifica aggiornamenti",
+				"checking": "Verifica…",
+				"download": "Scarica aggiornamento",
+				"install": "Installa aggiornamento",
+				"confirmTitle": "Installare l'aggiornamento?",
+				"confirmText": "I modelli si arrestano e il dispositivo si riavvia durante l'installazione. Non scollegarlo finché non è di nuovo disponibile.",
+				"confirmLabel": "Installa",
+				"installing": "Installazione dell'aggiornamento. Il dispositivo si riavvia una volta; non scollegarlo."
+			},
+			"power": {
+				"title": "Alimentazione",
+				"restart": "Riavvia",
+				"shutDown": "Spegni",
+				"restarting": "Riavvio… in attesa che il dispositivo torni disponibile.",
+				"back": "Il dispositivo è di nuovo disponibile.",
+				"notBack": "Il dispositivo non è tornato disponibile dopo 10 minuti",
+				"shuttingDown": "Il dispositivo si sta spegnendo.",
+				"restartTitle": "Riavviare il dispositivo?",
+				"restartText": "I modelli caricati, le chat e gli agenti si arrestano e il dispositivo non è raggiungibile per alcuni minuti.",
+				"shutDownTitle": "Spegnere il dispositivo?",
+				"shutDownText": "I modelli caricati, le chat e gli agenti si arrestano. Il dispositivo resta spento finché non viene riacceso dal dispositivo stesso (o ricollegato all'alimentazione con l'accensione automatica)."
+			}
+		},
+		"apiAccess": {
+			"title": "Accesso API",
+			"subheader": "Usa i modelli del dispositivo da altre app della tua rete",
+			"loading": "Caricamento dell'accesso API",
+			"openaiCompatible": "Compatibile con OpenAI",
+			"uses": {
+				"openai": "Testo, embedding, rerank, immagini, voce",
+				"anthropic": "Generazione di testo",
+				"ollama": "Generazione di testo, embedding"
+			},
+			"copyBaseUrl": "Copia URL di base {{format}}",
+			"apiKey": "Chiave API",
+			"copyApiKey": "Copia chiave API",
+			"reveal": "Mostra",
+			"hint": "Usa un ID modello dalla pagina Modelli, oppure <code>default</code> per il modello usato più di recente. Mantieni la chiave privata: chiunque la possieda può usare l'API del dispositivo."
+		},
+		"storage": {
+			"title": "Archiviazione",
+			"subheader": "Utilizzo del disco sul dispositivo",
+			"loading": "Caricamento dell'archiviazione",
+			"used": "{{used}} usati su {{total}}",
+			"usedBar": "Spazio utilizzato",
+			"category": "{{name}}: {{size}}",
+			"modelFiles": "File dei modelli",
+			"agentFiles": "File degli agenti",
+			"size": "Dimensioni",
+			"usedByVault": "Usato da Vault",
+			"deleted": "{{id}} eliminato.",
+			"deleteModelTitle": "Eliminare il modello?",
+			"deleteModelText": "Eliminare {{id}} dal dispositivo? Dovrai scaricarlo di nuovo per usarlo.",
+			"deleteAgentTitle": "Eliminare l'agente?",
+			"deleteAgentText": "Eliminare {{id}} e i suoi dati dal dispositivo? L'operazione non può essere annullata."
+		},
+		"backup": {
+			"title": "Backup e ripristino",
+			"subheader": "Cronologia chat e Vault, salvati su questo computer",
+			"backUp": {
+				"title": "Backup",
+				"loading": "Caricamento del backup",
+				"category": "{{name}} · circa {{size}}",
+				"categoryNotReady": "{{name}} · circa {{size}} (non pronto)",
+				"download": "Scarica backup",
+				"inProgress": "Backup in corso…",
+				"saved": "{{name}} salvato ({{size}}).",
+				"savedWithout": "{{name}} salvato ({{size}}), senza: {{failed}}."
+			},
+			"restore": {
+				"title": "Ripristino",
+				"chooseFile": "Scegli un file di backup",
+				"fileField": "File di backup",
+				"restore": "Ripristina",
+				"inProgress": "Ripristino…",
+				"otherDevice": "Questo backup è stato creato su un altro dispositivo ({{deviceId}}); può essere ripristinato solo lì.",
+				"unknownDevice": "sconosciuto",
+				"result": "{{name}}: {{message}}",
+				"restored": "ripristinato",
+				"failed": "Il dispositivo non è riuscito a ripristinare il backup",
+				"confirmTitle": "Ripristinare il backup?",
+				"confirmText": "Sostituire {{categories}} sul dispositivo con il contenuto del backup? Ciò che è stato aggiunto dopo il backup andrà perso.",
+				"categoryJoiner": " e "
+			}
+		},
+		"network": {
+			"title": "Rete",
+			"subheader": "Connessioni Wi-Fi e cablate del dispositivo",
+			"loading": "Caricamento della rete",
+			"wifi": "Wi-Fi",
+			"wifiTurnedOn": "Wi-Fi attivato.",
+			"wifiTurnedOff": "Wi-Fi disattivato.",
+			"connectedTo": "Connesso a {{ssid}} (segnale {{signal}}%)",
+			"notConnected": "Non connesso",
+			"off": "Disattivato",
+			"wifiLink": "Questa app raggiunge il dispositivo tramite Wi-Fi ({{interface}}), quindi qui non è possibile disattivare il Wi-Fi, dimenticare {{ssid}} o connettersi a un'altra rete. Usa TiinyOS o collega il dispositivo via cavo per effettuare queste modifiche.",
+			"interfaces": {
+				"interface": "Interfaccia",
+				"state": "Stato",
+				"addresses": "Indirizzi",
+				"appLink": "Collegamento di questa app"
+			},
+			"networks": {
+				"scanning": "Ricerca di reti…",
+				"network": "Rete",
+				"autoJoin": "Connessione automatica",
+				"connected": "Connesso",
+				"connecting": "Connessione…",
+				"saved": "Salvata",
+				"open": "Aperta",
+				"signal": "Segnale {{signal}}%",
+				"autoJoinSwitch": "Connessione automatica a {{ssid}}",
+				"autoJoinOn": "Connessione automatica attivata per {{ssid}}.",
+				"autoJoinOff": "Connessione automatica disattivata per {{ssid}}.",
+				"join": "Connetti",
+				"joining": "Connessione a {{ssid}}.",
+				"forget": "Dimentica",
+				"forgotten": "{{ssid}} dimenticata."
+			},
+			"joinDialog": {
+				"title": "Connetti a {{ssid}}",
+				"password": "Password"
+			},
+			"forgetDialog": {
+				"title": "Dimenticare la rete?",
+				"text": "Il dispositivo dimenticherà {{ssid}} e la relativa password."
+			}
+		}
+	},
+	"models": {
+		"heading": "Modelli",
+		"percent": "{{value}}%",
+		"tabs": {
+			"models": "Modelli",
+			"store": "Store"
+		},
+		"pages": {
+			"models": "Carica un modello scaricato nella memoria NPU, oppure rilascialo per liberare spazio.",
+			"store": "Modelli dallo store Tiiny. I download vengono salvati sul dispositivo; caricali dalla scheda Modelli.",
+			"huggingFace": "Importa modelli personalizzati da Hugging Face. È il dispositivo a stabilire cosa può importare: in genere fine-tune e adattatori LoRA di modelli del suo store, alcuni solo dopo aver scaricato quel modello dello store."
+		},
+		"columns": {
+			"model": "Modello",
+			"type": "Tipo",
+			"size": "Dimensioni",
+			"npuShare": "Quota NPU",
+			"status": "Stato",
+			"action": "Azione"
+		},
+		"table": {
+			"loading": "Caricamento dei modelli",
+			"title": "Modelli scaricati",
+			"npuFree": "{{percent}}% della NPU libero",
+			"empty": "Nessun modello è scaricato sul dispositivo.",
+			"status": {
+				"loaded": "caricato",
+				"notLoaded": "non caricato",
+				"tooBig": "NPU libera insufficiente",
+				"tooBigHint": "Richiede il {{needed}}% della NPU; è libero il {{free}}%. Rilascia un modello per liberare spazio."
+			},
+			"pending": {
+				"load": "Avvio…",
+				"unload": "Rilascio…",
+				"delete": "Eliminazione…"
+			},
+			"progress": {
+				"load": "avanzamento del caricamento",
+				"unload": "avanzamento del rilascio",
+				"delete": "avanzamento dell'eliminazione"
+			},
+			"done": {
+				"load": "{{name}} caricato.",
+				"unload": "{{name}} rilasciato.",
+				"delete": "{{name}} eliminato."
+			},
+			"failed": {
+				"load": "Impossibile caricare {{name}}: {{reason}}",
+				"unload": "Impossibile rilasciare {{name}}: {{reason}}",
+				"delete": "Impossibile eliminare {{name}}: {{reason}}",
+				"unloadAll": "Impossibile rilasciare tutti i modelli: {{reason}}",
+				"interrupt": "Impossibile interrompere {{name}}: {{reason}}"
+			},
+			"allUnloaded": "Tutti i modelli sono stati rilasciati.",
+			"interrupted": "Interrotto il lavoro in corso di {{name}}.",
+			"interrupt": "Interrompi",
+			"interruptHint": "Interrompi le richieste che questo modello sta elaborando, da qualsiasi app",
+			"unload": "Rilascia",
+			"unloading": "Rilascio…",
+			"unloadAll": "Rilascia tutti",
+			"delete": "Elimina",
+			"load": "Carica",
+			"cancel": "Annulla",
+			"unloadAllDialog": {
+				"title": "Rilasciare tutti i modelli?",
+				"text": "Tutti i modelli caricati vengono rilasciati dalla NPU. Le richieste in corso, da questa app o da altri client, si interrompono."
+			},
+			"deleteDialog": {
+				"title": "Eliminare {{name}}?",
+				"text": "I file del modello verranno rimossi dal dispositivo. Potrai scaricarlo di nuovo dallo store."
+			},
+			"unloadDialog": {
+				"title": "Rilasciare {{name}}?",
+				"text": "La sua quota NPU verrà liberata. Qualsiasi richiesta che sta usando il modello, da questa app o da altri client, verrà interrotta."
+			}
+		},
+		"store": {
+			"loading": "Caricamento dello store",
+			"search": "Cerca nello store",
+			"searchPlaceholder": "Cerca modelli",
+			"allTypes": "Tutti i tipi",
+			"empty": "Nessun modello dello store corrisponde alla ricerca.",
+			"tableLabel": "Modelli dello store",
+			"trending": "di tendenza",
+			"stage": {
+				"starting": "Avvio",
+				"downloading": "Download",
+				"verifying": "Verifica",
+				"installing": "Installazione"
+			},
+			"status": {
+				"loaded": "caricato",
+				"downloaded": "scaricato",
+				"paused": "in pausa {{percent}}%",
+				"downloading": "download {{percent}}%",
+				"notDownloaded": "non scaricato"
+			},
+			"downloadProgress": "avanzamento del download",
+			"pause": "Pausa",
+			"cancel": "Annulla",
+			"resume": "Riprendi",
+			"download": "Scarica",
+			"deviceReported": "Il dispositivo ha segnalato {{status}}",
+			"streamEnded": "Lo stream di download si è interrotto prima che il modello fosse scaricato",
+			"pausedDone": "{{name}} in pausa. Puoi riprendere in qualsiasi momento.",
+			"downloaded": "{{name}} scaricato. Caricalo dalla pagina Modelli.",
+			"cancelled": "Download di {{name}} annullato.",
+			"failed": {
+				"download": "Impossibile scaricare {{name}}: {{reason}}",
+				"pause": "Impossibile mettere in pausa {{name}}: {{reason}}",
+				"cancel": "Impossibile annullare {{name}}: {{reason}}"
+			},
+			"details": {
+				"tableLabel": "Dettagli del modello",
+				"close": "Chiudi",
+				"modelId": "ID modello",
+				"type": "Tipo",
+				"parameters": "Parametri",
+				"inputOutput": "Input → output",
+				"npuShare": "Quota NPU",
+				"contextWindow": "Finestra di contesto",
+				"tokens_one": "{{tokens}} token",
+				"tokens_many": "{{tokens}} token",
+				"tokens_other": "{{tokens}} token",
+				"imageSize": "Dimensioni immagine",
+				"defaultSteps": "Passaggi predefiniti",
+				"guidanceScale": "Guidance scale",
+				"reasoning": "Ragionamento",
+				"loadTime": "Tempo di caricamento",
+				"loadSeconds": "circa {{seconds}} s",
+				"downloadsLikes": "Download · Mi piace",
+				"thinking": {
+					"none": "Nessuno",
+					"toggleable": "Disattivabile",
+					"alwaysOn": "Sempre attivo",
+					"levels": "livelli {{levels}}",
+					"defaultLevel": "predefinito {{level}}"
+				}
+			}
+		},
+		"huggingFace": {
+			"verdict": {
+				"compatible": "compatibile",
+				"needsBaseModel": "richiede modello base",
+				"incompatible": "non compatibile"
+			},
+			"kind": {
+				"adapter": "adattatore LoRA",
+				"fineTune": "fine-tune"
+			},
+			"search": {
+				"title": "Trova modelli compatibili",
+				"subheader": "Adattatori LoRA e fine-tune su Hugging Face basati su un modello dello store, verificati con il dispositivo.",
+				"baseModel": "Modello base",
+				"onDevice": "{{modelId}} (sul dispositivo)",
+				"query": "Cerca (facoltativo)",
+				"submit": "Cerca su Hugging Face",
+				"checkingBases": "Richiesta al dispositivo dei modelli dello store utilizzabili come base di importazione…",
+				"autoCheck": "Verifica automatica dei risultati",
+				"compatibleOnly": "Solo compatibili",
+				"limit": "Risultati per tipo",
+				"searching": "Ricerca su Hugging Face",
+				"empty": "Nessun adattatore o fine-tune di {{base}} trovato su Hugging Face.",
+				"tableLabel": "Repository Hugging Face",
+				"groups": {
+					"importable": "Basi importabili",
+					"checking": "Verifica con il dispositivo…",
+					"notOnHf": "Non presenti su Hugging Face",
+					"unsupported": "Importazione non supportata"
+				},
+				"columns": {
+					"repo": "Repository",
+					"kind": "Tipo",
+					"downloads": "Download",
+					"compatibility": "Compatibilità",
+					"action": "Azione"
+				},
+				"details": "Dettagli",
+				"checking": "verifica…",
+				"notChecked": "non verificato",
+				"checkFailed": "verifica non riuscita",
+				"downloadBase": "Scarica prima {{name}} dallo Store",
+				"summary": {
+					"checked": "Verificati {{finished}} di {{total}} · {{compatible}} compatibili",
+					"needBase_one": "{{count}} richiede un modello base",
+					"needBase_many": "{{count}} richiedono un modello base",
+					"needBase_other": "{{count}} richiedono un modello base",
+					"hidden_one": "{{count}} incompatibile nascosto",
+					"hidden_many": "{{count}} incompatibili nascosti",
+					"hidden_other": "{{count}} incompatibili nascosti"
+				},
+				"checkingCompatibility": "Verifica della compatibilità"
+			},
+			"check": {
+				"title": "Verifica un repository",
+				"subheader": "È il dispositivo a stabilire se può importare un repository.",
+				"repo": "Repository Hugging Face",
+				"placeholder": "org/name o https://huggingface.co/org/name",
+				"checking": "Verifica…",
+				"check": "Verifica",
+				"checkingRepo": "Verifica del repository",
+				"store": "Store",
+				"needsBase": "Importabile dopo aver scaricato {{name}} ({{modelId}}) sul dispositivo dallo Store.",
+				"cannotImport": "Il dispositivo non può importare questo repository.",
+				"size": "Dimensioni {{size}}",
+				"baseModel": "modello base {{modelId}}",
+				"disk": "richiede {{required}} di disco, {{available}} liberi",
+				"toolkit": "L'importazione scarica prima il toolkit {{toolkit}} sul dispositivo ({{size}}).",
+				"noDisk": "Spazio libero su disco insufficiente sul dispositivo.",
+				"bytes": "{{downloaded}} di {{total}}",
+				"importProgress": "avanzamento dell'importazione",
+				"continues": "L'importazione viene eseguita sul dispositivo e prosegue anche se lasci questa pagina.",
+				"cancelImport": "Annulla importazione",
+				"import": "Importa sul dispositivo",
+				"starting": "Avvio",
+				"importing": "Importazione",
+				"importFailed": "Importazione non riuscita",
+				"cancelled": "Importazione annullata.",
+				"imported": "{{repo}} importato. Caricalo dalla pagina Modelli.",
+				"streamStopped": "Gli aggiornamenti sull'avanzamento si sono interrotti. L'importazione potrebbe essere ancora in corso sul dispositivo."
+			}
+		}
+	},
+	"vault": {
+		"layout": {
+			"title": "Vault",
+			"description": "La knowledge base del dispositivo: i tuoi file e i riepiloghi delle chat passate, indicizzati sul dispositivo perché i modelli possano cercarli.",
+			"tabs": {
+				"files": "File",
+				"chatHistory": "Cronologia chat"
+			}
+		},
+		"files": {
+			"title": "File",
+			"subheader": "PDF, Word, Excel, CSV, testo, Markdown o HTML, fino a 200 MB ciascuno. I modelli li usano in modalità Attività.",
+			"upload": "Carica file",
+			"uploadInput": "File da caricare",
+			"loading": "Caricamento dei file di Vault",
+			"empty": "Ancora nessun file. Carica documenti da far usare ai modelli.",
+			"fileCount_one": "{{count}} file",
+			"fileCount_many": "{{count}} file",
+			"fileCount_other": "{{count}} file",
+			"columns": {
+				"file": "File",
+				"size": "Dimensioni",
+				"added": "Aggiunto",
+				"status": "Stato"
+			},
+			"status": {
+				"indexed": "Indicizzato",
+				"indexFailed": "Indicizzazione non riuscita",
+				"notIndexed": "Non indicizzato"
+			},
+			"actions": {
+				"index": "Indicizza",
+				"download": "Scarica",
+				"rename": "Rinomina",
+				"delete": "Elimina"
+			},
+			"progress": {
+				"label": "Avanzamento di Vault",
+				"line": "{{label}}: {{message}}",
+				"uploading": "Caricamento…",
+				"indexing": "Indicizzazione…",
+				"loadingModel": "Caricamento del modello di embedding",
+				"stage": "Indicizzazione: {{stage}}",
+				"withChunks": "{{stage}} ({{processed}}/{{total}} frammenti)",
+				"retrying": "Indicizzazione non riuscita sul dispositivo, nuovo tentativo…"
+			},
+			"outcome": {
+				"added": "{{label}} aggiunto a Vault.",
+				"indexed": "{{name}} indicizzato.",
+				"renamed": "Rinominato in {{name}}.",
+				"deleted": "{{name}} eliminato."
+			},
+			"errors": {
+				"device": "Il dispositivo ha segnalato un errore",
+				"uploadUnconfirmed": "Il dispositivo non ha confermato il caricamento"
+			},
+			"renameDialog": {
+				"title": "Rinomina file",
+				"name": "Nome file",
+				"cancel": "Annulla",
+				"confirm": "Rinomina"
+			},
+			"deleteDialog": {
+				"title": "Eliminare il file?",
+				"text": "Eliminare {{name}} e il relativo indice dal dispositivo? I modelli non lo troveranno più.",
+				"confirm": "Elimina"
+			}
+		},
+		"search": {
+			"title": "Cerca in Vault",
+			"subheader": "Ciò che i modelli trovano quando cercano in Vault",
+			"label": "Cerca",
+			"submit": "Cerca",
+			"searching": "Ricerca…",
+			"empty": "Nessun risultato pertinente."
+		},
+		"chatHistory": {
+			"title": "Cronologia chat",
+			"subheader": "Riepiloghi giornalieri delle conversazioni passate, conservati in Vault.",
+			"loading": "Caricamento della cronologia chat",
+			"empty": "Ancora nessun riepilogo.",
+			"read": "Leggi",
+			"hide": "Nascondi",
+			"delete": "Elimina",
+			"loadingSummary": "Caricamento del riepilogo",
+			"deleted": "Riepilogo del {{day}} eliminato.",
+			"deleteDialog": {
+				"title": "Eliminare il riepilogo?",
+				"text": "Eliminare il riepilogo del {{day}}? I modelli non ricorderanno più le conversazioni di quel giorno.",
+				"confirm": "Elimina"
+			}
+		},
+		"summarySettings": {
+			"loading": "Caricamento dei riepiloghi giornalieri",
+			"enabled": "Riepiloghi giornalieri",
+			"time": "Ora",
+			"deviceTime": "{{time}} sul dispositivo ({{zone}})",
+			"model": "Modello",
+			"save": "Salva",
+			"saving": "Salvataggio…",
+			"savedOn": "Riepiloghi giornalieri attivati, alle {{time}}.",
+			"savedOff": "Riepiloghi giornalieri disattivati.",
+			"description": "Ogni giorno il dispositivo riassume in Vault le conversazioni della giornata, così i modelli possono ricordarle in modalità Attività. Durante il lavoro carica il modello, che può restare occupato per un po'."
+		}
+	},
+	"playground": {
+		"layout": {
+			"title": "Playground",
+			"description": "Prova i modelli vocali, di visione, di embedding e di rerank del dispositivo e misura le prestazioni dei modelli di testo (come fa la CLI tiiny). Un modello viene caricato alla prima esecuzione."
+		},
+		"tabs": {
+			"asr": {
+				"label": "Da voce a testo",
+				"intro": "Trascrivi una registrazione WAV con un modello di riconoscimento vocale."
+			},
+			"tts": {
+				"label": "Da testo a voce",
+				"intro": "Trasforma il testo in parlato con un modello vocale."
+			},
+			"ocr": {
+				"label": "OCR",
+				"intro": "Leggi il testo in un'immagine."
+			},
+			"embed": {
+				"label": "Embedding",
+				"intro": "Trasforma testi in vettori e confronta quanto sono simili."
+			},
+			"rerank": {
+				"label": "Rerank",
+				"intro": "Ordina i documenti in base a quanto rispondono bene a una query."
+			},
+			"text": {
+				"label": "Benchmark",
+				"intro": "Misura la velocità di generazione di un modello di testo, come tiiny bench."
+			}
+		},
+		"model": {
+			"label": "Modello",
+			"loadsWhenRun": "{{name}} (caricato all'esecuzione)"
+		},
+		"loading": "Caricamento dei modelli",
+		"noModel": "Nessun modello adatto è scaricato. Scaricane uno dallo Store.",
+		"run": "Esegui",
+		"running": "Esecuzione…",
+		"asr": {
+			"chooseFile": "Scegli un file WAV",
+			"fileInput": "File audio"
+		},
+		"tts": {
+			"text": "Testo",
+			"voice": "Voce (facoltativa)",
+			"voiceHelp": "Solo alcuni modelli vocali ne richiedono una, ad es. Supertonic.",
+			"download": "Scarica"
+		},
+		"ocr": {
+			"chooseImage": "Scegli immagine",
+			"imageInput": "File immagine",
+			"noText": "Nessun testo trovato.",
+			"lines": "Righe riconosciute",
+			"score": "{{value}}%"
+		},
+		"embed": {
+			"texts": "Testi",
+			"textsHelp": "Un testo per riga",
+			"summary_one": "{{count}} dimensione. Similarità del coseno:",
+			"summary_many": "{{count}} dimensioni. Similarità del coseno:",
+			"summary_other": "{{count}} dimensioni. Similarità del coseno:"
+		},
+		"rerank": {
+			"query": "Query",
+			"documents": "Documenti",
+			"documentsHelp": "Un documento per riga",
+			"results": "Documenti classificati"
+		},
+		"bench": {
+			"tokensInput": "Token da generare",
+			"results": "Benchmark",
+			"speed": "Velocità di generazione",
+			"speedValue": "{{value}} token/s",
+			"firstToken": "Tempo al primo token",
+			"seconds": "{{value}} s",
+			"tokens": "Token",
+			"tokensValue": "{{prompt}} in input · {{completion}} in output · {{total}} s in totale"
+		}
+	},
+	"overview": {
+		"title": "Panoramica",
+		"npuReady": "La NPU è pronta.",
+		"loading": "Caricamento dello stato del dispositivo",
+		"retry": "Riprova",
+		"staleValues": "Vengono mostrati gli ultimi valori noti. {{error}}",
+		"percent": "{{value}}%",
+		"usedOfTotal": "{{used}} di {{total}}",
+		"stats": {
+			"npuUtilization": "Utilizzo NPU",
+			"npuReserved": "{{percent}} riservato dai modelli caricati",
+			"npuMemory": "Memoria NPU",
+			"systemMemory": "Memoria di sistema",
+			"systemMemoryCaption": "CPU {{cpu}} · {{used}} di {{total}} di RAM",
+			"storage": "Archiviazione",
+			"progress": "{{title}} {{percent}}"
+		},
+		"running": {
+			"title": "Modelli caricati",
+			"empty": "Nessun modello è caricato. Caricane uno dalla pagina Modelli.",
+			"columns": {
+				"model": "Modello",
+				"type": "Tipo",
+				"status": "Stato",
+				"npuShare": "Quota NPU",
+				"activeRequests": "Richieste attive"
+			}
+		},
+		"usage": {
+			"title": "Utilizzo dei token",
+			"subheader": "{{tokens}} in {{requests}} (modelli di testo)",
+			"subheaderLoading": "Modelli di testo",
+			"tokens_one": "{{value}} token",
+			"tokens_many": "{{value}} token",
+			"tokens_other": "{{value}} token",
+			"requests_one": "{{value}} richiesta",
+			"requests_many": "{{value}} richieste",
+			"requests_other": "{{value}} richieste",
+			"previousWeek": "Settimana precedente",
+			"nextWeek": "Settimana successiva",
+			"weekRange": "{{start}} – {{end}}",
+			"dayBar": "{{day}}: {{tokens}}",
+			"segment": "{{day}} · {{model}}: {{tokens}}",
+			"other": "Altro",
+			"showTable": "Mostra come tabella",
+			"showChart": "Mostra grafico",
+			"loading": "Caricamento dell'utilizzo dei token",
+			"empty": "Nessun token questa settimana.",
+			"table": {
+				"label": "Utilizzo dei token per giorno",
+				"day": "Giorno",
+				"model": "Modello",
+				"requests": "Richieste",
+				"prompt": "Prompt",
+				"completion": "Completamento",
+				"total": "Totale"
+			}
+		},
+		"apps": {
+			"title": "Utilizzo per app",
+			"subheader": "Token di questa settimana, per app",
+			"label": "Utilizzo per app",
+			"loading": "Caricamento dell'utilizzo per app",
+			"empty": "Nessun token questa settimana."
+		}
+	},
+	"server": {
+		"done": "Fatto",
+		"models": {
+			"allUnloaded": "Tutti i modelli sono stati rilasciati"
+		},
+		"settings": {
+			"shuttingDown": "Spegnimento",
+			"restarting": "Riavvio",
+			"enabled": "Attivato",
+			"disabled": "Disattivato",
+			"specs": {
+				"peakInt8": "Picco INT8",
+				"storage": "Archiviazione",
+				"network": "Rete"
+			}
+		},
+		"connectors": {
+			"connected": "Connesso",
+			"notConnected": "Non connesso",
+			"unavailable": "Non disponibile",
+			"waitingForQr": "In attesa della scansione del QR",
+			"scanQr": "Scansiona il codice QR con WhatsApp",
+			"signIn": "Accedi con il tuo account {{provider}}",
+			"names": {
+				"email": "Email (IMAP/SMTP)",
+				"telegram": "Bot Telegram",
+				"discord": "Bot Discord"
+			}
+		},
+		"backup": {
+			"categories": {
+				"conversationService": "Cronologia chat",
+				"knowledgeBase": "Vault e personalizzazione",
+				"agentUsage": "Utilizzo degli agenti",
+				"connectorService": "Connettori",
+				"scheduled": "Attività pianificate",
+				"skills": "Competenze"
+			}
+		},
+		"usage": {
+			"otherApps": "API e altre app"
+		},
+		"task": {
+			"searchedVault": "Ricerca in Vault: {{query}}",
+			"readHost": "Letto {{host}}",
+			"readWebPage": "Letta una pagina web",
+			"updatedOccupation": "Professione aggiornata",
+			"updatedPreferences": "Preferenze aggiornate",
+			"updatedRecentFocus": "Attività recenti aggiornate",
+			"updatedProfile": "Profilo aggiornato",
+			"updatedField": "Aggiornato: {{field}}"
+		}
+	}
+}

@@ -1,3 +1,5 @@
+import type { ParseKeys, TFunction } from "i18next";
+
 import type { Connector, ConnectorKey, McpServer, McpTool } from "@/types/device";
 
 import { DeviceError, deviceId, deviceJson } from "./device";
@@ -10,10 +12,13 @@ const OAUTH: Partial<Record<ConnectorKey, { path: string; name: string; category
 	"outlook-mail": { path: "outlook", name: "Outlook Mail", category: "email" },
 	"outlook-calendar": { path: "outlook/calendar", name: "Outlook Calendar", category: "calendar" },
 };
-const CHANNELS: Partial<Record<ConnectorKey, { channel: string; name: string; category: Connector["category"] }>> = {
-	email: { channel: "email", name: "Email (IMAP/SMTP)", category: "email" },
-	telegram: { channel: "telegram", name: "Telegram bot", category: "messaging" },
-	discord: { channel: "discord", name: "Discord bot", category: "messaging" },
+// A channel's name is a brand name or, where it has words in it, a translation key.
+const CHANNELS: Partial<
+	Record<ConnectorKey, { channel: string; name: string | { key: ParseKeys }; category: Connector["category"] }>
+> = {
+	email: { channel: "email", name: { key: "server.connectors.names.email" }, category: "email" },
+	telegram: { channel: "telegram", name: { key: "server.connectors.names.telegram" }, category: "messaging" },
+	discord: { channel: "discord", name: { key: "server.connectors.names.discord" }, category: "messaging" },
 	x: { channel: "x", name: "X (Twitter)", category: "messaging" },
 	whatsapp: { channel: "whatsapp", name: "WhatsApp", category: "messaging" },
 };
@@ -22,7 +27,7 @@ export const CONNECTOR_KEYS = [...Object.keys(OAUTH), ...Object.keys(CHANNELS)] 
 
 export function connectorKeyFrom(value: unknown): ConnectorKey {
 	if (typeof value !== "string" || !CONNECTOR_KEYS.includes(value as ConnectorKey)) {
-		throw new DeviceError("Unknown connector", 400);
+		throw new DeviceError("errors.connectors.unknown", 400);
 	}
 	return value as ConnectorKey;
 }
@@ -42,7 +47,7 @@ interface ChannelStatus {
 	detail: string;
 }
 
-export async function listConnectors(): Promise<Connector[]> {
+export async function listConnectors(t: TFunction): Promise<Connector[]> {
 	const [status, oauth] = await Promise.all([
 		connector<{ channels: Record<string, ChannelStatus> }>("/v1/status"),
 		Promise.all(
@@ -67,31 +72,36 @@ export async function listConnectors(): Promise<Connector[]> {
 				connected: reply?.connected ?? false,
 				detail: reply
 					? reply.connected
-						? (reply.email_address ?? "Connected")
-						: `Sign in with your ${key.startsWith("outlook") ? "Microsoft" : "Google"} account`
-					: "Unavailable",
+						? (reply.email_address ?? t("server.connectors.connected"))
+						: t("server.connectors.signIn", { provider: key.startsWith("outlook") ? "Microsoft" : "Google" })
+					: t("server.connectors.unavailable"),
 			};
 		}),
 		...Object.entries(CHANNELS).map(([key, spec]) => {
 			const channel = status.channels[spec.channel];
 			return {
 				key: key as ConnectorKey,
-				name: spec.name,
+				name: typeof spec.name === "string" ? spec.name : t(spec.name.key),
 				category: spec.category,
 				connected: channel?.connected ?? false,
-				detail: channel ? (channel.connected ? "Connected" : describe(channel.detail)) : "Unavailable",
+				detail: channel
+					? channel.connected
+						? t("server.connectors.connected")
+						: describe(channel.detail, t)
+					: t("server.connectors.unavailable"),
 			};
 		}),
 	];
 }
 
 // The device's status details are terse ("qr", "Telegram token not configured").
-const describe = (detail: string): string => (detail === "qr" ? "Waiting for a QR scan" : detail || "Not connected");
+const describe = (detail: string, t: TFunction): string =>
+	detail === "qr" ? t("server.connectors.waitingForQr") : detail || t("server.connectors.notConnected");
 
 // OAuth: the sign-in page to open (the device notices when sign-in completes).
 export async function authUrl(key: ConnectorKey): Promise<string> {
 	const spec = OAUTH[key];
-	if (!spec) throw new DeviceError("This connector does not sign in with an account", 400);
+	if (!spec) throw new DeviceError("errors.connectors.noAccountSignIn", 400);
 	const prompt = key.startsWith("outlook") ? "?prompt=select_account" : "";
 	const reply = await connector<{ url: string }>(`/v1/${spec.path}/auth-url${prompt}`);
 	return reply.url;
@@ -105,27 +115,31 @@ interface Verdict {
 	status?: string;
 }
 
-const failed = (verdict: Verdict, fallback: string): never => {
-	throw new DeviceError(verdict.error || fallback, 422);
+// The device's reason when it gives one.
+const failed = (verdict: Verdict, fallback: ParseKeys): never => {
+	throw verdict.error
+		? new DeviceError("errors.passthrough", 422, { message: verdict.error })
+		: new DeviceError(fallback, 422);
 };
 
 // Connects a token, login or mail connector after the device has checked the credentials, as TiinyOS does.
 export async function connect(
 	key: ConnectorKey,
-	input: Record<string, unknown>
+	input: Record<string, unknown>,
+	t: TFunction
 ): Promise<{ detail: string; qr?: string }> {
 	const text = (field: string): string => {
 		const value = input[field];
-		if (typeof value !== "string" || !value.trim()) throw new DeviceError(`${field} is required`, 400);
+		if (typeof value !== "string" || !value.trim()) throw new DeviceError("errors.request.required", 400, { field });
 		return value.trim();
 	};
 	switch (key) {
 		case "telegram": {
 			const token = text("token");
 			const verdict = await connector<Verdict>("/v1/telegram/check-with-token", { method: "POST", body: { token } });
-			if (!verdict.ok) failed(verdict, "The device rejected the token");
+			if (!verdict.ok) failed(verdict, "errors.connectors.tokenRejected");
 			await connector("/v1/config/telegram", { method: "PATCH", body: { enabled: true, token } });
-			return { detail: verdict.username ? `@${verdict.username}` : "Connected" };
+			return { detail: verdict.username ? `@${verdict.username}` : t("server.connectors.connected") };
 		}
 		case "discord": {
 			const token = text("token");
@@ -134,19 +148,19 @@ export async function connect(
 				method: "POST",
 				body: { token, channel },
 			});
-			if (!verdict.ok) failed(verdict, "The device rejected the token");
+			if (!verdict.ok) failed(verdict, "errors.connectors.tokenRejected");
 			await connector("/v1/config/discord", {
 				method: "PATCH",
 				body: { enabled: true, token, allow_channels: [channel] },
 			});
-			return { detail: verdict.username ?? "Connected" };
+			return { detail: verdict.username ?? t("server.connectors.connected") };
 		}
 		case "x": {
 			const body = { auth_token: text("authToken"), ct0: text("ct0") };
 			const verdict = await connector<Verdict>("/v2/x/check-with-token", { method: "POST", body });
-			if (!verdict.ok) failed(verdict, "X rejected the login");
+			if (!verdict.ok) failed(verdict, "errors.connectors.xLoginRejected");
 			await connector("/v1/config/x", { method: "PATCH", body: { ...body, enabled: true } });
-			return { detail: verdict.username ? `@${verdict.username}` : "Connected" };
+			return { detail: verdict.username ? `@${verdict.username}` : t("server.connectors.connected") };
 		}
 		case "email": {
 			const username = text("username");
@@ -159,7 +173,7 @@ export async function connect(
 				method: "POST",
 				body: { imap_username: username, imap_password: password, imap_host: imapHost, imap_port: imapPort },
 			});
-			if (!verdict.ok) failed(verdict, "The mail server refused the login");
+			if (!verdict.ok) failed(verdict, "errors.connectors.mailLoginRefused");
 			await connector("/v1/config/email", {
 				method: "PATCH",
 				body: {
@@ -184,11 +198,13 @@ export async function connect(
 		}
 		case "whatsapp": {
 			const reply = await connector<Verdict>("/v1/whatsapp/qr", { method: "POST", body: {} });
-			if (!reply.ok) failed(reply, "The device could not start WhatsApp");
-			return reply.qr ? { detail: "Scan the QR code with WhatsApp", qr: reply.qr } : { detail: "Connected" };
+			if (!reply.ok) failed(reply, "errors.connectors.whatsappFailed");
+			return reply.qr
+				? { detail: t("server.connectors.scanQr"), qr: reply.qr }
+				: { detail: t("server.connectors.connected") };
 		}
 		default: {
-			throw new DeviceError("This connector signs in with an account", 400);
+			throw new DeviceError("errors.connectors.accountSignIn", 400);
 		}
 	}
 }
@@ -275,7 +291,8 @@ export async function listMcpServers(): Promise<McpServer[]> {
 }
 
 export function mcpIdFrom(value: unknown): string {
-	if (typeof value !== "string" || !/^[\w-]{1,100}$/.test(value)) throw new DeviceError("Invalid MCP server id", 400);
+	if (typeof value !== "string" || !/^[\w-]{1,100}$/.test(value))
+		throw new DeviceError("errors.connectors.invalidMcpId", 400);
 	return value;
 }
 
@@ -283,7 +300,7 @@ export function mcpIdFrom(value: unknown): string {
 export async function importMcpServers(config: unknown): Promise<void> {
 	const servers = (config as { mcpServers?: unknown })?.mcpServers;
 	if (!servers || typeof servers !== "object" || Array.isArray(servers) || Object.keys(servers).length === 0) {
-		throw new DeviceError('Expected a JSON object like { "mcpServers": { "name": { … } } }', 400);
+		throw new DeviceError("errors.connectors.mcpConfig", 400, { example: '{ "mcpServers": { "name": { … } } }' });
 	}
 	await connector("/v1/mcp/servers/import-json", {
 		method: "POST",

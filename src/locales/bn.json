@@ -1,0 +1,1207 @@
+{
+	"nav": {
+		"overview": "সংক্ষিপ্ত বিবরণ",
+		"models": "মডেল",
+		"agents": "এজেন্ট",
+		"chat": "চ্যাট",
+		"playground": "প্লেগ্রাউন্ড",
+		"vault": "ভল্ট",
+		"connectors": "কানেক্টর",
+		"settings": "সেটিংস",
+		"openNavigation": "নেভিগেশন খুলুন",
+		"signOut": "সাইন আউট করুন",
+		"language": "ভাষা",
+		"languageCurrent": "ভাষা: {{language}}"
+	},
+	"titles": {
+		"page": "{{page}} | {{site}}",
+		"notFound": "পাওয়া যায়নি",
+		"settings": "সেটিংস",
+		"overview": "সংক্ষিপ্ত বিবরণ",
+		"agents": "এজেন্ট",
+		"history": "ইতিহাস",
+		"signIn": "সাইন ইন করুন",
+		"playground": "প্লেগ্রাউন্ড",
+		"connectors": "কানেক্টর",
+		"models": "মডেল",
+		"store": "স্টোর",
+		"chat": "চ্যাট",
+		"vault": "ভল্ট",
+		"huggingFace": "Hugging Face"
+	},
+	"errors": {
+		"notSignedIn": "সাইন ইন করা হয়নি",
+		"internal": "অভ্যন্তরীণ ত্রুটি",
+		"unknownLanguage": "অজানা ভাষা",
+		"incorrectPassword": "ভুল পাসওয়ার্ড",
+		"passthrough": "{{message}}",
+		"request": {
+			"expected": "{{shape}} প্রত্যাশিত",
+			"required": "{{field}} আবশ্যক",
+			"mustBeText": "{{field}} অবশ্যই টেক্সট হতে হবে",
+			"tooLong_one": "{{field}} {{count}} অক্ষরের চেয়ে দীর্ঘ",
+			"tooLong_other": "{{field}} {{count}} অক্ষরের চেয়ে দীর্ঘ",
+			"modelIdFormat": "{{field}} অবশ্যই Org/Name-এর মতো হতে হবে",
+			"modelIdLike": "{{field}} অবশ্যই Org/Name-এর মতো মডেল id হতে হবে",
+			"range": "{{field}} অবশ্যই {{min}}-{{max}} হতে হবে",
+			"oneOf": "{{field}} অবশ্যই এগুলোর একটি হতে হবে: {{options}}",
+			"dateFormat": "{{field}} অবশ্যই {{example}}-এর মতো তারিখ হতে হবে",
+			"jsonList": "{{field}} অবশ্যই একটি JSON তালিকা হতে হবে",
+			"emptySearch": "খোঁজার জন্য কিছু লিখুন"
+		},
+		"device": {
+			"notConfigured": "ডিভাইস কনফিগার করা নেই: TIINY_DEVICE_URL ও TIINY_AUTH_KEY সেট করুন, অথবা আগে tiiny CLI দিয়ে সাইন ইন করুন",
+			"notConfiguredShort": "ডিভাইস কনফিগার করা নেই",
+			"responded": "ডিভাইসের উত্তর {{status}}: {{message}}",
+			"respondedUnavailable": "ডিভাইসের উত্তর {{status}}: পরিষেবাটি উপলভ্য নয়",
+			"unreachable": "{{url}}-এ ডিভাইসে পৌঁছানো যাচ্ছে না: {{reason}}",
+			"emptyStream": "ডিভাইস একটি খালি স্ট্রিম ফেরত দিয়েছে",
+			"refusedChange": "ডিভাইস পরিবর্তনটি প্রত্যাখ্যান করেছে",
+			"reportedError": "ডিভাইস একটি ত্রুটি জানিয়েছে"
+		},
+		"file": {
+			"tooLarge": "{{name}} {{megabytes}} MB-এর চেয়ে বড়"
+		},
+		"hf": {
+			"invalidRepo": "Hugging Face রিপো org/name বা তার huggingface.co URL হিসেবে লিখুন",
+			"unreachable": "Hugging Face-এ পৌঁছানো যাচ্ছে না: {{reason}}",
+			"responded": "Hugging Face-এর উত্তর {{status}}"
+		},
+		"models": {
+			"didNotLoad": "মডেল লোড হয়নি",
+			"didNotLoadStatus": "মডেল লোড হয়নি ({{status}})",
+			"didNotLoadNoStatus": "মডেল লোড হয়নি (কোনো স্ট্যাটাস নেই)"
+		},
+		"connectors": {
+			"unknown": "অজানা কানেক্টর",
+			"noAccountSignIn": "এই কানেক্টর কোনো অ্যাকাউন্ট দিয়ে সাইন ইন করে না",
+			"accountSignIn": "এই কানেক্টর একটি অ্যাকাউন্ট দিয়ে সাইন ইন করে",
+			"tokenRejected": "ডিভাইস টোকেনটি প্রত্যাখ্যান করেছে",
+			"xLoginRejected": "X লগইন প্রত্যাখ্যান করেছে",
+			"mailLoginRefused": "মেল সার্ভার লগইন প্রত্যাখ্যান করেছে",
+			"whatsappFailed": "ডিভাইস WhatsApp চালু করতে পারেনি",
+			"invalidMcpId": "অবৈধ MCP সার্ভার id",
+			"mcpConfig": "{{example}}-এর মতো একটি JSON অবজেক্ট প্রত্যাশিত"
+		},
+		"chat": {
+			"invalidAttachment": "অবৈধ অ্যাটাচমেন্ট",
+			"tooManyAttachments_one": "সর্বাধিক {{count}}টি অ্যাটাচমেন্ট",
+			"tooManyAttachments_other": "সর্বাধিক {{count}}টি অ্যাটাচমেন্ট",
+			"chooseFile": "একটি ফাইল বেছে নিন",
+			"unsupportedFile": "{{name}}: ছবি বা {{extensions}} ফাইল সংযুক্ত করুন",
+			"noText": "ডিভাইস {{name}}-এ কোনো টেক্সট পায়নি",
+			"invalidMediaId": "অবৈধ মিডিয়া id"
+		},
+		"task": {
+			"interrupted": "বাধাপ্রাপ্ত।",
+			"tooManySteps_one": "{{count}}টি ধাপের পরে চূড়ান্ত উত্তর ছাড়াই থামানো হয়েছে।",
+			"tooManySteps_other": "{{count}}টি ধাপের পরে চূড়ান্ত উত্তর ছাড়াই থামানো হয়েছে।"
+		},
+		"history": {
+			"invalidConversationId": "অবৈধ কথোপকথন id"
+		},
+		"vault": {
+			"invalidSourceId": "অবৈধ উৎস id",
+			"chooseFiles": "অন্তত একটি ফাইল বেছে নিন",
+			"tooManyFiles_one": "একবারে সর্বাধিক {{count}}টি ফাইল আপলোড করুন",
+			"tooManyFiles_other": "একবারে সর্বাধিক {{count}}টি ফাইল আপলোড করুন",
+			"unsupportedFile": "{{name}}: ভল্ট {{extensions}} ফাইল গ্রহণ করে",
+			"invalidName": "স্ল্যাশ ছাড়া একটি ফাইলের নাম লিখুন"
+		},
+		"memory": {
+			"chooseTextModel": "ডাউনলোড করা একটি টেক্সট মডেল বেছে নিন"
+		},
+		"settings": {
+			"deviceNameLength_one": "ডিভাইসের নাম 1-{{count}} অক্ষরের হতে হবে",
+			"deviceNameLength_other": "ডিভাইসের নাম 1-{{count}} অক্ষরের হতে হবে"
+		},
+		"agents": {
+			"noDomain": "এজেন্ট সাবডোমেন কনফিগার করা নেই (AGENT_DOMAIN)"
+		},
+		"playground": {
+			"textRequired": "টেক্সট আবশ্যক",
+			"textTooLong_one": "টেক্সট {{count}} অক্ষরের চেয়ে দীর্ঘ",
+			"textTooLong_other": "টেক্সট {{count}} অক্ষরের চেয়ে দীর্ঘ",
+			"queryRequired": "কোয়েরি আবশ্যক",
+			"queryTooLong_one": "কোয়েরি {{count}} অক্ষরের চেয়ে দীর্ঘ",
+			"queryTooLong_other": "কোয়েরি {{count}} অক্ষরের চেয়ে দীর্ঘ",
+			"numberedTextRequired": "টেক্সট {{number}} আবশ্যক",
+			"numberedTextTooLong_one": "টেক্সট {{number}} {{count}} অক্ষরের চেয়ে দীর্ঘ",
+			"numberedTextTooLong_other": "টেক্সট {{number}} {{count}} অক্ষরের চেয়ে দীর্ঘ",
+			"documentRequired": "ডকুমেন্ট {{number}} আবশ্যক",
+			"documentTooLong_one": "ডকুমেন্ট {{number}} {{count}} অক্ষরের চেয়ে দীর্ঘ",
+			"documentTooLong_other": "ডকুমেন্ট {{number}} {{count}} অক্ষরের চেয়ে দীর্ঘ",
+			"textCount": "{{min}} থেকে {{max}}টি টেক্সট দিন",
+			"documentCount": "{{min}} থেকে {{max}}টি ডকুমেন্ট দিন",
+			"chooseAudio": "কোনো অডিও বেছে নিন বা রেকর্ড করুন",
+			"audioTooLarge": "অডিও {{megabytes}} MB-এর চেয়ে বড়",
+			"wavOnly": "ডিভাইস শুধু WAV অডিও ট্রান্সক্রাইব করতে পারে। আগে ফাইলটি WAV-এ রূপান্তর করুন।",
+			"chooseImage": "একটি ছবি বেছে নিন",
+			"imageTooLarge": "ছবি {{megabytes}} MB-এর চেয়ে বড়"
+		},
+		"backup": {
+			"chooseFile": "একটি ব্যাকআপ ফাইল বেছে নিন",
+			"chooseCategory": "ডিভাইস যে বিভাগগুলো দেয় তার অন্তত একটি বেছে নিন",
+			"unexpectedReply": "অপ্রত্যাশিত ব্যাকআপ উত্তর ({{type}})",
+			"unexpectedReplyNoType": "অপ্রত্যাশিত ব্যাকআপ উত্তর (কোনো ধরন নেই)",
+			"noArchive": "ডিভাইসের ব্যাকআপে কোনো আর্কাইভ ছিল না",
+			"notBackup": "এই ফাইলটি Tiiny ব্যাকআপ নয়",
+			"otherDevice": "এই ব্যাকআপটি অন্য একটি ডিভাইসে তৈরি; এটি শুধু সেখানেই রিস্টোর করা যাবে",
+			"missing": "ব্যাকআপে {{services}} নেই"
+		},
+		"wifi": {
+			"unknownAction": "অজানা Wi-Fi অ্যাকশন",
+			"wouldDropLink": "এই অ্যাপ Wi-Fi-এর মাধ্যমে ডিভাইসে পৌঁছায়, তাই এই পরিবর্তনে সংযোগ বিচ্ছিন্ন হয়ে যাবে। এটি TiinyOS থেকে করুন বা ডিভাইসটি কেবলে যুক্ত রেখে করুন।"
+		},
+		"update": {
+			"upToDate": "TiinyOS হালনাগাদ আছে",
+			"notReady": "ইনস্টল করার মতো কোনো ডাউনলোড করা আপডেট প্রস্তুত নেই",
+			"unknownAction": "অজানা আপডেট অ্যাকশন"
+		},
+		"agentProxy": {
+			"noAnswer": "এজেন্ট সাড়া দেয়নি ({{reason}})। এটি হয়তো বন্ধ আছে।",
+			"linkExpired": "এই লিংকের মেয়াদ শেষ। tiiny-web-এর এজেন্ট পেজ থেকে এজেন্টটি আবার খুলুন।",
+			"signIn": "tiiny-web-এ সাইন ইন করুন এবং এজেন্ট পেজ থেকে এই এজেন্টটি খুলুন।"
+		}
+	},
+	"chat": {
+		"title": "চ্যাট",
+		"tabs": {
+			"chat": "চ্যাট",
+			"history": "ইতিহাস"
+		},
+		"intro": "লোড করা একটি মডেলের সঙ্গে কথা বলুন। চ্যাটগুলো ডিভাইসের চ্যাট ইতিহাসে রাখা হয়, যা TiinyOS-এর সঙ্গে শেয়ার করা। ডিভাইস প্রতিটি মডেলের জন্য একবারে একটি অনুরোধের উত্তর দেয়, তাই উত্তর সারিতে অপেক্ষা করতে পারে।",
+		"message": {
+			"you": "আপনি",
+			"assistant": "অ্যাসিস্ট্যান্ট",
+			"thinking": "ভাবছে"
+		},
+		"notes": {
+			"stopped": "থামানো হয়েছে।",
+			"noReply": "সম্পূর্ণ উত্তর নেই।",
+			"interrupted": "বাধাপ্রাপ্ত।",
+			"drawing": "ছবি আঁকা হচ্ছে… ধাপ {{step}}/{{total}}",
+			"picture_one": "{{size}}, {{count}}টি ধাপ",
+			"picture_other": "{{size}}, {{count}}টি ধাপ"
+		},
+		"errors": {
+			"openConversation": "কথোপকথন খোলা যায়নি: {{message}}",
+			"load": "{{name}} লোড করা যায়নি: {{message}}",
+			"device": "ডিভাইস একটি ত্রুটি জানিয়েছে",
+			"gaveUp": "ডিভাইস অপেক্ষা ছেড়ে দিয়েছে: মডেলটি অন্য অনুরোধে ব্যস্ত ছিল। আবার চেষ্টা করুন। ({{message}})",
+			"drawFailed": "ডিভাইস ছবিটি আঁকতে পারেনি",
+			"noPicture": "ডিভাইস কোনো ছবি ছাড়াই শেষ করেছে",
+			"notSaved": "ইতিহাসে সংরক্ষিত হয়নি: {{message}}"
+		},
+		"models": {
+			"loading": "চ্যাট মডেল লোড হচ্ছে",
+			"none": "কোনো চ্যাট বা ছবির মডেল ডাউনলোড করা নেই। স্টোর থেকে একটি নিন, তারপর লোড করুন।",
+			"modelsButton": "মডেল",
+			"label": "মডেল",
+			"choose": "একটি মডেল বেছে নিন",
+			"notLoadedOption": "{{name}} (লোড করা নেই)"
+		},
+		"loading": {
+			"starting": "শুরু হচ্ছে",
+			"unloading": "{{name}} আনলোড হচ্ছে",
+			"status": "{{name}} লোড হচ্ছে: {{message}}",
+			"statusProgress": "{{name}} লোড হচ্ছে: {{message}} {{progress}}%",
+			"progressLabel": "মডেল লোডিং",
+			"notLoaded": "{{name}} লোড করা নেই।",
+			"load": "লোড করুন"
+		},
+		"makeRoom": {
+			"title": "{{name}}-এর জন্য জায়গা করবেন?",
+			"text": "ডিভাইসে যথেষ্ট খালি NPU মেমোরি নেই। আগে {{models}} আনলোড করবেন? যেসব অ্যাপ এগুলো ব্যবহার করছে সেগুলো থেমে যাবে।",
+			"otherModels": "অন্য মডেলগুলো",
+			"cancel": "বাতিল করুন",
+			"confirm": "আনলোড করে লোড করুন"
+		},
+		"mode": {
+			"label": "মোড",
+			"chat": "চ্যাট",
+			"chatTitle": "মডেল সরাসরি উত্তর দেয়",
+			"task": "টাস্ক",
+			"taskTitle": "মডেল ভল্ট, ওয়েব পেজ ও MCP টুল দিয়ে ধাপে ধাপে কাজ করে"
+		},
+		"tools": {
+			"vault": "ভল্ট",
+			"vaultTitle": "মডেলকে আপনার ভল্ট ফাইল ও চ্যাট সারাংশ খুঁজতে দিন",
+			"web": "ওয়েব",
+			"webTitle": "মডেলকে ওয়েব পেজ পড়তে দিন"
+		},
+		"image": {
+			"size": "আকার",
+			"steps": "ধাপ"
+		},
+		"thinking": {
+			"label": "থিংকিং",
+			"off": "বন্ধ"
+		},
+		"newChat": "নতুন চ্যাট",
+		"conversation": {
+			"opening": "কথোপকথন খোলা হচ্ছে",
+			"empty": "{{name}}-এর সঙ্গে চ্যাট শুরু করতে একটি বার্তা পাঠান।",
+			"theModel": "মডেল",
+			"waiting": "ডিভাইসের অপেক্ষায় · {{seconds}}s",
+			"waitingQueued_one": "ডিভাইসের অপেক্ষায় · {{seconds}}s · মডেলটি অন্য {{count}}টি অনুরোধে ব্যস্ত, আপনারটি সারিতে আছে",
+			"waitingQueued_other": "ডিভাইসের অপেক্ষায় · {{seconds}}s · মডেলটি অন্য {{count}}টি অনুরোধে ব্যস্ত, আপনারটি সারিতে আছে"
+		},
+		"composer": {
+			"files": "সংযুক্ত করার ফাইল",
+			"attachImagesOrDocuments": "ছবি বা ডকুমেন্ট সংযুক্ত করুন",
+			"attachDocuments": "ডকুমেন্ট সংযুক্ত করুন",
+			"message": "বার্তা",
+			"placeholder": "পাঠাতে Enter, নতুন লাইনের জন্য Shift+Enter",
+			"stop": "থামান",
+			"send": "পাঠান"
+		},
+		"attachments": {
+			"charactersRead_one": "ডিভাইস {{characters}}টি অক্ষর পড়েছে",
+			"charactersRead_other": "ডিভাইস {{characters}}টি অক্ষর পড়েছে",
+			"uploading": "{{name}}…",
+			"missing": "{{name}} (আর ডিভাইসে নেই)",
+			"download": "ডাউনলোড করুন"
+		},
+		"task": {
+			"running": "{{label}} চলছে",
+			"showResult": "ফলাফল দেখান",
+			"hideResult": "ফলাফল লুকান"
+		},
+		"history": {
+			"intro": "ডিভাইসে রাখা কথোপকথন, এই অ্যাপ ও TiinyOS থেকে।",
+			"search": "কথোপকথন খুঁজুন",
+			"searchButton": "খুঁজুন",
+			"searching": "খোঁজা হচ্ছে…",
+			"loading": "কথোপকথন লোড হচ্ছে",
+			"noMatches": "কোনো কথোপকথনে “{{query}}” উল্লেখ নেই।",
+			"empty": "এখনও কোনো কথোপকথন নেই। আপনার চ্যাটগুলো এখানে রাখা হয়।",
+			"untitled": "শিরোনামহীন",
+			"delete": "মুছুন",
+			"confirmTitle": "কথোপকথন মুছবেন?",
+			"confirmText": "ডিভাইস থেকে “{{title}}” মুছবেন? এটি TiinyOS থেকেও সরিয়ে দেওয়া হবে।"
+		}
+	},
+	"auth": {
+		"layout": {
+			"welcome": "<brand>Tiiny</brand>-তে স্বাগতম",
+			"tagline": "আপনার নেটওয়ার্কের যেকোনো ব্রাউজার থেকে ডিভাইস পর্যবেক্ষণ করুন, লোড করা মডেল পরিচালনা করুন এবং চ্যাট করুন।"
+		},
+		"signIn": {
+			"title": "সাইন ইন করুন",
+			"description": "এই সার্ভারের জন্য কনফিগার করা অ্যাডমিন পাসওয়ার্ড লিখুন।",
+			"password": "পাসওয়ার্ড",
+			"passwordRequired": "পাসওয়ার্ড আবশ্যক",
+			"showPassword": "পাসওয়ার্ড দেখান",
+			"hidePassword": "পাসওয়ার্ড লুকান",
+			"submit": "সাইন ইন করুন",
+			"submitting": "সাইন ইন হচ্ছে…",
+			"failed": "সাইন ইন ব্যর্থ ({{status}})",
+			"unreachable": "সার্ভারে পৌঁছানো যায়নি"
+		}
+	},
+	"core": {
+		"backHome": "হোমে ফিরে যান",
+		"notFound": {
+			"heading": "404: আপনি যে পেজটি খুঁজছেন সেটি এখানে নেই",
+			"hint": "ড্যাশবোর্ডে ফিরে যেতে নেভিগেশন ব্যবহার করুন।"
+		},
+		"errors": {
+			"requestFailed": "অনুরোধ ব্যর্থ ({{status}})",
+			"deviceReported": "ডিভাইস {{status}} জানিয়েছে"
+		}
+	},
+	"agents": {
+		"page": {
+			"title": "এজেন্ট",
+			"description": "ডিভাইসে ইনস্টল করা এজেন্টগুলো এখানে HTTPS-এর মাধ্যমে, এই অ্যাপের সাইন-ইনের পেছনে খোলে।"
+		},
+		"loading": "এজেন্ট লোড হচ্ছে",
+		"recommendedModels_one": "প্রস্তাবিত মডেল: {{models}}",
+		"recommendedModels_other": "প্রস্তাবিত মডেল: {{models}}",
+		"stream": {
+			"failed": "ব্যর্থ",
+			"working": "কাজ চলছে"
+		},
+		"progress": {
+			"percent": "{{message}} {{percent}}%",
+			"ariaLabel": "{{name}}-এর অগ্রগতি",
+			"startingInstall": "ইনস্টল শুরু হচ্ছে…",
+			"resumingInstall": "ইনস্টল আবার শুরু হচ্ছে…",
+			"updating": "আপডেট হচ্ছে…",
+			"stopping": "বন্ধ হচ্ছে…",
+			"starting": "শুরু হচ্ছে…",
+			"deleting": "মোছা হচ্ছে…"
+		},
+		"install": {
+			"paused": "ইনস্টল {{percent}}%-এ থেমে আছে",
+			"running": "ইনস্টল হচ্ছে {{percent}}%",
+			"ariaLabel": "{{name}} ইনস্টল"
+		},
+		"outcome": {
+			"installed": "{{name}} ইনস্টল হয়েছে।",
+			"installPaused": "{{name}}-এর ইনস্টল থামানো হয়েছে।",
+			"updated": "{{name}} {{version}}-এ আপডেট হয়েছে।",
+			"stopped": "{{name}} বন্ধ হয়েছে।",
+			"started": "{{name}} চালু হয়েছে।",
+			"deleted": "{{name}} মুছে ফেলা হয়েছে।",
+			"error": "{{name}}: {{message}}"
+		},
+		"actions": {
+			"resume": "আবার শুরু করুন",
+			"pause": "থামান",
+			"cancelInstall": "ইনস্টল বাতিল করুন",
+			"update": "আপডেট করুন",
+			"open": "খুলুন",
+			"stop": "বন্ধ করুন",
+			"start": "চালু করুন",
+			"delete": "মুছুন",
+			"installOnDevice": "ডিভাইসে ইনস্টল করুন",
+			"cancel": "বাতিল করুন"
+		},
+		"installed": {
+			"heading": "এই ডিভাইসে",
+			"empty": "ডিভাইসে কোনো এজেন্ট ইনস্টল করা নেই। নিচের স্টোর থেকে একটি ইনস্টল করুন।",
+			"version": "সংস্করণ {{version}}",
+			"versionWithUpdate": "সংস্করণ {{version}} · {{latest}} উপলভ্য",
+			"unknownVersion": "অজানা",
+			"usage": "CPU {{cpu}}% · মেমোরি {{memory}}",
+			"containersStopped": "ডিভাইস জানাচ্ছে এই এজেন্টের কন্টেইনারগুলো অপ্রত্যাশিতভাবে বন্ধ হয়ে গেছে। এটি আবার চালু করুন, অথবা রিসেট করতে বন্ধ করুন।",
+			"proxyError": "পোর্ট {{port}}-এ প্রক্সি: {{error}}"
+		},
+		"store": {
+			"heading": "এজেন্ট স্টোর: ডিভাইসে চালান",
+			"allInstalled": "স্টোরের সব ওয়েব এজেন্ট ইতিমধ্যে ইনস্টল করা আছে।",
+			"version": "সংস্করণ {{version}}"
+		},
+		"desktop": {
+			"heading": "এজেন্ট স্টোর: আপনার কম্পিউটারে চালান",
+			"description": "এই এজেন্টগুলো কম্পিউটারে চলে এবং ডিভাইসের OpenAI-সামঞ্জস্যপূর্ণ API ব্যবহার করে। <code>tiiny auth key</code> থেকে পাওয়া key দিয়ে এগুলোকে ডিভাইসের দিকে নির্দেশ করুন (যেমন <code>http://&lt;device address&gt;/v1</code>)।",
+			"noDownloads": "কোনো ডাউনলোড প্রকাশিত হয়নি।"
+		},
+		"deleteDialog": {
+			"title": "{{name}} মুছবেন?",
+			"text": "এতে এজেন্টটি ডিভাইস থেকে সরানো হবে। আপনি এজেন্ট স্টোর থেকে এটি আবার ইনস্টল করতে পারবেন।"
+		},
+		"status": {
+			"created": "তৈরি হয়েছে",
+			"running": "চলছে",
+			"starting": "শুরু হচ্ছে",
+			"stopped": "বন্ধ",
+			"exited": "প্রস্থান করেছে",
+			"paused": "থামানো",
+			"error": "ত্রুটি"
+		}
+	},
+	"connectors": {
+		"page": {
+			"title": "কানেক্টর",
+			"description": "ইমেল, ক্যালেন্ডার, মেসেজিং ও MCP টুল, যা মডেল টাস্ক মোডে ব্যবহার করতে পারে।"
+		},
+		"category": {
+			"email": "ইমেল",
+			"calendar": "ক্যালেন্ডার",
+			"messaging": "মেসেজিং"
+		},
+		"state": {
+			"connected": "সংযুক্ত",
+			"notConnected": "সংযুক্ত নয়",
+			"notReachable": "পৌঁছানো যাচ্ছে না"
+		},
+		"actions": {
+			"connect": "সংযুক্ত করুন",
+			"disconnect": "সংযোগ বিচ্ছিন্ন করুন",
+			"cancel": "বাতিল করুন",
+			"close": "বন্ধ করুন",
+			"remove": "সরান"
+		},
+		"services": {
+			"heading": "পরিষেবা",
+			"description": "মডেল টাস্ক মোডে সংযুক্ত পরিষেবা ব্যবহার করে, আপনি যতটুকু অনুমতি দেন ততটুকুই। সংযোগগুলো ডিভাইসে থাকে এবং TiinyOS-এর সঙ্গে শেয়ার করা হয়।",
+			"loading": "কানেক্টর লোড হচ্ছে",
+			"waitingForSignIn": "আপনার সাইন ইন শেষ হওয়ার অপেক্ষায়… <link>সাইন-ইন পেজ খুলুন</link>"
+		},
+		"outcome": {
+			"connected": "{{name}} সংযুক্ত হয়েছে: {{detail}}।",
+			"whatsappConnected": "WhatsApp সংযুক্ত হয়েছে।",
+			"disconnected": "{{name}}-এর সংযোগ বিচ্ছিন্ন হয়েছে।",
+			"error": "{{name}}: {{message}}"
+		},
+		"disconnectDialog": {
+			"title": "সংযোগ বিচ্ছিন্ন করবেন?",
+			"text": "{{name}}-এর সংযোগ বিচ্ছিন্ন করবেন? ডিভাইস সংরক্ষিত সাইন-ইন ভুলে যাবে, এবং মডেল আর এটি ব্যবহার করতে পারবে না।"
+		},
+		"connect": {
+			"title": "{{name}} সংযুক্ত করুন",
+			"telegramIntro": "Telegram-এ @BotFather দিয়ে একটি বট তৈরি করুন (/newbot) এবং যে টোকেন দেয় সেটি পেস্ট করুন।",
+			"discordIntro": "Discord Developer Portal-এ একটি বট তৈরি করুন, Message Content Intent চালু করুন, আপনার সার্ভারে আমন্ত্রণ জানান এবং এর টোকেন পেস্ট করুন।",
+			"xIntro": "একটি ব্রাউজারে x.com-এ সাইন ইন করুন এবং auth_token ও ct0 কুকি কপি করুন।",
+			"botToken": "বট টোকেন",
+			"channelId": "চ্যানেল ID",
+			"channelIdHelp": "যে চ্যানেলে বট পড়তে ও পোস্ট করতে পারবে।",
+			"whatsappQrAlt": "WhatsApp পেয়ারিং QR কোড",
+			"whatsappIntro": "আপনার ফোনের WhatsApp-এ Settings → Linked devices → Link a device খুলুন এবং এই কোডটি স্ক্যান করুন।",
+			"newCode": "নতুন কোড",
+			"emailIntro": "একটি অ্যাপ পাসওয়ার্ড ব্যবহার করুন (দুই-ধাপের সাইন-ইন চালু থাকলে Gmail, Outlook ও iCloud-এ এটি লাগে)।",
+			"provider": "প্রদানকারী",
+			"otherProvider": "অন্যান্য",
+			"emailAddress": "ইমেল ঠিকানা",
+			"appPassword": "অ্যাপ পাসওয়ার্ড",
+			"imapServer": "IMAP সার্ভার",
+			"smtpServer": "SMTP সার্ভার",
+			"checking": "যাচাই করা হচ্ছে…"
+		},
+		"mcp": {
+			"heading": "কাস্টম MCP সার্ভার",
+			"addServer": "MCP সার্ভার যোগ করুন",
+			"description": "এই সার্ভারগুলোর টুল টাস্ক মোডে মডেলকে দেওয়া হয়। এগুলো ডিভাইসে চলে।",
+			"loading": "MCP সার্ভার লোড হচ্ছে",
+			"empty": "এখনও কোনো MCP সার্ভার নেই।",
+			"tools": "টুল",
+			"hideTools": "টুল লুকান",
+			"loadingTools": "টুল লোড হচ্ছে",
+			"added": "MCP সার্ভার যোগ করা হয়েছে।",
+			"removed": "{{name}} সরানো হয়েছে।",
+			"removeDialog": {
+				"title": "MCP সার্ভার সরাবেন?",
+				"text": "ডিভাইস থেকে {{name}} সরাবেন? মডেল আর এর টুল ব্যবহার করতে পারবে না।"
+			},
+			"addDialog": {
+				"title": "একটি MCP সার্ভার যোগ করুন",
+				"description": "সার্ভারটি ডিভাইসে চলে, তাই সেখান থেকে এটিতে পৌঁছানো যেতে হবে। যেসব সার্ভারের ডেস্কটপ বা ব্রাউজার লাগে, সেগুলো ডিভাইসে কাজ করবে না।",
+				"byUrl": "URL দিয়ে",
+				"fromJson": "JSON থেকে",
+				"name": "নাম",
+				"url": "URL",
+				"urlHelp": "HTTP বা SSE এন্ডপয়েন্ট, যেমন {{example}}",
+				"config": "MCP কনফিগ",
+				"invalidJson": "এটি বৈধ JSON নয়",
+				"add": "যোগ করুন",
+				"adding": "যোগ করা হচ্ছে…"
+			}
+		}
+	},
+	"settings": {
+		"page": {
+			"title": "সেটিংস",
+			"subtitle": "ডিভাইসের নিজস্ব সেটিংস, TiinyOS-এর মতো।"
+		},
+		"actions": {
+			"cancel": "বাতিল করুন",
+			"save": "সংরক্ষণ করুন",
+			"saving": "সংরক্ষণ করা হচ্ছে…",
+			"retry": "আবার চেষ্টা করুন",
+			"copy": "কপি করুন",
+			"copied": "কপি হয়েছে",
+			"delete": "মুছুন",
+			"deleting": "মোছা হচ্ছে…"
+		},
+		"section": {
+			"staleValues": "সর্বশেষ জানা মান দেখানো হচ্ছে। {{error}}"
+		},
+		"device": {
+			"title": "আমার ডিভাইস",
+			"subheader": "ডিভাইসের দেওয়া তথ্য",
+			"loading": "ডিভাইসের তথ্য লোড হচ্ছে",
+			"name": "নাম",
+			"rename": "নাম পরিবর্তন করুন",
+			"nameField": "ডিভাইসের নাম",
+			"serialNumber": "সিরিয়াল নম্বর",
+			"copySerialNumber": "সিরিয়াল নম্বর কপি করুন",
+			"model": "মডেল",
+			"osService": "TiinyOS পরিষেবা"
+		},
+		"personalization": {
+			"title": "ব্যক্তিগতকরণ",
+			"subheader": "টাস্ক মোডে ডিভাইস মডেলকে আপনার সম্পর্কে যে প্রসঙ্গ দেয়",
+			"loading": "ব্যক্তিগতকরণ লোড হচ্ছে",
+			"fields": {
+				"userName": {
+					"label": "নাম",
+					"hint": "মডেল আপনাকে কী নামে ডাকবে।"
+				},
+				"occupation": {
+					"label": "পেশা",
+					"hint": "যেমন: সফটওয়্যার ইঞ্জিনিয়ার।"
+				},
+				"preferences": {
+					"label": "পছন্দ",
+					"hint": "আপনি কেমন উত্তর পছন্দ করেন।"
+				},
+				"recentFocus": {
+					"label": "সাম্প্রতিক ফোকাস",
+					"hint": "আপনি কী নিয়ে কাজ করছেন।"
+				}
+			},
+			"fieldHelper": "{{hint}} {{length}}/{{limit}}",
+			"saved": "সংরক্ষিত হয়েছে। পরের টাস্ক মোড কথোপকথন থেকে মডেল এটি দেখবে।",
+			"discardChanges": "পরিবর্তন বাতিল করুন"
+		},
+		"power": {
+			"title": "সিস্টেম",
+			"subheader": "পাওয়ার ও TiinyOS আপডেট",
+			"autoPowerOn": {
+				"title": "অটো পাওয়ার-অন",
+				"description": "পাওয়ারে যুক্ত হলে ডিভাইস নিজে থেকেই চালু হয়। এটি চালু আছে কিনা ডিভাইস জানায় না (সবসময় বন্ধ দেখায়), তাই শুধু পরিবর্তনের ফলাফল দেখানো হয়।",
+				"turnOn": "চালু করুন",
+				"turnOff": "বন্ধ করুন",
+				"deviceReply": "ডিভাইস: {{message}}"
+			},
+			"update": {
+				"title": "সিস্টেম আপডেট",
+				"current": "TiinyOS {{version}}",
+				"available": "TiinyOS {{version}} · সংস্করণ {{available}} উপলভ্য",
+				"upToDate": "TiinyOS {{version}} · হালনাগাদ",
+				"loading": "আপডেটের অবস্থা লোড হচ্ছে",
+				"inProgress": "আপডেট {{state}}…",
+				"progress": "আপডেটের অগ্রগতি",
+				"check": "আপডেট খুঁজুন",
+				"checking": "যাচাই করা হচ্ছে…",
+				"download": "আপডেট ডাউনলোড করুন",
+				"install": "আপডেট ইনস্টল করুন",
+				"confirmTitle": "আপডেট ইনস্টল করবেন?",
+				"confirmText": "ইনস্টলেশনের সময় মডেলগুলো থেমে যাবে এবং ডিভাইস রিস্টার্ট হবে। এটি ফিরে না আসা পর্যন্ত আনপ্লাগ করবেন না।",
+				"confirmLabel": "ইনস্টল করুন",
+				"installing": "আপডেট ইনস্টল হচ্ছে। ডিভাইস একবার রিস্টার্ট হবে; আনপ্লাগ করবেন না।"
+			},
+			"power": {
+				"title": "পাওয়ার",
+				"restart": "রিস্টার্ট করুন",
+				"shutDown": "শাট ডাউন করুন",
+				"restarting": "রিস্টার্ট হচ্ছে… ডিভাইস ফিরে আসার অপেক্ষায়।",
+				"back": "ডিভাইস ফিরে এসেছে।",
+				"notBack": "10 মিনিট পরেও ডিভাইস ফিরে আসেনি",
+				"shuttingDown": "ডিভাইস শাট ডাউন হচ্ছে।",
+				"restartTitle": "ডিভাইস রিস্টার্ট করবেন?",
+				"restartText": "লোড করা মডেল, চ্যাট ও এজেন্ট থেমে যাবে, এবং কয়েক মিনিট ডিভাইসে পৌঁছানো যাবে না।",
+				"shutDownTitle": "ডিভাইস শাট ডাউন করবেন?",
+				"shutDownText": "লোড করা মডেল, চ্যাট ও এজেন্ট থেমে যাবে। ডিভাইসে সরাসরি চালু না করা পর্যন্ত (বা অটো পাওয়ার-অন সহ আবার পাওয়ারে যুক্ত না করা পর্যন্ত) এটি বন্ধ থাকবে।"
+			}
+		},
+		"apiAccess": {
+			"title": "API অ্যাক্সেস",
+			"subheader": "আপনার নেটওয়ার্কের অন্য অ্যাপ থেকে ডিভাইসের মডেল ব্যবহার করুন",
+			"loading": "API অ্যাক্সেস লোড হচ্ছে",
+			"openaiCompatible": "OpenAI-সামঞ্জস্যপূর্ণ",
+			"uses": {
+				"openai": "টেক্সট, এমবেডিং, রির‍্যাঙ্ক, ছবি, স্পিচ",
+				"anthropic": "টেক্সট জেনারেশন",
+				"ollama": "টেক্সট জেনারেশন, এমবেডিং"
+			},
+			"copyBaseUrl": "{{format}} বেস URL কপি করুন",
+			"apiKey": "API key",
+			"copyApiKey": "API key কপি করুন",
+			"reveal": "দেখান",
+			"hint": "মডেল পেজ থেকে একটি মডেল id ব্যবহার করুন, অথবা সবচেয়ে সম্প্রতি ব্যবহৃত মডেলের জন্য <code>default</code>। key গোপন রাখুন: যার কাছে এটি আছে সে ডিভাইসের API ব্যবহার করতে পারবে।"
+		},
+		"storage": {
+			"title": "স্টোরেজ",
+			"subheader": "ডিভাইসে ডিস্কের ব্যবহার",
+			"loading": "স্টোরেজ লোড হচ্ছে",
+			"used": "{{total}}-এর মধ্যে {{used}} ব্যবহৃত",
+			"usedBar": "ব্যবহৃত স্টোরেজ",
+			"category": "{{name}}: {{size}}",
+			"modelFiles": "মডেল ফাইল",
+			"agentFiles": "এজেন্ট ফাইল",
+			"size": "আকার",
+			"usedByVault": "ভল্টের ব্যবহৃত",
+			"deleted": "{{id}} মুছে ফেলা হয়েছে।",
+			"deleteModelTitle": "মডেল মুছবেন?",
+			"deleteModelText": "ডিভাইস থেকে {{id}} মুছবেন? ব্যবহার করতে হলে আবার ডাউনলোড করতে হবে।",
+			"deleteAgentTitle": "এজেন্ট মুছবেন?",
+			"deleteAgentText": "ডিভাইস থেকে {{id}} ও এর ডেটা মুছবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।"
+		},
+		"backup": {
+			"title": "ব্যাকআপ ও রিস্টোর",
+			"subheader": "চ্যাট ইতিহাস ও ভল্ট, এই কম্পিউটারে সংরক্ষিত",
+			"backUp": {
+				"title": "ব্যাকআপ নিন",
+				"loading": "ব্যাকআপ লোড হচ্ছে",
+				"category": "{{name}} · প্রায় {{size}}",
+				"categoryNotReady": "{{name}} · প্রায় {{size}} (প্রস্তুত নয়)",
+				"download": "ব্যাকআপ ডাউনলোড করুন",
+				"inProgress": "ব্যাকআপ নেওয়া হচ্ছে…",
+				"saved": "{{name}} সংরক্ষিত হয়েছে ({{size}})।",
+				"savedWithout": "{{name}} সংরক্ষিত হয়েছে ({{size}}), এগুলো ছাড়া: {{failed}}।"
+			},
+			"restore": {
+				"title": "রিস্টোর",
+				"chooseFile": "একটি ব্যাকআপ ফাইল বেছে নিন",
+				"fileField": "ব্যাকআপ ফাইল",
+				"restore": "রিস্টোর করুন",
+				"inProgress": "রিস্টোর হচ্ছে…",
+				"otherDevice": "এই ব্যাকআপটি অন্য একটি ডিভাইসে ({{deviceId}}) তৈরি; এটি শুধু সেখানেই রিস্টোর করা যাবে।",
+				"unknownDevice": "অজানা",
+				"result": "{{name}}: {{message}}",
+				"restored": "রিস্টোর হয়েছে",
+				"failed": "ডিভাইস ব্যাকআপ রিস্টোর করতে পারেনি",
+				"confirmTitle": "ব্যাকআপ রিস্টোর করবেন?",
+				"confirmText": "ডিভাইসের {{categories}} ব্যাকআপের বিষয়বস্তু দিয়ে প্রতিস্থাপন করবেন? ব্যাকআপের পরে যা যোগ হয়েছে তা হারিয়ে যাবে।",
+				"categoryJoiner": " ও "
+			}
+		},
+		"network": {
+			"title": "নেটওয়ার্ক",
+			"subheader": "ডিভাইসের Wi-Fi ও তারযুক্ত সংযোগ",
+			"loading": "নেটওয়ার্ক লোড হচ্ছে",
+			"wifi": "Wi-Fi",
+			"wifiTurnedOn": "Wi-Fi চালু হয়েছে।",
+			"wifiTurnedOff": "Wi-Fi বন্ধ হয়েছে।",
+			"connectedTo": "{{ssid}}-এ সংযুক্ত (সিগন্যাল {{signal}}%)",
+			"notConnected": "সংযুক্ত নয়",
+			"off": "বন্ধ",
+			"wifiLink": "এই অ্যাপ Wi-Fi ({{interface}})-এর মাধ্যমে ডিভাইসে পৌঁছায়, তাই এখানে Wi-Fi বন্ধ করা, {{ssid}} ভুলে যাওয়া বা অন্য নেটওয়ার্কে যোগ দেওয়া নিষ্ক্রিয়। এই পরিবর্তনগুলো করতে TiinyOS ব্যবহার করুন বা ডিভাইসটি কেবলে যুক্ত করুন।",
+			"interfaces": {
+				"interface": "ইন্টারফেস",
+				"state": "অবস্থা",
+				"addresses": "ঠিকানা",
+				"appLink": "এই অ্যাপের লিংক"
+			},
+			"networks": {
+				"scanning": "নেটওয়ার্ক খোঁজা হচ্ছে…",
+				"network": "নেটওয়ার্ক",
+				"autoJoin": "অটো-জয়েন",
+				"connected": "সংযুক্ত",
+				"connecting": "সংযুক্ত হচ্ছে…",
+				"saved": "সংরক্ষিত",
+				"open": "উন্মুক্ত",
+				"signal": "সিগন্যাল {{signal}}%",
+				"autoJoinSwitch": "{{ssid}}-এ অটো-জয়েন",
+				"autoJoinOn": "{{ssid}}-এর জন্য অটো-জয়েন চালু।",
+				"autoJoinOff": "{{ssid}}-এর জন্য অটো-জয়েন বন্ধ।",
+				"join": "যোগ দিন",
+				"joining": "{{ssid}}-এ যোগ দেওয়া হচ্ছে।",
+				"forget": "ভুলে যান",
+				"forgotten": "{{ssid}} ভুলে যাওয়া হয়েছে।"
+			},
+			"joinDialog": {
+				"title": "{{ssid}}-এ যোগ দিন",
+				"password": "পাসওয়ার্ড"
+			},
+			"forgetDialog": {
+				"title": "নেটওয়ার্ক ভুলে যাবেন?",
+				"text": "ডিভাইস {{ssid}} ও এর পাসওয়ার্ড ভুলে যাবে।"
+			}
+		}
+	},
+	"models": {
+		"heading": "মডেল",
+		"percent": "{{value}}%",
+		"tabs": {
+			"models": "মডেল",
+			"store": "স্টোর"
+		},
+		"pages": {
+			"models": "ডাউনলোড করা মডেল NPU মেমোরিতে লোড করুন, অথবা জায়গা খালি করতে আনলোড করুন।",
+			"store": "Tiiny স্টোরের মডেল। ডাউনলোড ডিভাইসে যায়; মডেল ট্যাব থেকে লোড করুন।",
+			"huggingFace": "Hugging Face থেকে কাস্টম মডেল ইমপোর্ট করুন। ডিভাইস ঠিক করে কী ইমপোর্ট করা যাবে: সাধারণত এর স্টোরের মডেলের ফাইন-টিউন ও LoRA অ্যাডাপ্টার, কিছু শুধু সেই স্টোর মডেল ডাউনলোড হওয়ার পরে।"
+		},
+		"columns": {
+			"model": "মডেল",
+			"type": "ধরন",
+			"size": "আকার",
+			"npuShare": "NPU অংশ",
+			"status": "অবস্থা",
+			"action": "অ্যাকশন"
+		},
+		"table": {
+			"loading": "মডেল লোড হচ্ছে",
+			"title": "ডাউনলোড করা মডেল",
+			"npuFree": "NPU-এর {{percent}}% খালি",
+			"empty": "ডিভাইসে কোনো মডেল ডাউনলোড করা নেই।",
+			"status": {
+				"loaded": "লোড করা",
+				"notLoaded": "লোড করা নেই",
+				"tooBig": "যথেষ্ট খালি NPU নেই",
+				"tooBigHint": "NPU-এর {{needed}}% প্রয়োজন; {{free}}% খালি। জায়গা করতে একটি মডেল আনলোড করুন।"
+			},
+			"pending": {
+				"load": "শুরু হচ্ছে…",
+				"unload": "আনলোড হচ্ছে…",
+				"delete": "মোছা হচ্ছে…"
+			},
+			"progress": {
+				"load": "লোডের অগ্রগতি",
+				"unload": "আনলোডের অগ্রগতি",
+				"delete": "মোছার অগ্রগতি"
+			},
+			"done": {
+				"load": "{{name}} লোড হয়েছে।",
+				"unload": "{{name}} আনলোড হয়েছে।",
+				"delete": "{{name}} মুছে ফেলা হয়েছে।"
+			},
+			"failed": {
+				"load": "{{name}} লোড করা যায়নি: {{reason}}",
+				"unload": "{{name}} আনলোড করা যায়নি: {{reason}}",
+				"delete": "{{name}} মোছা যায়নি: {{reason}}",
+				"unloadAll": "সব মডেল আনলোড করা যায়নি: {{reason}}",
+				"interrupt": "{{name}}-কে থামানো যায়নি: {{reason}}"
+			},
+			"allUnloaded": "সব মডেল আনলোড হয়েছে।",
+			"interrupted": "{{name}} যে কাজ করছিল তা থামানো হয়েছে।",
+			"interrupt": "থামান",
+			"interruptHint": "এই মডেল যে অনুরোধগুলোতে কাজ করছে সেগুলো থামান, যেকোনো অ্যাপ থেকে আসা",
+			"unload": "আনলোড করুন",
+			"unloading": "আনলোড হচ্ছে…",
+			"unloadAll": "সব আনলোড করুন",
+			"delete": "মুছুন",
+			"load": "লোড করুন",
+			"cancel": "বাতিল করুন",
+			"unloadAllDialog": {
+				"title": "সব মডেল আনলোড করবেন?",
+				"text": "লোড করা প্রতিটি মডেল NPU থেকে সরিয়ে দেওয়া হবে। এই অ্যাপ বা অন্য ক্লায়েন্টের চলমান অনুরোধ থেমে যাবে।"
+			},
+			"deleteDialog": {
+				"title": "{{name}} মুছবেন?",
+				"text": "এতে মডেলের ফাইলগুলো ডিভাইস থেকে মুছে যাবে। আপনি স্টোর থেকে এটি আবার ডাউনলোড করতে পারবেন।"
+			},
+			"unloadDialog": {
+				"title": "{{name}} আনলোড করবেন?",
+				"text": "এতে এর NPU অংশ খালি হবে। এই মুহূর্তে মডেলটি ব্যবহার করা যেকোনো অনুরোধ, এই অ্যাপ বা অন্য ক্লায়েন্ট থেকে, থামিয়ে দেওয়া হবে।"
+			}
+		},
+		"store": {
+			"loading": "স্টোর লোড হচ্ছে",
+			"search": "স্টোরে খুঁজুন",
+			"searchPlaceholder": "মডেল খুঁজুন",
+			"allTypes": "সব ধরন",
+			"empty": "আপনার খোঁজার সঙ্গে কোনো স্টোর মডেল মেলেনি।",
+			"tableLabel": "স্টোর মডেল",
+			"trending": "ট্রেন্ডিং",
+			"stage": {
+				"starting": "শুরু হচ্ছে",
+				"downloading": "ডাউনলোড হচ্ছে",
+				"verifying": "যাচাই হচ্ছে",
+				"installing": "ইনস্টল হচ্ছে"
+			},
+			"status": {
+				"loaded": "লোড করা",
+				"downloaded": "ডাউনলোড করা",
+				"paused": "থামানো {{percent}}%",
+				"downloading": "ডাউনলোড হচ্ছে {{percent}}%",
+				"notDownloaded": "ডাউনলোড করা নেই"
+			},
+			"downloadProgress": "ডাউনলোডের অগ্রগতি",
+			"pause": "থামান",
+			"cancel": "বাতিল করুন",
+			"resume": "আবার শুরু করুন",
+			"download": "ডাউনলোড করুন",
+			"deviceReported": "ডিভাইস {{status}} জানিয়েছে",
+			"streamEnded": "মডেল ডাউনলোড হওয়ার আগেই ডাউনলোড স্ট্রিম শেষ হয়ে গেছে",
+			"pausedDone": "{{name}} থামানো হয়েছে। যেকোনো সময় আবার শুরু করুন।",
+			"downloaded": "{{name}} ডাউনলোড হয়েছে। মডেল পেজ থেকে লোড করুন।",
+			"cancelled": "{{name}}-এর ডাউনলোড বাতিল হয়েছে।",
+			"failed": {
+				"download": "{{name}} ডাউনলোড করা যায়নি: {{reason}}",
+				"pause": "{{name}} থামানো যায়নি: {{reason}}",
+				"cancel": "{{name}} বাতিল করা যায়নি: {{reason}}"
+			},
+			"details": {
+				"tableLabel": "মডেলের বিবরণ",
+				"close": "বন্ধ করুন",
+				"modelId": "মডেল id",
+				"type": "ধরন",
+				"parameters": "প্যারামিটার",
+				"inputOutput": "ইনপুট → আউটপুট",
+				"npuShare": "NPU অংশ",
+				"contextWindow": "কনটেক্সট উইন্ডো",
+				"tokens_one": "{{tokens}} টোকেন",
+				"tokens_other": "{{tokens}} টোকেন",
+				"imageSize": "ছবির আকার",
+				"defaultSteps": "ডিফল্ট ধাপ",
+				"guidanceScale": "গাইডেন্স স্কেল",
+				"reasoning": "রিজনিং",
+				"loadTime": "লোডের সময়",
+				"loadSeconds": "প্রায় {{seconds}} s",
+				"downloadsLikes": "ডাউনলোড · লাইক",
+				"thinking": {
+					"none": "নেই",
+					"toggleable": "বন্ধ করা যায়",
+					"alwaysOn": "সবসময় চালু",
+					"levels": "লেভেল {{levels}}",
+					"defaultLevel": "ডিফল্ট {{level}}"
+				}
+			}
+		},
+		"huggingFace": {
+			"verdict": {
+				"compatible": "সামঞ্জস্যপূর্ণ",
+				"needsBaseModel": "বেস মডেল প্রয়োজন",
+				"incompatible": "সামঞ্জস্যপূর্ণ নয়"
+			},
+			"kind": {
+				"adapter": "LoRA অ্যাডাপ্টার",
+				"fineTune": "ফাইন-টিউন"
+			},
+			"search": {
+				"title": "সামঞ্জস্যপূর্ণ মডেল খুঁজুন",
+				"subheader": "কোনো স্টোর মডেলের ওপর তৈরি Hugging Face-এর LoRA অ্যাডাপ্টার ও ফাইন-টিউন, ডিভাইস দিয়ে যাচাই করা।",
+				"baseModel": "বেস মডেল",
+				"onDevice": "{{modelId}} (ডিভাইসে)",
+				"query": "খুঁজুন (ঐচ্ছিক)",
+				"submit": "Hugging Face-এ খুঁজুন",
+				"checkingBases": "কোন স্টোর মডেলগুলো ইমপোর্ট বেস হতে পারে তা ডিভাইসকে জিজ্ঞেস করা হচ্ছে…",
+				"autoCheck": "ফলাফল স্বয়ংক্রিয়ভাবে যাচাই করুন",
+				"compatibleOnly": "শুধু সামঞ্জস্যপূর্ণ",
+				"limit": "প্রতি ধরনে ফলাফল",
+				"searching": "Hugging Face-এ খোঁজা হচ্ছে",
+				"empty": "Hugging Face-এ {{base}}-এর কোনো অ্যাডাপ্টার বা ফাইন-টিউন পাওয়া যায়নি।",
+				"tableLabel": "Hugging Face রিপো",
+				"groups": {
+					"importable": "ইমপোর্টযোগ্য বেস",
+					"checking": "ডিভাইসের সঙ্গে যাচাই হচ্ছে…",
+					"notOnHf": "Hugging Face-এ নেই",
+					"unsupported": "ইমপোর্টের জন্য সমর্থিত নয়"
+				},
+				"columns": {
+					"repo": "রিপো",
+					"kind": "ধরন",
+					"downloads": "ডাউনলোড",
+					"compatibility": "সামঞ্জস্য",
+					"action": "অ্যাকশন"
+				},
+				"details": "বিবরণ",
+				"checking": "যাচাই হচ্ছে…",
+				"notChecked": "যাচাই করা হয়নি",
+				"checkFailed": "যাচাই ব্যর্থ",
+				"downloadBase": "আগে স্টোর থেকে {{name}} ডাউনলোড করুন",
+				"summary": {
+					"checked": "{{total}}টির মধ্যে {{finished}}টি যাচাই হয়েছে · {{compatible}}টি সামঞ্জস্যপূর্ণ",
+					"needBase_one": "{{count}}টির বেস মডেল প্রয়োজন",
+					"needBase_other": "{{count}}টির বেস মডেল প্রয়োজন",
+					"hidden_one": "{{count}}টি অসামঞ্জস্যপূর্ণ লুকানো",
+					"hidden_other": "{{count}}টি অসামঞ্জস্যপূর্ণ লুকানো"
+				},
+				"checkingCompatibility": "সামঞ্জস্য যাচাই হচ্ছে"
+			},
+			"check": {
+				"title": "একটি রিপো যাচাই করুন",
+				"subheader": "ডিভাইস ঠিক করে কোনো রিপো ইমপোর্ট করা যাবে কিনা।",
+				"repo": "Hugging Face রিপো",
+				"placeholder": "org/name বা https://huggingface.co/org/name",
+				"checking": "যাচাই হচ্ছে…",
+				"check": "যাচাই করুন",
+				"checkingRepo": "রিপো যাচাই হচ্ছে",
+				"store": "স্টোর",
+				"needsBase": "স্টোর থেকে {{name}} ({{modelId}}) ডিভাইসে ডাউনলোড হলে ইমপোর্ট করা যাবে।",
+				"cannotImport": "ডিভাইস এই রিপো ইমপোর্ট করতে পারবে না।",
+				"size": "আকার {{size}}",
+				"baseModel": "বেস মডেল {{modelId}}",
+				"disk": "{{required}} ডিস্ক প্রয়োজন, {{available}} খালি",
+				"toolkit": "ইমপোর্টের আগে ডিভাইসে {{toolkit}} টুলকিট ডাউনলোড হবে ({{size}})।",
+				"noDisk": "ডিভাইসে যথেষ্ট খালি ডিস্ক স্পেস নেই।",
+				"bytes": "{{total}}-এর মধ্যে {{downloaded}}",
+				"importProgress": "ইমপোর্টের অগ্রগতি",
+				"continues": "ইমপোর্ট ডিভাইসে চলে এবং আপনি এই পেজ ছেড়ে গেলেও চলতে থাকে।",
+				"cancelImport": "ইমপোর্ট বাতিল করুন",
+				"import": "ডিভাইসে ইমপোর্ট করুন",
+				"starting": "শুরু হচ্ছে",
+				"importing": "ইমপোর্ট হচ্ছে",
+				"importFailed": "ইমপোর্ট ব্যর্থ",
+				"cancelled": "ইমপোর্ট বাতিল হয়েছে।",
+				"imported": "{{repo}} ইমপোর্ট হয়েছে। মডেল পেজ থেকে লোড করুন।",
+				"streamStopped": "অগ্রগতির আপডেট বন্ধ হয়ে গেছে। ইমপোর্ট হয়তো এখনও ডিভাইসে চলছে।"
+			}
+		}
+	},
+	"vault": {
+		"layout": {
+			"title": "ভল্ট",
+			"description": "ডিভাইসের নলেজ বেস: আপনার ফাইল ও আগের চ্যাটের সারাংশ, ডিভাইসে ইনডেক্স করা যাতে মডেল খুঁজতে পারে।",
+			"tabs": {
+				"files": "ফাইল",
+				"chatHistory": "চ্যাট ইতিহাস"
+			}
+		},
+		"files": {
+			"title": "ফাইল",
+			"subheader": "PDF, Word, Excel, CSV, টেক্সট, Markdown বা HTML, প্রতিটি 200 MB পর্যন্ত। মডেল টাস্ক মোডে এগুলো ব্যবহার করে।",
+			"upload": "ফাইল আপলোড করুন",
+			"uploadInput": "আপলোড করার ফাইল",
+			"loading": "ভল্টের ফাইল লোড হচ্ছে",
+			"empty": "এখনও কোনো ফাইল নেই। মডেলের ব্যবহারের জন্য ডকুমেন্ট আপলোড করুন।",
+			"fileCount_one": "{{count}}টি ফাইল",
+			"fileCount_other": "{{count}}টি ফাইল",
+			"columns": {
+				"file": "ফাইল",
+				"size": "আকার",
+				"added": "যোগ করা হয়েছে",
+				"status": "অবস্থা"
+			},
+			"status": {
+				"indexed": "ইনডেক্স করা",
+				"indexFailed": "ইনডেক্সিং ব্যর্থ",
+				"notIndexed": "ইনডেক্স করা নেই"
+			},
+			"actions": {
+				"index": "ইনডেক্স করুন",
+				"download": "ডাউনলোড করুন",
+				"rename": "নাম পরিবর্তন করুন",
+				"delete": "মুছুন"
+			},
+			"progress": {
+				"label": "ভল্টের অগ্রগতি",
+				"line": "{{label}}: {{message}}",
+				"uploading": "আপলোড হচ্ছে…",
+				"indexing": "ইনডেক্স হচ্ছে…",
+				"loadingModel": "এমবেডিং মডেল লোড হচ্ছে",
+				"stage": "ইনডেক্সিং: {{stage}}",
+				"withChunks": "{{stage}} ({{processed}}/{{total}} চাঙ্ক)",
+				"retrying": "ডিভাইসে ইনডেক্সিং ব্যর্থ হয়েছে, আবার চেষ্টা করা হচ্ছে…"
+			},
+			"outcome": {
+				"added": "{{label}} ভল্টে যোগ করা হয়েছে।",
+				"indexed": "{{name}} ইনডেক্স হয়েছে।",
+				"renamed": "নাম বদলে {{name}} করা হয়েছে।",
+				"deleted": "{{name}} মুছে ফেলা হয়েছে।"
+			},
+			"errors": {
+				"device": "ডিভাইস একটি ত্রুটি জানিয়েছে",
+				"uploadUnconfirmed": "ডিভাইস আপলোড নিশ্চিত করেনি"
+			},
+			"renameDialog": {
+				"title": "ফাইলের নাম পরিবর্তন",
+				"name": "ফাইলের নাম",
+				"cancel": "বাতিল করুন",
+				"confirm": "নাম পরিবর্তন করুন"
+			},
+			"deleteDialog": {
+				"title": "ফাইল মুছবেন?",
+				"text": "ডিভাইস থেকে {{name}} ও এর ইনডেক্স মুছবেন? মডেল আর এটি খুঁজে পাবে না।",
+				"confirm": "মুছুন"
+			}
+		},
+		"search": {
+			"title": "ভল্টে খুঁজুন",
+			"subheader": "ভল্টে খুঁজলে মডেল যা পায়",
+			"label": "খুঁজুন",
+			"submit": "খুঁজুন",
+			"searching": "খোঁজা হচ্ছে…",
+			"empty": "প্রাসঙ্গিক কিছু পাওয়া যায়নি।"
+		},
+		"chatHistory": {
+			"title": "চ্যাট ইতিহাস",
+			"subheader": "আগের কথোপকথনের দৈনিক সারাংশ, ভল্টে রাখা।",
+			"loading": "চ্যাট ইতিহাস লোড হচ্ছে",
+			"empty": "এখনও কোনো সারাংশ নেই।",
+			"read": "পড়ুন",
+			"hide": "লুকান",
+			"delete": "মুছুন",
+			"loadingSummary": "সারাংশ লোড হচ্ছে",
+			"deleted": "{{day}}-এর সারাংশ মুছে ফেলা হয়েছে।",
+			"deleteDialog": {
+				"title": "সারাংশ মুছবেন?",
+				"text": "{{day}}-এর সারাংশ মুছবেন? মডেল আর সেই দিনের কথোপকথন মনে রাখতে পারবে না।",
+				"confirm": "মুছুন"
+			}
+		},
+		"summarySettings": {
+			"loading": "দৈনিক সারাংশ লোড হচ্ছে",
+			"enabled": "দৈনিক সারাংশ",
+			"time": "সময়",
+			"deviceTime": "ডিভাইসে {{time}} ({{zone}})",
+			"model": "মডেল",
+			"save": "সংরক্ষণ করুন",
+			"saving": "সংরক্ষণ করা হচ্ছে…",
+			"savedOn": "দৈনিক সারাংশ চালু, {{time}}-এ।",
+			"savedOff": "দৈনিক সারাংশ বন্ধ।",
+			"description": "প্রতিদিন ডিভাইস সেদিনের কথোপকথনের সারাংশ ভল্টে তৈরি করে, যাতে মডেল টাস্ক মোডে সেগুলো মনে করতে পারে। কাজের সময় এটি মডেলটি লোড করে, ফলে সেই মডেল কিছুক্ষণ ব্যস্ত থাকতে পারে।"
+		}
+	},
+	"playground": {
+		"layout": {
+			"title": "প্লেগ্রাউন্ড",
+			"description": "ডিভাইসের স্পিচ, ভিশন, এমবেডিং ও রির‍্যাঙ্ক মডেল চেষ্টা করুন, এবং টেক্সট মডেল বেঞ্চমার্ক করুন (tiiny CLI-এর মতো)। প্রথমবার চালালে মডেল লোড হয়।"
+		},
+		"tabs": {
+			"asr": {
+				"label": "স্পিচ থেকে টেক্সট",
+				"intro": "স্পিচ রিকগনিশন মডেল দিয়ে একটি WAV রেকর্ডিং ট্রান্সক্রাইব করুন।"
+			},
+			"tts": {
+				"label": "টেক্সট থেকে স্পিচ",
+				"intro": "ভয়েস মডেল দিয়ে টেক্সটকে স্পিচে রূপান্তর করুন।"
+			},
+			"ocr": {
+				"label": "OCR",
+				"intro": "ছবির টেক্সট পড়ুন।"
+			},
+			"embed": {
+				"label": "এমবেডিং",
+				"intro": "টেক্সটকে ভেক্টরে রূপান্তর করুন এবং সেগুলো কতটা মিলে যায় তুলনা করুন।"
+			},
+			"rerank": {
+				"label": "রির‍্যাঙ্ক",
+				"intro": "কোনো কোয়েরির উত্তর কতটা ভালোভাবে দেয় সেই অনুযায়ী ডকুমেন্ট সাজান।"
+			},
+			"text": {
+				"label": "বেঞ্চমার্ক",
+				"intro": "টেক্সট মডেল কত দ্রুত জেনারেট করে তা মাপুন, tiiny bench-এর মতো।"
+			}
+		},
+		"model": {
+			"label": "মডেল",
+			"loadsWhenRun": "{{name}} (চালালে লোড হবে)"
+		},
+		"loading": "মডেল লোড হচ্ছে",
+		"noModel": "এর জন্য কোনো মডেল ডাউনলোড করা নেই। স্টোর থেকে একটি নিন।",
+		"run": "চালান",
+		"running": "চলছে…",
+		"asr": {
+			"chooseFile": "একটি WAV ফাইল বেছে নিন",
+			"fileInput": "অডিও ফাইল"
+		},
+		"tts": {
+			"text": "টেক্সট",
+			"voice": "ভয়েস (ঐচ্ছিক)",
+			"voiceHelp": "শুধু কিছু ভয়েস মডেলে এটি লাগে, যেমন Supertonic।",
+			"download": "ডাউনলোড করুন"
+		},
+		"ocr": {
+			"chooseImage": "ছবি বেছে নিন",
+			"imageInput": "ছবির ফাইল",
+			"noText": "কোনো টেক্সট পাওয়া যায়নি।",
+			"lines": "শনাক্ত করা লাইন",
+			"score": "{{value}}%"
+		},
+		"embed": {
+			"texts": "টেক্সট",
+			"textsHelp": "প্রতি লাইনে একটি টেক্সট",
+			"summary_one": "{{count}}টি ডাইমেনশন। কোসাইন সাদৃশ্য:",
+			"summary_other": "{{count}}টি ডাইমেনশন। কোসাইন সাদৃশ্য:"
+		},
+		"rerank": {
+			"query": "কোয়েরি",
+			"documents": "ডকুমেন্ট",
+			"documentsHelp": "প্রতি লাইনে একটি ডকুমেন্ট",
+			"results": "র‍্যাঙ্ক করা ডকুমেন্ট"
+		},
+		"bench": {
+			"tokensInput": "জেনারেট করার টোকেন",
+			"results": "বেঞ্চমার্ক",
+			"speed": "জেনারেশনের গতি",
+			"speedValue": "{{value}} টোকেন/s",
+			"firstToken": "প্রথম টোকেন পর্যন্ত সময়",
+			"seconds": "{{value}} s",
+			"tokens": "টোকেন",
+			"tokensValue": "{{prompt}} ইনপুট · {{completion}} আউটপুট · মোট {{total}} s"
+		}
+	},
+	"overview": {
+		"title": "সংক্ষিপ্ত বিবরণ",
+		"npuReady": "NPU প্রস্তুত।",
+		"loading": "ডিভাইসের অবস্থা লোড হচ্ছে",
+		"retry": "আবার চেষ্টা করুন",
+		"staleValues": "সর্বশেষ জানা মান দেখানো হচ্ছে। {{error}}",
+		"percent": "{{value}}%",
+		"usedOfTotal": "{{total}}-এর মধ্যে {{used}}",
+		"stats": {
+			"npuUtilization": "NPU ব্যবহার",
+			"npuReserved": "লোড করা মডেলের জন্য {{percent}} সংরক্ষিত",
+			"npuMemory": "NPU মেমোরি",
+			"systemMemory": "সিস্টেম মেমোরি",
+			"systemMemoryCaption": "CPU {{cpu}} · {{total}} RAM-এর মধ্যে {{used}}",
+			"storage": "স্টোরেজ",
+			"progress": "{{title}} {{percent}}"
+		},
+		"running": {
+			"title": "লোড করা মডেল",
+			"empty": "কোনো মডেল লোড করা নেই। মডেল পেজ থেকে একটি লোড করুন।",
+			"columns": {
+				"model": "মডেল",
+				"type": "ধরন",
+				"status": "অবস্থা",
+				"npuShare": "NPU অংশ",
+				"activeRequests": "সক্রিয় অনুরোধ"
+			}
+		},
+		"usage": {
+			"title": "টোকেন ব্যবহার",
+			"subheader": "{{requests}}-এ {{tokens}} (টেক্সট মডেল)",
+			"subheaderLoading": "টেক্সট মডেল",
+			"tokens_one": "{{value}} টোকেন",
+			"tokens_other": "{{value}} টোকেন",
+			"requests_one": "{{value}}টি অনুরোধ",
+			"requests_other": "{{value}}টি অনুরোধ",
+			"previousWeek": "আগের সপ্তাহ",
+			"nextWeek": "পরের সপ্তাহ",
+			"weekRange": "{{start}} – {{end}}",
+			"dayBar": "{{day}}: {{tokens}}",
+			"segment": "{{day}} · {{model}}: {{tokens}}",
+			"other": "অন্যান্য",
+			"showTable": "টেবিল হিসেবে দেখান",
+			"showChart": "চার্ট দেখান",
+			"loading": "টোকেন ব্যবহার লোড হচ্ছে",
+			"empty": "এই সপ্তাহে কোনো টোকেন নেই।",
+			"table": {
+				"label": "দিন অনুযায়ী টোকেন ব্যবহার",
+				"day": "দিন",
+				"model": "মডেল",
+				"requests": "অনুরোধ",
+				"prompt": "প্রম্পট",
+				"completion": "কমপ্লিশন",
+				"total": "মোট"
+			}
+		},
+		"apps": {
+			"title": "অ্যাপ অনুযায়ী ব্যবহার",
+			"subheader": "এই সপ্তাহের টোকেন, অ্যাপ অনুযায়ী",
+			"label": "অ্যাপ অনুযায়ী ব্যবহার",
+			"loading": "অ্যাপের ব্যবহার লোড হচ্ছে",
+			"empty": "এই সপ্তাহে কোনো টোকেন নেই।"
+		}
+	},
+	"server": {
+		"done": "সম্পন্ন",
+		"models": {
+			"allUnloaded": "সব মডেল আনলোড হয়েছে"
+		},
+		"settings": {
+			"shuttingDown": "শাট ডাউন হচ্ছে",
+			"restarting": "রিস্টার্ট হচ্ছে",
+			"enabled": "সক্রিয়",
+			"disabled": "নিষ্ক্রিয়",
+			"specs": {
+				"peakInt8": "সর্বোচ্চ INT8",
+				"storage": "স্টোরেজ",
+				"network": "নেটওয়ার্ক"
+			}
+		},
+		"connectors": {
+			"connected": "সংযুক্ত",
+			"notConnected": "সংযুক্ত নয়",
+			"unavailable": "উপলভ্য নয়",
+			"waitingForQr": "QR স্ক্যানের অপেক্ষায়",
+			"scanQr": "WhatsApp দিয়ে QR কোড স্ক্যান করুন",
+			"signIn": "আপনার {{provider}} অ্যাকাউন্ট দিয়ে সাইন ইন করুন",
+			"names": {
+				"email": "ইমেল (IMAP/SMTP)",
+				"telegram": "Telegram বট",
+				"discord": "Discord বট"
+			}
+		},
+		"backup": {
+			"categories": {
+				"conversationService": "চ্যাট ইতিহাস",
+				"knowledgeBase": "ভল্ট ও ব্যক্তিগতকরণ",
+				"agentUsage": "এজেন্টের ব্যবহার",
+				"connectorService": "কানেক্টর",
+				"scheduled": "নির্ধারিত টাস্ক",
+				"skills": "স্কিল"
+			}
+		},
+		"usage": {
+			"otherApps": "API ও অন্যান্য অ্যাপ"
+		},
+		"task": {
+			"searchedVault": "ভল্টে খোঁজা হয়েছে: {{query}}",
+			"readHost": "{{host}} পড়া হয়েছে",
+			"readWebPage": "একটি ওয়েব পেজ পড়া হয়েছে",
+			"updatedOccupation": "আপনার পেশা আপডেট করা হয়েছে",
+			"updatedPreferences": "আপনার পছন্দ আপডেট করা হয়েছে",
+			"updatedRecentFocus": "আপনার সাম্প্রতিক ফোকাস আপডেট করা হয়েছে",
+			"updatedProfile": "আপনার প্রোফাইল আপডেট করা হয়েছে",
+			"updatedField": "আপনার {{field}} আপডেট করা হয়েছে"
+		}
+	}
+}

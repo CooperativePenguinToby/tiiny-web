@@ -5,6 +5,7 @@ import RouterLink from "next/link";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { Trans, useTranslation } from "react-i18next";
 
 import { paths } from "@/paths";
 import { DynamicLogo } from "@/components/core/logo";
@@ -14,6 +15,8 @@ export interface LayoutProperties {
 }
 
 export function Layout({ children }: LayoutProperties): React.JSX.Element {
+	const { t } = useTranslation();
+
 	return (
 		<Box
 			sx={{
@@ -53,13 +56,13 @@ export function Layout({ children }: LayoutProperties): React.JSX.Element {
 							textAlign: "center",
 						}}
 					>
-						Welcome to{" "}
-						<Box component="span" sx={{ color: "#15b79e" }}>
-							Tiiny
-						</Box>
+						<Trans
+							i18nKey="auth.layout.welcome"
+							components={{ brand: <Box component="span" sx={{ color: "#15b79e" }} /> }}
+						/>
 					</Typography>
 					<Typography align="center" variant="subtitle1">
-						Monitor the device, manage loaded models and chat from any browser on your network.
+						{t("auth.layout.tagline")}
 					</Typography>
 				</Stack>
 			</Box>

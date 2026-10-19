@@ -5,16 +5,22 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { config } from "@/config";
+import { getT } from "@/i18n/server";
 import { BackHomeButton } from "@/components/core/back-home-button";
 
-export const metadata = { title: `Not found | ${config.site.name}` } satisfies Metadata;
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getT();
+	return { title: t("titles.page", { page: t("titles.notFound"), site: config.site.name }) };
+}
 
-export default function NotFound(): React.JSX.Element {
+export default async function NotFound(): Promise<React.JSX.Element> {
+	const t = await getT();
+
 	return (
 		<Box component="main" sx={{ alignItems: "center", display: "flex", justifyContent: "center", minHeight: "100%" }}>
 			<Stack spacing={3} sx={{ alignItems: "center", maxWidth: "md" }}>
 				<Typography variant="h3" sx={{ textAlign: "center" }}>
-					404: The page you are looking for isn&apos;t here
+					{t("core.notFound.heading")}
 				</Typography>
 				<Typography
 					variant="body1"
@@ -23,7 +29,7 @@ export default function NotFound(): React.JSX.Element {
 						textAlign: "center",
 					}}
 				>
-					Use the navigation to get back to the dashboard.
+					{t("core.notFound.hint")}
 				</Typography>
 				<BackHomeButton />
 			</Stack>

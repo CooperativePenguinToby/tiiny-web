@@ -19,10 +19,12 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import type { ParseKeys, TFunction } from "i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 import type { Agent, AgentEvent } from "@/types/device";
-import { formatBytes } from "@/lib/format";
 import { readSse, responseError } from "@/lib/sse";
+import { useFormat } from "@/i18n/client";
 import { usePolling } from "@/hooks/use-polling";
 
 interface Busy {
@@ -44,6 +46,7 @@ async function post(path: string, body: Record<string, string>): Promise<void> {
 
 // Installs (or, with resume, continues installing) an agent; resolves "paused" if the install was paused.
 async function installAgent(
+	t: TFunction,
 	appId: string,
 	onProgress: (message: string, percent: number | null) => void,
 	shouldResume = false
@@ -53,11 +56,12 @@ async function installAgent(
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ appId }),
 	});
-	return followAgentStream(response, onProgress);
+	return followAgentStream(t, response, onProgress);
 }
 
 // Follows the device's install or update stream until it reports completion.
 async function followAgentStream(
+	t: TFunction,
 	response: Response,
 	onProgress: (message: string, percent: number | null) => void
 ): Promise<"done" | "paused"> {
@@ -66,15 +70,20 @@ async function followAgentStream(
 		const update = JSON.parse(data) as AgentEvent;
 		const failure =
 			typeof update.error === "string" ? update.error : (update.error?.message ?? (event === "error" ? data : null));
-		if (failure || update.status === "failed" || update.status === "error") throw new Error(failure ?? "Failed");
+		if (failure || update.status === "failed" || update.status === "error")
+			throw new Error(failure ?? t("agents.stream.failed"));
 		if (event === "done" || update.status === "completed") return "done";
 		if (event === "paused") return "paused";
-		onProgress(update.message || update.phase || update.status || "Working", update.overall_progress ?? null);
+		onProgress(
+			update.message || update.phase || update.status || t("agents.stream.working"),
+			update.overall_progress ?? null
+		);
 	}
 	return "done";
 }
 
 async function updateAgent(
+	t: TFunction,
 	serviceId: string,
 	onProgress: (message: string, percent: number | null) => void
 ): Promise<void> {
@@ -83,7 +92,7 @@ async function updateAgent(
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ serviceId }),
 	});
-	await followAgentStream(response, onProgress);
+	await followAgentStream(t, response, onProgress);
 }
 
 // Cards in a row are equally tall; the content grows so every card's actions line up at the bottom.
@@ -97,6 +106,21 @@ const STATUS_COLORS: Record<string, "success" | "warning" | "error"> = {
 	error: "error",
 };
 const STOPPABLE = new Set(["running", "starting", "error"]);
+// Labels for the container states the device reports; anything else is shown as the device says it.
+const STATUS_LABELS: Partial<Record<string, ParseKeys>> = {
+	created: "agents.status.created",
+	running: "agents.status.running",
+	starting: "agents.status.starting",
+	stopped: "agents.status.stopped",
+	exited: "agents.status.exited",
+	paused: "agents.status.paused",
+	error: "agents.status.error",
+};
+
+function statusLabel(t: TFunction, status: string): string {
+	const key = STATUS_LABELS[status];
+	return key ? t(key) : status;
+}
 
 // Through the agent's subdomain when configured (a one-time link signs that host in), else its port.
 const agentUrl = (service: NonNullable<Agent["service"]>): string =>
@@ -113,6 +137,7 @@ function AgentIcon({ agent }: { agent: Agent }): React.JSX.Element {
 }
 
 function RecommendedModels({ agent }: { agent: Agent }): React.JSX.Element | null {
+	const { t } = useTranslation();
 	if (agent.recommendedModels.length === 0) return null;
 	return (
 		<Typography
@@ -121,12 +146,17 @@ function RecommendedModels({ agent }: { agent: Agent }): React.JSX.Element | nul
 				color: "text.secondary",
 			}}
 		>
-			Recommended model{agent.recommendedModels.length > 1 ? "s" : ""}: {agent.recommendedModels.join(", ")}
+			{t("agents.recommendedModels", {
+				count: agent.recommendedModels.length,
+				models: agent.recommendedModels.join(", "),
+			})}
 		</Typography>
 	);
 }
 
 export function AgentsPanel(): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const { data, error, isLoading, refresh } = usePolling<Agent[]>("/api/agents", 10_000);
 	const [busy, setBusy] = React.useState<Busy | null>(null);
 	const [outcome, setOutcome] = React.useState<{ severity: "success" | "error"; message: string } | null>(null);
@@ -135,7 +165,7 @@ export function AgentsPanel(): React.JSX.Element {
 	if (isLoading) {
 		return (
 			<Stack sx={{ alignItems: "center", py: 8 }}>
-				<CircularProgress aria-label="Loading agents" />
+				<CircularProgress aria-label={t("agents.loading")} />
 			</Stack>
 		);
 	}
@@ -152,11 +182,17 @@ export function AgentsPanel(): React.JSX.Element {
 		setBusy({ appId: agent.appId, message: label, percent: null, installing: isInstall });
 		try {
 			const result = await action();
-			setOutcome({ severity: "success", message: `${agent.name} ${result === "paused" ? "install paused" : done}.` });
+			setOutcome({
+				severity: "success",
+				message: result === "paused" ? t("agents.outcome.installPaused", { name: agent.name }) : done,
+			});
 		} catch (error_) {
 			setOutcome({
 				severity: "error",
-				message: `${agent.name}: ${error_ instanceof Error ? error_.message : String(error_)}`,
+				message: t("agents.outcome.error", {
+					name: agent.name,
+					message: error_ instanceof Error ? error_.message : String(error_),
+				}),
 			});
 		} finally {
 			setBusy(null);
@@ -175,7 +211,10 @@ export function AgentsPanel(): React.JSX.Element {
 		} catch (error_) {
 			setOutcome({
 				severity: "error",
-				message: `${agent.name}: ${error_ instanceof Error ? error_.message : String(error_)}`,
+				message: t("agents.outcome.error", {
+					name: agent.name,
+					message: error_ instanceof Error ? error_.message : String(error_),
+				}),
 			});
 		}
 	};
@@ -183,14 +222,15 @@ export function AgentsPanel(): React.JSX.Element {
 	const install = (agent: Agent, shouldResume: boolean): Promise<void> =>
 		run(
 			agent,
-			shouldResume ? "Resuming install…" : "Starting install…",
+			t(shouldResume ? "agents.progress.resumingInstall" : "agents.progress.startingInstall"),
 			() =>
 				installAgent(
+					t,
 					agent.appId,
 					(message, percent) => setBusy({ appId: agent.appId, message, percent, installing: true }),
 					shouldResume
 				),
-			"installed",
+			t("agents.outcome.installed", { name: agent.name }),
 			true
 		);
 
@@ -204,21 +244,27 @@ export function AgentsPanel(): React.JSX.Element {
 					color: "text.secondary",
 				}}
 			>
-				{state.state === "paused" ? "Install paused at" : "Installing"} {state.percent.toFixed(0)}%
+				{t(state.state === "paused" ? "agents.install.paused" : "agents.install.running", {
+					percent: format.number(state.percent, { maximumFractionDigits: 0 }),
+				})}
 			</Typography>
-			<LinearProgress aria-label={`${agent.name} install`} value={state.percent} variant="determinate" />
+			<LinearProgress
+				aria-label={t("agents.install.ariaLabel", { name: agent.name })}
+				value={state.percent}
+				variant="determinate"
+			/>
 			<Stack direction="row" spacing={1}>
 				{state.state === "paused" ? (
 					<Button disabled={busy !== null} onClick={() => void install(agent, true)} variant="contained">
-						Resume
+						{t("agents.actions.resume")}
 					</Button>
 				) : (
 					<Button disabled={busy !== null} onClick={() => void pauseInstall(agent)}>
-						Pause
+						{t("agents.actions.pause")}
 					</Button>
 				)}
 				<Button color="error" disabled={busy !== null} onClick={() => setConfirmDelete(agent)}>
-					Cancel install
+					{t("agents.actions.cancelInstall")}
 				</Button>
 			</Stack>
 		</Stack>
@@ -234,18 +280,22 @@ export function AgentsPanel(): React.JSX.Element {
 						color: "text.secondary",
 					}}
 				>
-					{busy.message}
-					{busy.percent === null ? "" : ` ${busy.percent.toFixed(0)}%`}
+					{busy.percent === null
+						? busy.message
+						: t("agents.progress.percent", {
+								message: busy.message,
+								percent: format.number(busy.percent, { maximumFractionDigits: 0 }),
+							})}
 				</Typography>
 				<LinearProgress
-					aria-label={`${agent.name} progress`}
+					aria-label={t("agents.progress.ariaLabel", { name: agent.name })}
 					value={busy.percent ?? 0}
 					variant={busy.percent === null ? "indeterminate" : "determinate"}
 				/>
 				{busy.installing ? (
 					<Stack direction="row">
 						<Button onClick={() => void pauseInstall(agent)} size="small">
-							Pause
+							{t("agents.actions.pause")}
 						</Button>
 					</Stack>
 				) : null}
@@ -262,7 +312,7 @@ export function AgentsPanel(): React.JSX.Element {
 			) : null}
 
 			<Stack spacing={2}>
-				<Typography variant="h6">On this device</Typography>
+				<Typography variant="h6">{t("agents.installed.heading")}</Typography>
 				{installed.length === 0 ? (
 					<Typography
 						variant="body2"
@@ -270,7 +320,7 @@ export function AgentsPanel(): React.JSX.Element {
 							color: "text.secondary",
 						}}
 					>
-						No agents are installed on the device. Install one from the store below.
+						{t("agents.installed.empty")}
 					</Typography>
 				) : (
 					<Grid container spacing={3}>
@@ -290,7 +340,7 @@ export function AgentsPanel(): React.JSX.Element {
 														<Typography variant="subtitle1">{agent.name}</Typography>
 														<Chip
 															color={STATUS_COLORS[service.status] ?? "default"}
-															label={service.status}
+															label={statusLabel(t, service.status)}
 															size="small"
 														/>
 													</Stack>
@@ -308,8 +358,14 @@ export function AgentsPanel(): React.JSX.Element {
 															color: "text.secondary",
 														}}
 													>
-														Version {service.version ?? "unknown"}
-														{service.update ? ` · ${service.update.latestVersion} available` : ""}
+														{service.update
+															? t("agents.installed.versionWithUpdate", {
+																	version: service.version ?? t("agents.installed.unknownVersion"),
+																	latest: service.update.latestVersion,
+																})
+															: t("agents.installed.version", {
+																	version: service.version ?? t("agents.installed.unknownVersion"),
+																})}
 													</Typography>
 													{isRunning && service.usage ? (
 														<Typography
@@ -319,20 +375,27 @@ export function AgentsPanel(): React.JSX.Element {
 																color: "text.secondary",
 															}}
 														>
-															CPU {service.usage.cpuPercent.toFixed(1)}% · memory{" "}
-															{formatBytes(service.usage.memoryBytes)}
+															{t("agents.installed.usage", {
+																cpu: format.number(service.usage.cpuPercent, {
+																	minimumFractionDigits: 1,
+																	maximumFractionDigits: 1,
+																}),
+																memory: format.bytes(service.usage.memoryBytes),
+															})}
 														</Typography>
 													) : null}
 													<RecommendedModels agent={agent} />
 													{service.status === "error" ? (
 														<Typography color="error" variant="caption">
-															The device reports this agent&apos;s containers have stopped unexpectedly. Start it again,
-															or Stop to reset it.
+															{t("agents.installed.containersStopped")}
 														</Typography>
 													) : null}
 													{service.proxy?.error ? (
 														<Typography color="error" variant="caption">
-															Proxy on port {service.port}: {service.proxy.error}
+															{t("agents.installed.proxyError", {
+																port: service.port,
+																error: service.proxy.error,
+															})}
 														</Typography>
 													) : null}
 												</Stack>
@@ -347,17 +410,20 @@ export function AgentsPanel(): React.JSX.Element {
 															onClick={() =>
 																void run(
 																	agent,
-																	"Updating…",
+																	t("agents.progress.updating"),
 																	() =>
-																		updateAgent(service.id, (message, percent) =>
+																		updateAgent(t, service.id, (message, percent) =>
 																			setBusy({ appId: agent.appId, message, percent })
 																		),
-																	`updated to ${service.update!.latestVersion}`
+																	t("agents.outcome.updated", {
+																		name: agent.name,
+																		version: service.update!.latestVersion,
+																	})
 																)
 															}
 															variant="outlined"
 														>
-															Update
+															{t("agents.actions.update")}
 														</Button>
 													) : null}
 													{canOpen ? (
@@ -368,7 +434,7 @@ export function AgentsPanel(): React.JSX.Element {
 															target="_blank"
 															variant="contained"
 														>
-															Open
+															{t("agents.actions.open")}
 														</Button>
 													) : null}
 													{STOPPABLE.has(service.status) ? (
@@ -377,13 +443,13 @@ export function AgentsPanel(): React.JSX.Element {
 															onClick={() =>
 																void run(
 																	agent,
-																	"Stopping…",
+																	t("agents.progress.stopping"),
 																	() => post("/api/agents/stop", { serviceId: service.id }),
-																	"stopped"
+																	t("agents.outcome.stopped", { name: agent.name })
 																)
 															}
 														>
-															Stop
+															{t("agents.actions.stop")}
 														</Button>
 													) : null}
 													{isRunning || service.status === "starting" ? null : (
@@ -392,18 +458,18 @@ export function AgentsPanel(): React.JSX.Element {
 															onClick={() =>
 																void run(
 																	agent,
-																	"Starting…",
+																	t("agents.progress.starting"),
 																	() => post("/api/agents/start", { serviceId: service.id }),
-																	"started"
+																	t("agents.outcome.started", { name: agent.name })
 																)
 															}
 															variant="outlined"
 														>
-															Start
+															{t("agents.actions.start")}
 														</Button>
 													)}
 													<Button color="error" disabled={busy !== null} onClick={() => setConfirmDelete(agent)}>
-														Delete
+														{t("agents.actions.delete")}
 													</Button>
 												</React.Fragment>
 											)}
@@ -417,7 +483,7 @@ export function AgentsPanel(): React.JSX.Element {
 			</Stack>
 
 			<Stack spacing={2}>
-				<Typography variant="h6">Agent store: run on the device</Typography>
+				<Typography variant="h6">{t("agents.store.heading")}</Typography>
 				{installable.length === 0 ? (
 					<Typography
 						variant="body2"
@@ -425,7 +491,7 @@ export function AgentsPanel(): React.JSX.Element {
 							color: "text.secondary",
 						}}
 					>
-						Every web agent from the store is already installed.
+						{t("agents.store.allInstalled")}
 					</Typography>
 				) : (
 					<Grid container spacing={3}>
@@ -451,7 +517,7 @@ export function AgentsPanel(): React.JSX.Element {
 														color: "text.secondary",
 													}}
 												>
-													Version {agent.cloudVersion}
+													{t("agents.store.version", { version: agent.cloudVersion })}
 												</Typography>
 												<RecommendedModels agent={agent} />
 											</Stack>
@@ -460,7 +526,7 @@ export function AgentsPanel(): React.JSX.Element {
 									<CardActions sx={ACTIONS_SX}>
 										{progress(agent) ?? (agent.install ? installState(agent, agent.install) : null) ?? (
 											<Button disabled={busy !== null} onClick={() => void install(agent, false)} variant="contained">
-												Install on device
+												{t("agents.actions.installOnDevice")}
 											</Button>
 										)}
 									</CardActions>
@@ -472,15 +538,14 @@ export function AgentsPanel(): React.JSX.Element {
 			</Stack>
 
 			<Stack spacing={2}>
-				<Typography variant="h6">Agent store: run on your computer</Typography>
+				<Typography variant="h6">{t("agents.desktop.heading")}</Typography>
 				<Typography
 					variant="body2"
 					sx={{
 						color: "text.secondary",
 					}}
 				>
-					These agents run on a computer and use the device&apos;s OpenAI-compatible API. Point them at the device (for
-					example <code>http://&lt;device address&gt;/v1</code>) with the key from <code>tiiny auth key</code>.
+					<Trans components={{ code: <code /> }} i18nKey="agents.desktop.description" shouldUnescape />
 				</Typography>
 				<Grid container spacing={3}>
 					{desktop.map((agent) => (
@@ -512,7 +577,7 @@ export function AgentsPanel(): React.JSX.Element {
 													color: "text.secondary",
 												}}
 											>
-												No downloads published.
+												{t("agents.desktop.noDownloads")}
 											</Typography>
 										) : (
 											agent.downloads.map((download) => (
@@ -520,7 +585,7 @@ export function AgentsPanel(): React.JSX.Element {
 													<Link href={download.url} rel="noreferrer" target="_blank">
 														{download.platform} {download.version}
 													</Link>{" "}
-													· {formatBytes(download.sizeBytes)}
+													· {format.bytes(download.sizeBytes)}
 													{download.sha256 ? (
 														<span title={`SHA-256 ${download.sha256}`}> · sha256 {download.sha256.slice(0, 12)}…</span>
 													) : null}
@@ -536,14 +601,12 @@ export function AgentsPanel(): React.JSX.Element {
 			</Stack>
 
 			<Dialog onClose={() => setConfirmDelete(null)} open={confirmDelete !== null}>
-				<DialogTitle>Delete {confirmDelete?.name}?</DialogTitle>
+				<DialogTitle>{t("agents.deleteDialog.title", { name: confirmDelete?.name })}</DialogTitle>
 				<DialogContent>
-					<DialogContentText>
-						This removes the agent from the device. You can install it again from the agent store.
-					</DialogContentText>
+					<DialogContentText>{t("agents.deleteDialog.text")}</DialogContentText>
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={() => setConfirmDelete(null)}>Cancel</Button>
+					<Button onClick={() => setConfirmDelete(null)}>{t("agents.actions.cancel")}</Button>
 					<Button
 						color="error"
 						onClick={() => {
@@ -552,11 +615,16 @@ export function AgentsPanel(): React.JSX.Element {
 							if (!agent) return;
 							// An install paused before the device listed the agent is removed by its store id.
 							const serviceId = agent.service?.id ?? agent.appId.replace(/^wa-/, "");
-							void run(agent, "Deleting…", () => post("/api/agents/delete", { serviceId }), "deleted");
+							void run(
+								agent,
+								t("agents.progress.deleting"),
+								() => post("/api/agents/delete", { serviceId }),
+								t("agents.outcome.deleted", { name: agent.name })
+							);
 						}}
 						variant="contained"
 					>
-						Delete
+						{t("agents.actions.delete")}
 					</Button>
 				</DialogActions>
 			</Dialog>

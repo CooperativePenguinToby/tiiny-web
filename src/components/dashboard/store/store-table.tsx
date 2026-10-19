@@ -23,30 +23,35 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
+import type { ParseKeys, TFunction } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import type { DownloadEvent, StoreModel } from "@/types/device";
 import { postJson } from "@/lib/api";
 import { readSse, responseError } from "@/lib/sse";
+import { useFormat, type Formatters } from "@/i18n/client";
 import { usePolling } from "@/hooks/use-polling";
 
 import { ModelDetailsDialog } from "./model-details";
 
 interface Progress {
 	modelId: string;
-	stage: string;
+	// Translation key of the stage.
+	stage: ParseKeys;
 	percent: number | null;
 }
 
-const STAGE_LABELS: Record<string, string> = {
-	downloading: "Downloading",
-	verifying: "Verifying",
-	loading_image: "Installing",
+const STAGE_LABELS: Record<string, ParseKeys> = {
+	downloading: "models.store.stage.downloading",
+	verifying: "models.store.stage.verifying",
+	loading_image: "models.store.stage.installing",
 };
 
 // Resolves "paused" when the download was paused (downloading again resumes it).
 async function downloadModel(
 	modelId: string,
-	onProgress: (stage: string, percent: number | null) => void
+	onProgress: (stage: ParseKeys, percent: number | null) => void,
+	t: TFunction
 ): Promise<"downloaded" | "paused"> {
 	const response = await fetch("/api/store/download", {
 		method: "POST",
@@ -57,31 +62,37 @@ async function downloadModel(
 	for await (const { event, data } of readSse(response)) {
 		const update = JSON.parse(data) as DownloadEvent;
 		if (event === "error" || update.error || update.status === "failed" || update.status === "error") {
-			throw new Error(update.error || update.message || `Device reported ${update.status ?? event}`);
+			throw new Error(
+				update.error || update.message || t("models.store.deviceReported", { status: update.status ?? event })
+			);
 		}
 		if (event === "done" || update.status === "downloaded") return "downloaded";
 		if (update.status === "download_stop") return "paused";
-		onProgress(STAGE_LABELS[update.stage ?? ""] ?? "Starting", update.progress ?? null);
+		onProgress(STAGE_LABELS[update.stage ?? ""] ?? "models.store.stage.starting", update.progress ?? null);
 	}
-	throw new Error("The download stream ended before the model was downloaded");
+	throw new Error(t("models.store.streamEnded"));
 }
 
 // Orders strings by UTF-16 code units, exactly as `sort()` does without a compare function.
 const byCodeUnits = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
 
-const statusChip = (model: StoreModel): React.JSX.Element => {
-	if (model.status === "running") return <Chip color="success" label="loaded" size="small" />;
-	if (model.status === "downloaded") return <Chip color="info" label="downloaded" size="small" />;
+const statusChip = (model: StoreModel, t: TFunction, format: Formatters): React.JSX.Element => {
+	const percent = format.number(model.progress, { maximumFractionDigits: 0 });
+	if (model.status === "running") return <Chip color="success" label={t("models.store.status.loaded")} size="small" />;
+	if (model.status === "downloaded")
+		return <Chip color="info" label={t("models.store.status.downloaded")} size="small" />;
 	if (model.status === "download_stop")
-		return <Chip color="warning" label={`paused ${model.progress.toFixed(0)}%`} size="small" />;
+		return <Chip color="warning" label={t("models.store.status.paused", { percent })} size="small" />;
 	return model.status === "downloading" ? (
-		<Chip color="warning" label={`downloading ${model.progress.toFixed(0)}%`} size="small" />
+		<Chip color="warning" label={t("models.store.status.downloading", { percent })} size="small" />
 	) : (
-		<Chip label="not downloaded" size="small" />
+		<Chip label={t("models.store.status.notDownloaded")} size="small" />
 	);
 };
 
 export function StoreTable(): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const { data, error, isLoading, refresh } = usePolling<StoreModel[]>("/api/store", 10_000);
 	const [query, setQuery] = React.useState<string>("");
 	const [type, setType] = React.useState<string>("all");
@@ -105,28 +116,27 @@ export function StoreTable(): React.JSX.Element {
 	if (isLoading) {
 		return (
 			<Stack sx={{ alignItems: "center", py: 8 }}>
-				<CircularProgress aria-label="Loading store" />
+				<CircularProgress aria-label={t("models.store.loading")} />
 			</Stack>
 		);
 	}
 
 	const download = async (model: StoreModel): Promise<void> => {
 		setOutcome(null);
-		setProgress({ modelId: model.modelId, stage: "Starting", percent: null });
+		setProgress({ modelId: model.modelId, stage: "models.store.stage.starting", percent: null });
 		try {
-			const result = await downloadModel(model.modelId, (stage, percent) =>
-				setProgress({ modelId: model.modelId, stage, percent })
+			const result = await downloadModel(
+				model.modelId,
+				(stage, percent) => setProgress({ modelId: model.modelId, stage, percent }),
+				t
 			);
 			setOutcome({
 				severity: "success",
-				message:
-					result === "paused"
-						? `${model.name} paused. Resume it any time.`
-						: `${model.name} downloaded. Load it from the Models page.`,
+				message: t(result === "paused" ? "models.store.pausedDone" : "models.store.downloaded", { name: model.name }),
 			});
 		} catch (error_) {
 			const reason = error_ instanceof Error ? error_.message : String(error_);
-			setOutcome({ severity: "error", message: `Could not download ${model.name}: ${reason}` });
+			setOutcome({ severity: "error", message: t("models.store.failed.download", { name: model.name, reason }) });
 		} finally {
 			setProgress(null);
 			await refresh();
@@ -139,7 +149,10 @@ export function StoreTable(): React.JSX.Element {
 		} catch (error_) {
 			setOutcome({
 				severity: "error",
-				message: `Could not pause ${model.name}: ${error_ instanceof Error ? error_.message : String(error_)}`,
+				message: t("models.store.failed.pause", {
+					name: model.name,
+					reason: error_ instanceof Error ? error_.message : String(error_),
+				}),
 			});
 		}
 	};
@@ -148,11 +161,14 @@ export function StoreTable(): React.JSX.Element {
 		setOutcome(null);
 		try {
 			await postJson("/api/models/delete", { modelId: model.modelId });
-			setOutcome({ severity: "success", message: `Download of ${model.name} cancelled.` });
+			setOutcome({ severity: "success", message: t("models.store.cancelled", { name: model.name }) });
 		} catch (error_) {
 			setOutcome({
 				severity: "error",
-				message: `Could not cancel ${model.name}: ${error_ instanceof Error ? error_.message : String(error_)}`,
+				message: t("models.store.failed.cancel", {
+					name: model.name,
+					reason: error_ instanceof Error ? error_.message : String(error_),
+				}),
 			});
 		} finally {
 			await refresh();
@@ -171,9 +187,9 @@ export function StoreTable(): React.JSX.Element {
 				<Card>
 					<Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ p: 2 }}>
 						<OutlinedInput
-							inputProps={{ "aria-label": "Search store" }}
+							inputProps={{ "aria-label": t("models.store.search") }}
 							onChange={(event) => setQuery(event.target.value)}
-							placeholder="Search models"
+							placeholder={t("models.store.searchPlaceholder")}
 							startAdornment={
 								<InputAdornment position="start">
 									<MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
@@ -183,14 +199,14 @@ export function StoreTable(): React.JSX.Element {
 							value={query}
 						/>
 						<FormControl sx={{ minWidth: 220 }}>
-							<InputLabel id="store-type-label">Type</InputLabel>
+							<InputLabel id="store-type-label">{t("models.columns.type")}</InputLabel>
 							<Select
-								label="Type"
+								label={t("models.columns.type")}
 								labelId="store-type-label"
 								onChange={(event) => setType(event.target.value)}
 								value={type}
 							>
-								<MenuItem value="all">All types</MenuItem>
+								<MenuItem value="all">{t("models.store.allTypes")}</MenuItem>
 								{types.map((option) => (
 									<MenuItem key={option} value={option}>
 										{option}
@@ -208,19 +224,19 @@ export function StoreTable(): React.JSX.Element {
 								p: 3,
 							}}
 						>
-							No store models match your search.
+							{t("models.store.empty")}
 						</Typography>
 					) : (
 						<Box sx={{ overflowX: "auto" }}>
-							<Table aria-label="Store models" sx={{ minWidth: 900 }}>
+							<Table aria-label={t("models.store.tableLabel")} sx={{ minWidth: 900 }}>
 								<TableHead>
 									<TableRow>
-										<TableCell>Model</TableCell>
-										<TableCell>Type</TableCell>
-										<TableCell align="right">NPU share</TableCell>
-										<TableCell>Status</TableCell>
+										<TableCell>{t("models.columns.model")}</TableCell>
+										<TableCell>{t("models.columns.type")}</TableCell>
+										<TableCell align="right">{t("models.columns.npuShare")}</TableCell>
+										<TableCell>{t("models.columns.status")}</TableCell>
 										<TableCell align="right" sx={{ width: 220 }}>
-											Action
+											{t("models.columns.action")}
 										</TableCell>
 									</TableRow>
 								</TableHead>
@@ -238,7 +254,9 @@ export function StoreTable(): React.JSX.Element {
 														>
 															{model.name}
 														</Button>
-														{model.trending ? <Chip label="trending" size="small" sx={{ ml: 1 }} /> : null}
+														{model.trending ? (
+															<Chip label={t("models.store.trending")} size="small" sx={{ ml: 1 }} />
+														) : null}
 													</Typography>
 													<Typography
 														variant="body2"
@@ -264,8 +282,10 @@ export function StoreTable(): React.JSX.Element {
 													</Typography>
 												</TableCell>
 												<TableCell>{model.type}</TableCell>
-												<TableCell align="right">{model.npuUsage}%</TableCell>
-												<TableCell>{statusChip(model)}</TableCell>
+												<TableCell align="right">
+													{t("models.percent", { value: format.number(model.npuUsage) })}
+												</TableCell>
+												<TableCell>{statusChip(model, t, format)}</TableCell>
 												<TableCell align="right">
 													{active ? (
 														<Stack spacing={0.5}>
@@ -276,31 +296,33 @@ export function StoreTable(): React.JSX.Element {
 																	color: "text.secondary",
 																}}
 															>
-																{active.stage}
-																{active.percent === null ? "" : ` ${active.percent.toFixed(0)}%`}
+																{t(active.stage)}
+																{active.percent === null
+																	? ""
+																	: ` ${t("models.percent", { value: format.number(active.percent, { maximumFractionDigits: 0 }) })}`}
 															</Typography>
 															<LinearProgress
-																aria-label="download progress"
+																aria-label={t("models.store.downloadProgress")}
 																value={active.percent ?? 0}
 																variant={active.percent === null ? "indeterminate" : "determinate"}
 															/>
 															<Box>
 																<Button onClick={() => void pause(model)} size="small">
-																	Pause
+																	{t("models.store.pause")}
 																</Button>
 															</Box>
 														</Stack>
 													) : model.status === "download_stop" ? (
 														<Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end" }}>
 															<Button color="error" disabled={progress !== null} onClick={() => void cancel(model)}>
-																Cancel
+																{t("models.store.cancel")}
 															</Button>
 															<Button
 																disabled={progress !== null}
 																onClick={() => void download(model)}
 																variant="contained"
 															>
-																Resume
+																{t("models.store.resume")}
 															</Button>
 														</Stack>
 													) : model.status === "not_downloaded" ? (
@@ -309,7 +331,7 @@ export function StoreTable(): React.JSX.Element {
 															onClick={() => void download(model)}
 															variant="contained"
 														>
-															Download
+															{t("models.store.download")}
 														</Button>
 													) : null}
 												</TableCell>

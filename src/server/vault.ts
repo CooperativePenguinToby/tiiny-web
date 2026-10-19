@@ -57,7 +57,8 @@ export async function listVaultFiles(): Promise<VaultFile[]> {
 }
 
 export function sourceIdFrom(value: unknown): string {
-	if (typeof value !== "string" || !/^[\w.:#-]{1,200}$/.test(value)) throw new DeviceError("Invalid source id", 400);
+	if (typeof value !== "string" || !/^[\w.:#-]{1,200}$/.test(value))
+		throw new DeviceError("errors.vault.invalidSourceId", 400);
 	return value;
 }
 

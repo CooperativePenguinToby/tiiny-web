@@ -12,36 +12,38 @@ import DialogTitle from "@mui/material/DialogTitle";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import type { ParseKeys } from "i18next";
 import { toDataURL } from "qrcode";
+import { useTranslation } from "react-i18next";
 
 import type { Connector } from "@/types/device";
 import { postJson } from "@/lib/api";
 
 interface Field {
 	name: string;
-	label: string;
+	// A translation key, or text shown as it is (cookie names).
+	label: ParseKeys | { verbatim: string };
 	type?: string;
-	help?: string;
+	help?: ParseKeys;
 }
 
-const FIELDS: Partial<Record<Connector["key"], { intro: string; fields: Field[] }>> = {
+const FIELDS: Partial<Record<Connector["key"], { intro: ParseKeys; fields: Field[] }>> = {
 	telegram: {
-		intro: "Create a bot with @BotFather in Telegram (/newbot) and paste the token it gives you.",
-		fields: [{ name: "token", label: "Bot token", type: "password" }],
+		intro: "connectors.connect.telegramIntro",
+		fields: [{ name: "token", label: "connectors.connect.botToken", type: "password" }],
 	},
 	discord: {
-		intro:
-			"Create a bot in the Discord Developer Portal, turn on Message Content Intent, invite it to your server and paste its token.",
+		intro: "connectors.connect.discordIntro",
 		fields: [
-			{ name: "token", label: "Bot token", type: "password" },
-			{ name: "channel", label: "Channel ID", help: "The channel the bot may read and post in." },
+			{ name: "token", label: "connectors.connect.botToken", type: "password" },
+			{ name: "channel", label: "connectors.connect.channelId", help: "connectors.connect.channelIdHelp" },
 		],
 	},
 	x: {
-		intro: "Sign in to x.com in a browser and copy the auth_token and ct0 cookies.",
+		intro: "connectors.connect.xIntro",
 		fields: [
-			{ name: "authToken", label: "auth_token", type: "password" },
-			{ name: "ct0", label: "ct0", type: "password" },
+			{ name: "authToken", label: { verbatim: "auth_token" }, type: "password" },
+			{ name: "ct0", label: { verbatim: "ct0" }, type: "password" },
 		],
 	},
 };
@@ -56,13 +58,14 @@ const MAIL_PRESETS = [
 ];
 
 function QrCode({ text }: { text: string }): React.JSX.Element {
+	const { t } = useTranslation();
 	const [image, setImage] = React.useState<string | null>(null);
 	React.useEffect(() => {
 		void toDataURL(text, { margin: 1, width: 240 }).then(setImage);
 	}, [text]);
 	return image ? (
 		<Box
-			alt="WhatsApp pairing QR code"
+			alt={t("connectors.connect.whatsappQrAlt")}
 			component="img"
 			data-testid="whatsapp-qr"
 			src={image}
@@ -82,6 +85,7 @@ export interface ConnectDialogProperties {
 // Collects credentials for a token, login or mail connector, or shows WhatsApp's QR code; the device
 // checks them before anything is saved.
 export function ConnectDialog({ connector, onClose, onConnected }: ConnectDialogProperties): React.JSX.Element {
+	const { t } = useTranslation();
 	const [values, setValues] = React.useState<Record<string, string>>({});
 	const [preset, setPreset] = React.useState(MAIL_PRESETS[0].name);
 	const [qr, setQr] = React.useState<string | null>(null);
@@ -98,7 +102,7 @@ export function ConnectDialog({ connector, onClose, onConnected }: ConnectDialog
 		void postJson<{ detail: string; qr?: string }>("/api/connectors/connect", body)
 			.then((reply) => {
 				if (reply.qr) setQr(reply.qr);
-				else onConnected(`${connector.name} connected: ${reply.detail}.`);
+				else onConnected(t("connectors.outcome.connected", { name: connector.name, detail: reply.detail }));
 			})
 			.catch((error_: unknown) => setError(error_ instanceof Error ? error_.message : String(error_)))
 			.finally(() => setBusy(false));
@@ -121,23 +125,19 @@ export function ConnectDialog({ connector, onClose, onConnected }: ConnectDialog
 	const mail = MAIL_PRESETS.find((entry) => entry.name === preset)!;
 	return (
 		<Dialog fullWidth maxWidth="xs" onClose={onClose} open={connector !== null}>
-			<DialogTitle>Connect {connector?.name}</DialogTitle>
+			<DialogTitle>{t("connectors.connect.title", { name: connector?.name })}</DialogTitle>
 			<DialogContent>
 				<Stack spacing={2} sx={{ pt: 1 }}>
 					{key === "whatsapp" ? (
 						<>
-							<DialogContentText>
-								In WhatsApp on your phone open Settings → Linked devices → Link a device, and scan this code.
-							</DialogContentText>
+							<DialogContentText>{t("connectors.connect.whatsappIntro")}</DialogContentText>
 							<Stack sx={{ alignItems: "center" }}>{qr ? <QrCode text={qr} /> : null}</Stack>
 						</>
 					) : key === "email" ? (
 						<>
-							<DialogContentText>
-								Use an app password (Gmail, Outlook and iCloud require one when two-step sign-in is on).
-							</DialogContentText>
+							<DialogContentText>{t("connectors.connect.emailIntro")}</DialogContentText>
 							<TextField
-								label="Provider"
+								label={t("connectors.connect.provider")}
 								onChange={(event) => setPreset(event.target.value)}
 								select
 								size="small"
@@ -145,18 +145,18 @@ export function ConnectDialog({ connector, onClose, onConnected }: ConnectDialog
 							>
 								{MAIL_PRESETS.map((entry) => (
 									<MenuItem key={entry.name} value={entry.name}>
-										{entry.name}
+										{entry.name === "Other" ? t("connectors.connect.otherProvider") : entry.name}
 									</MenuItem>
 								))}
 							</TextField>
 							<TextField
-								label="Email address"
+								label={t("connectors.connect.emailAddress")}
 								onChange={(event) => setValues({ ...values, username: event.target.value })}
 								size="small"
 								value={values.username ?? ""}
 							/>
 							<TextField
-								label="App password"
+								label={t("connectors.connect.appPassword")}
 								onChange={(event) => setValues({ ...values, password: event.target.value })}
 								size="small"
 								type="password"
@@ -165,13 +165,13 @@ export function ConnectDialog({ connector, onClose, onConnected }: ConnectDialog
 							{mail.name === "Other" ? (
 								<>
 									<TextField
-										label="IMAP server"
+										label={t("connectors.connect.imapServer")}
 										onChange={(event) => setValues({ ...values, imapHost: event.target.value })}
 										size="small"
 										value={values.imapHost ?? ""}
 									/>
 									<TextField
-										label="SMTP server"
+										label={t("connectors.connect.smtpServer")}
 										onChange={(event) => setValues({ ...values, smtpHost: event.target.value })}
 										size="small"
 										value={values.smtpHost ?? ""}
@@ -181,12 +181,12 @@ export function ConnectDialog({ connector, onClose, onConnected }: ConnectDialog
 						</>
 					) : spec ? (
 						<>
-							<DialogContentText>{spec.intro}</DialogContentText>
+							<DialogContentText>{t(spec.intro)}</DialogContentText>
 							{spec.fields.map((field) => (
 								<TextField
-									helperText={field.help}
+									helperText={field.help ? t(field.help) : undefined}
 									key={field.name}
-									label={field.label}
+									label={typeof field.label === "string" ? t(field.label) : field.label.verbatim}
 									onChange={(event) => setValues({ ...values, [field.name]: event.target.value })}
 									size="small"
 									type={field.type ?? "text"}
@@ -199,14 +199,16 @@ export function ConnectDialog({ connector, onClose, onConnected }: ConnectDialog
 				</Stack>
 			</DialogContent>
 			<DialogActions>
-				<Button onClick={onClose}>{key === "whatsapp" ? "Close" : "Cancel"}</Button>
+				<Button onClick={onClose}>
+					{t(key === "whatsapp" ? "connectors.actions.close" : "connectors.actions.cancel")}
+				</Button>
 				{key === "whatsapp" ? (
 					<Button disabled={busy} onClick={submit}>
-						New code
+						{t("connectors.connect.newCode")}
 					</Button>
 				) : (
 					<Button disabled={busy} onClick={submit} variant="contained">
-						{busy ? "Checking…" : "Connect"}
+						{t(busy ? "connectors.connect.checking" : "connectors.actions.connect")}
 					</Button>
 				)}
 			</DialogActions>

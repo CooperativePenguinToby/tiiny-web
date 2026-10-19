@@ -8,12 +8,15 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import { ListIcon } from "@phosphor-icons/react/dist/ssr/List";
 import { SignOutIcon } from "@phosphor-icons/react/dist/ssr/SignOut";
+import { useTranslation } from "react-i18next";
 
 import { paths } from "@/paths";
 
+import { LanguageMenu } from "./language-menu";
 import { MobileNav } from "./mobile-nav";
 
 export function MainNav(): React.JSX.Element {
+	const { t } = useTranslation();
 	const router = useRouter();
 	const [openNav, setOpenNav] = React.useState<boolean>(false);
 
@@ -40,7 +43,7 @@ export function MainNav(): React.JSX.Element {
 					sx={{ alignItems: "center", justifyContent: "space-between", minHeight: "64px", px: 2 }}
 				>
 					<IconButton
-						aria-label="Open navigation"
+						aria-label={t("nav.openNavigation")}
 						onClick={(): void => {
 							setOpenNav(true);
 						}}
@@ -48,13 +51,16 @@ export function MainNav(): React.JSX.Element {
 					>
 						<ListIcon />
 					</IconButton>
-					<Button
-						color="secondary"
-						onClick={handleSignOut}
-						startIcon={<SignOutIcon fontSize="var(--icon-fontSize-md)" />}
-					>
-						Sign out
-					</Button>
+					<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+						<LanguageMenu />
+						<Button
+							color="secondary"
+							onClick={handleSignOut}
+							startIcon={<SignOutIcon fontSize="var(--icon-fontSize-md)" />}
+						>
+							{t("nav.signOut")}
+						</Button>
+					</Stack>
 				</Stack>
 			</Box>
 			<MobileNav

@@ -6,8 +6,13 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import type { Icon } from "@phosphor-icons/react/dist/lib/types";
+import { useTranslation } from "react-i18next";
+
+import { useFormat } from "@/i18n/client";
 
 export interface StatCardProperties {
+	// Stable across languages, for tests.
+	id: string;
 	title: string;
 	value: string;
 	caption: string;
@@ -17,6 +22,7 @@ export interface StatCardProperties {
 }
 
 export function StatCard({
+	id,
 	title,
 	value,
 	caption,
@@ -24,8 +30,10 @@ export function StatCard({
 	icon: IconComponent,
 	color,
 }: StatCardProperties): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	return (
-		<Card sx={{ height: "100%" }} data-testid={`stat-${title}`}>
+		<Card sx={{ height: "100%" }} data-testid={`stat-${id}`}>
 			<CardContent>
 				<Stack spacing={2}>
 					<Stack direction="row" spacing={3} sx={{ alignItems: "flex-start", justifyContent: "space-between" }}>
@@ -46,7 +54,10 @@ export function StatCard({
 					</Stack>
 					<div>
 						<LinearProgress
-							aria-label={`${title} ${percent.toFixed(0)}%`}
+							aria-label={t("overview.stats.progress", {
+								title,
+								percent: t("overview.percent", { value: format.number(percent, { maximumFractionDigits: 0 }) }),
+							})}
 							value={Math.min(percent, 100)}
 							variant="determinate"
 						/>

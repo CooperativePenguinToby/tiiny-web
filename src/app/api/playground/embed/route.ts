@@ -26,9 +26,9 @@ export const POST = apiRoute(async (request) => {
 	}
 	const model = modelIdOf(body.model);
 	if (!Array.isArray(body.inputs) || body.inputs.length === 0 || body.inputs.length > 16) {
-		throw new DeviceError("Give 1 to 16 texts", 400);
+		throw new DeviceError("errors.playground.textCount", 400, { min: 1, max: 16 });
 	}
-	const inputs = body.inputs.map((input, index) => textOf(input, `Text ${index + 1}`, 8000));
+	const inputs = body.inputs.map((input, index) => textOf(input, { kind: "numberedText", number: index + 1 }, 8000));
 	const reply = await withModel(model, () =>
 		deviceJson<{ data: { embedding: number[] }[]; usage?: { total_tokens?: number } }>("/v1/embeddings", {
 			method: "POST",

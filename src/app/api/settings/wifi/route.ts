@@ -4,6 +4,7 @@ import { isWifiLink, networkOverview, wifiNetworks } from "@/server/network";
 import { apiRoute } from "@/server/route";
 
 import type { WifiAction } from "@/types/device";
+import { getT } from "@/i18n/server";
 
 interface ActionResult {
 	success?: boolean;
@@ -37,11 +38,8 @@ function parse(body: unknown): WifiAction {
 			break;
 		}
 	}
-	throw new DeviceError("Unknown Wi-Fi action", 400);
+	throw new DeviceError("errors.wifi.unknownAction", 400);
 }
-
-const LINK_MESSAGE =
-	"This app reaches the device over Wi-Fi, so this change would cut it off. Make it from TiinyOS or with the device on a cable.";
 
 export const GET = apiRoute(async () => NextResponse.json(await wifiNetworks()));
 
@@ -61,7 +59,7 @@ export const POST = apiRoute(async (request) => {
 		((action.action === "radio" && !action.enabled) ||
 			(action.action === "forget" && action.ssid === current) ||
 			(action.action === "connect" && action.ssid !== current));
-	if (dropsLink) throw new DeviceError(LINK_MESSAGE, 409);
+	if (dropsLink) throw new DeviceError("errors.wifi.wouldDropLink", 409);
 
 	let result: ActionResult;
 	switch (action.action) {
@@ -109,6 +107,11 @@ export const POST = apiRoute(async (request) => {
 			break;
 		}
 	}
-	if (result.success === false) throw new DeviceError(result.message || "The device refused the change", 502);
-	return NextResponse.json({ message: result.message ?? "Done" });
+	if (result.success === false) {
+		throw result.message
+			? new DeviceError("errors.passthrough", 502, { message: result.message })
+			: new DeviceError("errors.device.refusedChange", 502);
+	}
+	const t = await getT();
+	return NextResponse.json({ message: result.message ?? t("server.done") });
 });

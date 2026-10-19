@@ -1,0 +1,1207 @@
+{
+	"nav": {
+		"overview": "अवलोकन",
+		"models": "मॉडल",
+		"agents": "एजेंट",
+		"chat": "चैट",
+		"playground": "प्लेग्राउंड",
+		"vault": "वॉल्ट",
+		"connectors": "कनेक्टर",
+		"settings": "सेटिंग्स",
+		"openNavigation": "नेविगेशन खोलें",
+		"signOut": "साइन आउट करें",
+		"language": "भाषा",
+		"languageCurrent": "भाषा: {{language}}"
+	},
+	"titles": {
+		"page": "{{page}} | {{site}}",
+		"notFound": "नहीं मिला",
+		"settings": "सेटिंग्स",
+		"overview": "अवलोकन",
+		"agents": "एजेंट",
+		"history": "इतिहास",
+		"signIn": "साइन इन करें",
+		"playground": "प्लेग्राउंड",
+		"connectors": "कनेक्टर",
+		"models": "मॉडल",
+		"store": "स्टोर",
+		"chat": "चैट",
+		"vault": "वॉल्ट",
+		"huggingFace": "Hugging Face"
+	},
+	"errors": {
+		"notSignedIn": "साइन इन नहीं किया गया है",
+		"internal": "आंतरिक त्रुटि",
+		"unknownLanguage": "अज्ञात भाषा",
+		"incorrectPassword": "गलत पासवर्ड",
+		"passthrough": "{{message}}",
+		"request": {
+			"expected": "{{shape}} अपेक्षित है",
+			"required": "{{field}} आवश्यक है",
+			"mustBeText": "{{field}} टेक्स्ट होना चाहिए",
+			"tooLong_one": "{{field}} {{count}} वर्ण से लंबा है",
+			"tooLong_other": "{{field}} {{count}} वर्णों से लंबा है",
+			"modelIdFormat": "{{field}} Org/Name जैसा होना चाहिए",
+			"modelIdLike": "{{field}} Org/Name जैसा मॉडल id होना चाहिए",
+			"range": "{{field}} {{min}}-{{max}} होना चाहिए",
+			"oneOf": "{{field}} इनमें से एक होना चाहिए: {{options}}",
+			"dateFormat": "{{field}} {{example}} जैसी तारीख होनी चाहिए",
+			"jsonList": "{{field}} JSON सूची होनी चाहिए",
+			"emptySearch": "खोजने के लिए कुछ दर्ज करें"
+		},
+		"device": {
+			"notConfigured": "डिवाइस कॉन्फ़िगर नहीं है: TIINY_DEVICE_URL और TIINY_AUTH_KEY सेट करें, या पहले tiiny CLI से साइन इन करें",
+			"notConfiguredShort": "डिवाइस कॉन्फ़िगर नहीं है",
+			"responded": "डिवाइस का जवाब {{status}}: {{message}}",
+			"respondedUnavailable": "डिवाइस का जवाब {{status}}: सेवा उपलब्ध नहीं है",
+			"unreachable": "{{url}} पर डिवाइस तक नहीं पहुँचा जा सका: {{reason}}",
+			"emptyStream": "डिवाइस ने खाली स्ट्रीम लौटाई",
+			"refusedChange": "डिवाइस ने बदलाव अस्वीकार कर दिया",
+			"reportedError": "डिवाइस ने त्रुटि की सूचना दी"
+		},
+		"file": {
+			"tooLarge": "{{name}} {{megabytes}} MB से बड़ी है"
+		},
+		"hf": {
+			"invalidRepo": "Hugging Face रिपो को org/name या उसके huggingface.co URL के रूप में दर्ज करें",
+			"unreachable": "Hugging Face तक नहीं पहुँचा जा सका: {{reason}}",
+			"responded": "Hugging Face का जवाब {{status}}"
+		},
+		"models": {
+			"didNotLoad": "मॉडल लोड नहीं हुआ",
+			"didNotLoadStatus": "मॉडल लोड नहीं हुआ ({{status}})",
+			"didNotLoadNoStatus": "मॉडल लोड नहीं हुआ (कोई स्टेटस नहीं)"
+		},
+		"connectors": {
+			"unknown": "अज्ञात कनेक्टर",
+			"noAccountSignIn": "यह कनेक्टर किसी अकाउंट से साइन इन नहीं करता",
+			"accountSignIn": "यह कनेक्टर अकाउंट से साइन इन करता है",
+			"tokenRejected": "डिवाइस ने टोकन अस्वीकार कर दिया",
+			"xLoginRejected": "X ने लॉगिन अस्वीकार कर दिया",
+			"mailLoginRefused": "मेल सर्वर ने लॉगिन अस्वीकार कर दिया",
+			"whatsappFailed": "डिवाइस WhatsApp शुरू नहीं कर सका",
+			"invalidMcpId": "अमान्य MCP सर्वर id",
+			"mcpConfig": "{{example}} जैसा JSON ऑब्जेक्ट अपेक्षित है"
+		},
+		"chat": {
+			"invalidAttachment": "अमान्य अटैचमेंट",
+			"tooManyAttachments_one": "अधिकतम {{count}} अटैचमेंट",
+			"tooManyAttachments_other": "अधिकतम {{count}} अटैचमेंट",
+			"chooseFile": "एक फ़ाइल चुनें",
+			"unsupportedFile": "{{name}}: इमेज या {{extensions}} फ़ाइलें अटैच करें",
+			"noText": "डिवाइस को {{name}} में कोई टेक्स्ट नहीं मिला",
+			"invalidMediaId": "अमान्य मीडिया id"
+		},
+		"task": {
+			"interrupted": "बाधित।",
+			"tooManySteps_one": "{{count}} चरण के बाद बिना अंतिम उत्तर के रोका गया।",
+			"tooManySteps_other": "{{count}} चरणों के बाद बिना अंतिम उत्तर के रोका गया।"
+		},
+		"history": {
+			"invalidConversationId": "अमान्य बातचीत id"
+		},
+		"vault": {
+			"invalidSourceId": "अमान्य स्रोत id",
+			"chooseFiles": "कम से कम एक फ़ाइल चुनें",
+			"tooManyFiles_one": "एक बार में अधिकतम {{count}} फ़ाइल अपलोड करें",
+			"tooManyFiles_other": "एक बार में अधिकतम {{count}} फ़ाइलें अपलोड करें",
+			"unsupportedFile": "{{name}}: वॉल्ट {{extensions}} फ़ाइलें स्वीकार करता है",
+			"invalidName": "स्लैश के बिना फ़ाइल का नाम दर्ज करें"
+		},
+		"memory": {
+			"chooseTextModel": "डाउनलोड किया हुआ कोई टेक्स्ट मॉडल चुनें"
+		},
+		"settings": {
+			"deviceNameLength_one": "डिवाइस का नाम 1-{{count}} वर्ण का होना चाहिए",
+			"deviceNameLength_other": "डिवाइस का नाम 1-{{count}} वर्णों का होना चाहिए"
+		},
+		"agents": {
+			"noDomain": "एजेंट सबडोमेन कॉन्फ़िगर नहीं हैं (AGENT_DOMAIN)"
+		},
+		"playground": {
+			"textRequired": "टेक्स्ट आवश्यक है",
+			"textTooLong_one": "टेक्स्ट {{count}} वर्ण से लंबा है",
+			"textTooLong_other": "टेक्स्ट {{count}} वर्णों से लंबा है",
+			"queryRequired": "क्वेरी आवश्यक है",
+			"queryTooLong_one": "क्वेरी {{count}} वर्ण से लंबी है",
+			"queryTooLong_other": "क्वेरी {{count}} वर्णों से लंबी है",
+			"numberedTextRequired": "टेक्स्ट {{number}} आवश्यक है",
+			"numberedTextTooLong_one": "टेक्स्ट {{number}} {{count}} वर्ण से लंबा है",
+			"numberedTextTooLong_other": "टेक्स्ट {{number}} {{count}} वर्णों से लंबा है",
+			"documentRequired": "दस्तावेज़ {{number}} आवश्यक है",
+			"documentTooLong_one": "दस्तावेज़ {{number}} {{count}} वर्ण से लंबा है",
+			"documentTooLong_other": "दस्तावेज़ {{number}} {{count}} वर्णों से लंबा है",
+			"textCount": "{{min}} से {{max}} टेक्स्ट दें",
+			"documentCount": "{{min}} से {{max}} दस्तावेज़ दें",
+			"chooseAudio": "कोई ऑडियो चुनें या रिकॉर्ड करें",
+			"audioTooLarge": "ऑडियो {{megabytes}} MB से बड़ा है",
+			"wavOnly": "डिवाइस केवल WAV ऑडियो को ट्रांसक्राइब कर सकता है। पहले फ़ाइल को WAV में बदलें।",
+			"chooseImage": "एक इमेज चुनें",
+			"imageTooLarge": "इमेज {{megabytes}} MB से बड़ी है"
+		},
+		"backup": {
+			"chooseFile": "बैकअप फ़ाइल चुनें",
+			"chooseCategory": "डिवाइस द्वारा दी गई कम से कम एक श्रेणी चुनें",
+			"unexpectedReply": "अनपेक्षित बैकअप जवाब ({{type}})",
+			"unexpectedReplyNoType": "अनपेक्षित बैकअप जवाब (कोई प्रकार नहीं)",
+			"noArchive": "डिवाइस के बैकअप में कोई आर्काइव नहीं था",
+			"notBackup": "यह फ़ाइल Tiiny बैकअप नहीं है",
+			"otherDevice": "यह बैकअप किसी दूसरे डिवाइस पर बनाया गया था; इसे केवल वहीं रीस्टोर किया जा सकता है",
+			"missing": "बैकअप में {{services}} शामिल नहीं है"
+		},
+		"wifi": {
+			"unknownAction": "अज्ञात Wi-Fi कार्रवाई",
+			"wouldDropLink": "यह ऐप Wi-Fi के ज़रिए डिवाइस से जुड़ता है, इसलिए यह बदलाव कनेक्शन काट देगा। इसे TiinyOS से करें या डिवाइस को केबल से जोड़कर करें।"
+		},
+		"update": {
+			"upToDate": "TiinyOS अप टू डेट है",
+			"notReady": "इंस्टॉल करने के लिए कोई डाउनलोड किया हुआ अपडेट तैयार नहीं है",
+			"unknownAction": "अज्ञात अपडेट कार्रवाई"
+		},
+		"agentProxy": {
+			"noAnswer": "एजेंट ने जवाब नहीं दिया ({{reason}})। हो सकता है वह रुका हुआ हो।",
+			"linkExpired": "यह लिंक समाप्त हो गया है। tiiny-web के एजेंट पेज से एजेंट को फिर से खोलें।",
+			"signIn": "tiiny-web में साइन इन करें और इस एजेंट को उसके एजेंट पेज से खोलें।"
+		}
+	},
+	"chat": {
+		"title": "चैट",
+		"tabs": {
+			"chat": "चैट",
+			"history": "इतिहास"
+		},
+		"intro": "किसी लोड किए गए मॉडल से बात करें। चैट डिवाइस के चैट इतिहास में रखी जाती हैं, जो TiinyOS के साथ साझा है। डिवाइस हर मॉडल के लिए एक समय में एक ही अनुरोध का जवाब देता है, इसलिए जवाब कतार में लग सकते हैं।",
+		"message": {
+			"you": "आप",
+			"assistant": "असिस्टेंट",
+			"thinking": "सोच रहा है"
+		},
+		"notes": {
+			"stopped": "रोका गया।",
+			"noReply": "पूरा जवाब नहीं मिला।",
+			"interrupted": "बाधित।",
+			"drawing": "चित्र बन रहा है… चरण {{step}} / {{total}}",
+			"picture_one": "{{size}}, {{count}} चरण",
+			"picture_other": "{{size}}, {{count}} चरण"
+		},
+		"errors": {
+			"openConversation": "बातचीत नहीं खुल सकी: {{message}}",
+			"load": "{{name}} लोड नहीं हो सका: {{message}}",
+			"device": "डिवाइस ने त्रुटि की सूचना दी",
+			"gaveUp": "डिवाइस ने इंतज़ार छोड़ दिया: मॉडल दूसरे अनुरोधों में व्यस्त था। फिर से कोशिश करें। ({{message}})",
+			"drawFailed": "डिवाइस चित्र नहीं बना सका",
+			"noPicture": "डिवाइस बिना चित्र के पूरा हो गया",
+			"notSaved": "इतिहास में सहेजा नहीं गया: {{message}}"
+		},
+		"models": {
+			"loading": "चैट मॉडल लोड हो रहे हैं",
+			"none": "कोई चैट या इमेज मॉडल डाउनलोड नहीं है। स्टोर से एक लें, फिर उसे लोड करें।",
+			"modelsButton": "मॉडल",
+			"label": "मॉडल",
+			"choose": "मॉडल चुनें",
+			"notLoadedOption": "{{name}} (लोड नहीं है)"
+		},
+		"loading": {
+			"starting": "शुरू हो रहा है",
+			"unloading": "{{name}} अनलोड हो रहा है",
+			"status": "{{name}} लोड हो रहा है: {{message}}",
+			"statusProgress": "{{name}} लोड हो रहा है: {{message}} {{progress}}%",
+			"progressLabel": "मॉडल लोडिंग",
+			"notLoaded": "{{name}} लोड नहीं है।",
+			"load": "लोड करें"
+		},
+		"makeRoom": {
+			"title": "{{name}} के लिए जगह बनाएँ?",
+			"text": "डिवाइस में पर्याप्त खाली NPU मेमोरी नहीं है। पहले {{models}} अनलोड करें? उनका उपयोग करने वाले ऐप रुक जाएँगे।",
+			"otherModels": "अन्य मॉडल",
+			"cancel": "रद्द करें",
+			"confirm": "अनलोड करके लोड करें"
+		},
+		"mode": {
+			"label": "मोड",
+			"chat": "चैट",
+			"chatTitle": "मॉडल सीधे जवाब देता है",
+			"task": "टास्क",
+			"taskTitle": "मॉडल वॉल्ट, वेब पेज और MCP टूल के साथ चरणों में काम करता है"
+		},
+		"tools": {
+			"vault": "वॉल्ट",
+			"vaultTitle": "मॉडल को आपकी वॉल्ट फ़ाइलें और चैट सारांश खोजने दें",
+			"web": "वेब",
+			"webTitle": "मॉडल को वेब पेज पढ़ने दें"
+		},
+		"image": {
+			"size": "आकार",
+			"steps": "चरण"
+		},
+		"thinking": {
+			"label": "थिंकिंग",
+			"off": "बंद"
+		},
+		"newChat": "नई चैट",
+		"conversation": {
+			"opening": "बातचीत खुल रही है",
+			"empty": "{{name}} के साथ चैट शुरू करने के लिए संदेश भेजें।",
+			"theModel": "मॉडल",
+			"waiting": "डिवाइस का इंतज़ार · {{seconds}}s",
+			"waitingQueued_one": "डिवाइस का इंतज़ार · {{seconds}}s · मॉडल {{count}} अन्य अनुरोध में व्यस्त है, आपका अनुरोध कतार में है",
+			"waitingQueued_other": "डिवाइस का इंतज़ार · {{seconds}}s · मॉडल {{count}} अन्य अनुरोधों में व्यस्त है, आपका अनुरोध कतार में है"
+		},
+		"composer": {
+			"files": "अटैच करने के लिए फ़ाइलें",
+			"attachImagesOrDocuments": "इमेज या दस्तावेज़ अटैच करें",
+			"attachDocuments": "दस्तावेज़ अटैच करें",
+			"message": "संदेश",
+			"placeholder": "भेजने के लिए Enter, नई पंक्ति के लिए Shift+Enter",
+			"stop": "रोकें",
+			"send": "भेजें"
+		},
+		"attachments": {
+			"charactersRead_one": "डिवाइस ने {{characters}} वर्ण पढ़ा",
+			"charactersRead_other": "डिवाइस ने {{characters}} वर्ण पढ़े",
+			"uploading": "{{name}}…",
+			"missing": "{{name}} (अब डिवाइस पर नहीं है)",
+			"download": "डाउनलोड करें"
+		},
+		"task": {
+			"running": "{{label}} चल रहा है",
+			"showResult": "परिणाम दिखाएँ",
+			"hideResult": "परिणाम छिपाएँ"
+		},
+		"history": {
+			"intro": "डिवाइस पर रखी गई बातचीत, इस ऐप से और TiinyOS से।",
+			"search": "बातचीत खोजें",
+			"searchButton": "खोजें",
+			"searching": "खोजा जा रहा है…",
+			"loading": "बातचीत लोड हो रही हैं",
+			"noMatches": "किसी बातचीत में “{{query}}” का ज़िक्र नहीं है।",
+			"empty": "अभी तक कोई बातचीत नहीं। आपकी चैट यहाँ रखी जाती हैं।",
+			"untitled": "बिना शीर्षक",
+			"delete": "हटाएँ",
+			"confirmTitle": "बातचीत हटाएँ?",
+			"confirmText": "डिवाइस से “{{title}}” हटाएँ? इसे TiinyOS से भी हटा दिया जाएगा।"
+		}
+	},
+	"auth": {
+		"layout": {
+			"welcome": "<brand>Tiiny</brand> में आपका स्वागत है",
+			"tagline": "अपने नेटवर्क के किसी भी ब्राउज़र से डिवाइस की निगरानी करें, लोड किए गए मॉडल प्रबंधित करें और चैट करें।"
+		},
+		"signIn": {
+			"title": "साइन इन करें",
+			"description": "इस सर्वर के लिए कॉन्फ़िगर किया गया एडमिन पासवर्ड दर्ज करें।",
+			"password": "पासवर्ड",
+			"passwordRequired": "पासवर्ड आवश्यक है",
+			"showPassword": "पासवर्ड दिखाएँ",
+			"hidePassword": "पासवर्ड छिपाएँ",
+			"submit": "साइन इन करें",
+			"submitting": "साइन इन हो रहा है…",
+			"failed": "साइन इन विफल ({{status}})",
+			"unreachable": "सर्वर तक नहीं पहुँचा जा सका"
+		}
+	},
+	"core": {
+		"backHome": "होम पर वापस जाएँ",
+		"notFound": {
+			"heading": "404: आप जो पेज ढूँढ रहे हैं वह यहाँ नहीं है",
+			"hint": "डैशबोर्ड पर वापस जाने के लिए नेविगेशन का उपयोग करें।"
+		},
+		"errors": {
+			"requestFailed": "अनुरोध विफल ({{status}})",
+			"deviceReported": "डिवाइस ने {{status}} की सूचना दी"
+		}
+	},
+	"agents": {
+		"page": {
+			"title": "एजेंट",
+			"description": "डिवाइस पर इंस्टॉल किए गए एजेंट यहाँ HTTPS पर, इस ऐप के साइन-इन के पीछे खुलते हैं।"
+		},
+		"loading": "एजेंट लोड हो रहे हैं",
+		"recommendedModels_one": "सुझाया गया मॉडल: {{models}}",
+		"recommendedModels_other": "सुझाए गए मॉडल: {{models}}",
+		"stream": {
+			"failed": "विफल",
+			"working": "काम चल रहा है"
+		},
+		"progress": {
+			"percent": "{{message}} {{percent}}%",
+			"ariaLabel": "{{name}} की प्रगति",
+			"startingInstall": "इंस्टॉल शुरू हो रहा है…",
+			"resumingInstall": "इंस्टॉल फिर से शुरू हो रहा है…",
+			"updating": "अपडेट हो रहा है…",
+			"stopping": "रुक रहा है…",
+			"starting": "शुरू हो रहा है…",
+			"deleting": "हटाया जा रहा है…"
+		},
+		"install": {
+			"paused": "इंस्टॉल {{percent}}% पर रुका है",
+			"running": "इंस्टॉल हो रहा है {{percent}}%",
+			"ariaLabel": "{{name}} इंस्टॉल"
+		},
+		"outcome": {
+			"installed": "{{name}} इंस्टॉल हो गया।",
+			"installPaused": "{{name}} का इंस्टॉल रोका गया।",
+			"updated": "{{name}} को {{version}} पर अपडेट किया गया।",
+			"stopped": "{{name}} रुक गया।",
+			"started": "{{name}} शुरू हो गया।",
+			"deleted": "{{name}} हटा दिया गया।",
+			"error": "{{name}}: {{message}}"
+		},
+		"actions": {
+			"resume": "फिर शुरू करें",
+			"pause": "रोकें",
+			"cancelInstall": "इंस्टॉल रद्द करें",
+			"update": "अपडेट करें",
+			"open": "खोलें",
+			"stop": "बंद करें",
+			"start": "शुरू करें",
+			"delete": "हटाएँ",
+			"installOnDevice": "डिवाइस पर इंस्टॉल करें",
+			"cancel": "रद्द करें"
+		},
+		"installed": {
+			"heading": "इस डिवाइस पर",
+			"empty": "डिवाइस पर कोई एजेंट इंस्टॉल नहीं है। नीचे दिए स्टोर से एक इंस्टॉल करें।",
+			"version": "संस्करण {{version}}",
+			"versionWithUpdate": "संस्करण {{version}} · {{latest}} उपलब्ध",
+			"unknownVersion": "अज्ञात",
+			"usage": "CPU {{cpu}}% · मेमोरी {{memory}}",
+			"containersStopped": "डिवाइस के अनुसार इस एजेंट के कंटेनर अचानक रुक गए हैं। इसे फिर से शुरू करें, या रीसेट करने के लिए बंद करें।",
+			"proxyError": "पोर्ट {{port}} पर प्रॉक्सी: {{error}}"
+		},
+		"store": {
+			"heading": "एजेंट स्टोर: डिवाइस पर चलाएँ",
+			"allInstalled": "स्टोर के सभी वेब एजेंट पहले से इंस्टॉल हैं।",
+			"version": "संस्करण {{version}}"
+		},
+		"desktop": {
+			"heading": "एजेंट स्टोर: अपने कंप्यूटर पर चलाएँ",
+			"description": "ये एजेंट कंप्यूटर पर चलते हैं और डिवाइस के OpenAI-संगत API का उपयोग करते हैं। इन्हें <code>tiiny auth key</code> से मिली key के साथ डिवाइस की ओर निर्देशित करें (उदाहरण के लिए <code>http://&lt;device address&gt;/v1</code>)।",
+			"noDownloads": "कोई डाउनलोड प्रकाशित नहीं है।"
+		},
+		"deleteDialog": {
+			"title": "{{name}} हटाएँ?",
+			"text": "इससे एजेंट डिवाइस से हट जाएगा। आप इसे एजेंट स्टोर से फिर से इंस्टॉल कर सकते हैं।"
+		},
+		"status": {
+			"created": "बनाया गया",
+			"running": "चल रहा है",
+			"starting": "शुरू हो रहा है",
+			"stopped": "रुका हुआ",
+			"exited": "बाहर निकला",
+			"paused": "रोका गया",
+			"error": "त्रुटि"
+		}
+	},
+	"connectors": {
+		"page": {
+			"title": "कनेक्टर",
+			"description": "ईमेल, कैलेंडर, मैसेजिंग और MCP टूल, जिनका उपयोग मॉडल टास्क मोड में कर सकते हैं।"
+		},
+		"category": {
+			"email": "ईमेल",
+			"calendar": "कैलेंडर",
+			"messaging": "मैसेजिंग"
+		},
+		"state": {
+			"connected": "कनेक्टेड",
+			"notConnected": "कनेक्ट नहीं है",
+			"notReachable": "पहुँच से बाहर"
+		},
+		"actions": {
+			"connect": "कनेक्ट करें",
+			"disconnect": "डिस्कनेक्ट करें",
+			"cancel": "रद्द करें",
+			"close": "बंद करें",
+			"remove": "हटाएँ"
+		},
+		"services": {
+			"heading": "सेवाएँ",
+			"description": "मॉडल टास्क मोड में कनेक्ट की गई सेवाओं का उपयोग करते हैं, उतना ही जितना आप अनुमति देते हैं। कनेक्शन डिवाइस पर रहते हैं और TiinyOS के साथ साझा होते हैं।",
+			"loading": "कनेक्टर लोड हो रहे हैं",
+			"waitingForSignIn": "आपके साइन इन पूरा करने का इंतज़ार है… <link>साइन-इन पेज खोलें</link>"
+		},
+		"outcome": {
+			"connected": "{{name}} कनेक्ट हो गया: {{detail}}।",
+			"whatsappConnected": "WhatsApp कनेक्ट हो गया।",
+			"disconnected": "{{name}} डिस्कनेक्ट हो गया।",
+			"error": "{{name}}: {{message}}"
+		},
+		"disconnectDialog": {
+			"title": "डिस्कनेक्ट करें?",
+			"text": "{{name}} को डिस्कनेक्ट करें? डिवाइस सहेजा गया साइन-इन भूल जाएगा, और मॉडल इसका उपयोग नहीं कर पाएँगे।"
+		},
+		"connect": {
+			"title": "{{name}} कनेक्ट करें",
+			"telegramIntro": "Telegram में @BotFather के साथ एक बॉट बनाएँ (/newbot) और उससे मिला टोकन पेस्ट करें।",
+			"discordIntro": "Discord Developer Portal में एक बॉट बनाएँ, Message Content Intent चालू करें, उसे अपने सर्वर पर आमंत्रित करें और उसका टोकन पेस्ट करें।",
+			"xIntro": "किसी ब्राउज़र में x.com पर साइन इन करें और auth_token और ct0 कुकीज़ कॉपी करें।",
+			"botToken": "बॉट टोकन",
+			"channelId": "चैनल ID",
+			"channelIdHelp": "वह चैनल जिसमें बॉट पढ़ और पोस्ट कर सकता है।",
+			"whatsappQrAlt": "WhatsApp पेयरिंग QR कोड",
+			"whatsappIntro": "अपने फ़ोन पर WhatsApp में Settings → Linked devices → Link a device खोलें, और यह कोड स्कैन करें।",
+			"newCode": "नया कोड",
+			"emailIntro": "ऐप पासवर्ड का उपयोग करें (दो-चरणीय साइन-इन चालू होने पर Gmail, Outlook और iCloud को इसकी ज़रूरत होती है)।",
+			"provider": "प्रदाता",
+			"otherProvider": "अन्य",
+			"emailAddress": "ईमेल पता",
+			"appPassword": "ऐप पासवर्ड",
+			"imapServer": "IMAP सर्वर",
+			"smtpServer": "SMTP सर्वर",
+			"checking": "जाँच हो रही है…"
+		},
+		"mcp": {
+			"heading": "कस्टम MCP सर्वर",
+			"addServer": "MCP सर्वर जोड़ें",
+			"description": "इन सर्वरों के टूल टास्क मोड में मॉडल को दिए जाते हैं। ये डिवाइस पर चलते हैं।",
+			"loading": "MCP सर्वर लोड हो रहे हैं",
+			"empty": "अभी तक कोई MCP सर्वर नहीं।",
+			"tools": "टूल",
+			"hideTools": "टूल छिपाएँ",
+			"loadingTools": "टूल लोड हो रहे हैं",
+			"added": "MCP सर्वर जोड़ा गया।",
+			"removed": "{{name}} हटा दिया गया।",
+			"removeDialog": {
+				"title": "MCP सर्वर हटाएँ?",
+				"text": "डिवाइस से {{name}} हटाएँ? मॉडल इसके टूल का उपयोग नहीं कर पाएँगे।"
+			},
+			"addDialog": {
+				"title": "MCP सर्वर जोड़ें",
+				"description": "सर्वर डिवाइस पर चलता है, इसलिए वहाँ से उस तक पहुँचना ज़रूरी है। जिन सर्वरों को डेस्कटॉप या ब्राउज़र चाहिए, वे डिवाइस पर काम नहीं करेंगे।",
+				"byUrl": "URL से",
+				"fromJson": "JSON से",
+				"name": "नाम",
+				"url": "URL",
+				"urlHelp": "HTTP या SSE एंडपॉइंट, जैसे {{example}}",
+				"config": "MCP कॉन्फ़िग",
+				"invalidJson": "यह मान्य JSON नहीं है",
+				"add": "जोड़ें",
+				"adding": "जोड़ा जा रहा है…"
+			}
+		}
+	},
+	"settings": {
+		"page": {
+			"title": "सेटिंग्स",
+			"subtitle": "डिवाइस की अपनी सेटिंग्स, जैसे TiinyOS में।"
+		},
+		"actions": {
+			"cancel": "रद्द करें",
+			"save": "सहेजें",
+			"saving": "सहेजा जा रहा है…",
+			"retry": "फिर से कोशिश करें",
+			"copy": "कॉपी करें",
+			"copied": "कॉपी हो गया",
+			"delete": "हटाएँ",
+			"deleting": "हटाया जा रहा है…"
+		},
+		"section": {
+			"staleValues": "अंतिम ज्ञात मान दिखाए जा रहे हैं। {{error}}"
+		},
+		"device": {
+			"title": "मेरा डिवाइस",
+			"subheader": "डिवाइस द्वारा बताया गया",
+			"loading": "डिवाइस की जानकारी लोड हो रही है",
+			"name": "नाम",
+			"rename": "नाम बदलें",
+			"nameField": "डिवाइस का नाम",
+			"serialNumber": "सीरियल नंबर",
+			"copySerialNumber": "सीरियल नंबर कॉपी करें",
+			"model": "मॉडल",
+			"osService": "TiinyOS सेवा"
+		},
+		"personalization": {
+			"title": "वैयक्तिकरण",
+			"subheader": "टास्क मोड में डिवाइस मॉडल को आपके बारे में जो संदर्भ देता है",
+			"loading": "वैयक्तिकरण लोड हो रहा है",
+			"fields": {
+				"userName": {
+					"label": "नाम",
+					"hint": "मॉडल आपको किस नाम से बुलाएँ।"
+				},
+				"occupation": {
+					"label": "पेशा",
+					"hint": "उदाहरण के लिए: सॉफ़्टवेयर इंजीनियर।"
+				},
+				"preferences": {
+					"label": "पसंद",
+					"hint": "आपको जवाब कैसे पसंद हैं।"
+				},
+				"recentFocus": {
+					"label": "हाल का फ़ोकस",
+					"hint": "आप किस पर काम कर रहे हैं।"
+				}
+			},
+			"fieldHelper": "{{hint}} {{length}}/{{limit}}",
+			"saved": "सहेजा गया। मॉडल इसे अगली टास्क मोड बातचीत से देखेंगे।",
+			"discardChanges": "बदलाव छोड़ें"
+		},
+		"power": {
+			"title": "सिस्टम",
+			"subheader": "पावर और TiinyOS अपडेट",
+			"autoPowerOn": {
+				"title": "ऑटो पावर-ऑन",
+				"description": "पावर से जुड़ने पर डिवाइस अपने आप चालू हो जाता है। डिवाइस यह नहीं बताता कि यह चालू है या नहीं (यह हमेशा बंद दिखता है), इसलिए केवल बदलाव का परिणाम दिखाया जाता है।",
+				"turnOn": "चालू करें",
+				"turnOff": "बंद करें",
+				"deviceReply": "डिवाइस: {{message}}"
+			},
+			"update": {
+				"title": "सिस्टम अपडेट",
+				"current": "TiinyOS {{version}}",
+				"available": "TiinyOS {{version}} · संस्करण {{available}} उपलब्ध है",
+				"upToDate": "TiinyOS {{version}} · अप टू डेट",
+				"loading": "अपडेट स्थिति लोड हो रही है",
+				"inProgress": "अपडेट {{state}}…",
+				"progress": "अपडेट की प्रगति",
+				"check": "अपडेट की जाँच करें",
+				"checking": "जाँच हो रही है…",
+				"download": "अपडेट डाउनलोड करें",
+				"install": "अपडेट इंस्टॉल करें",
+				"confirmTitle": "अपडेट इंस्टॉल करें?",
+				"confirmText": "इंस्टॉलेशन के दौरान मॉडल रुक जाएँगे और डिवाइस रीस्टार्ट होगा। उसके वापस आने तक इसे अनप्लग न करें।",
+				"confirmLabel": "इंस्टॉल करें",
+				"installing": "अपडेट इंस्टॉल हो रहा है। डिवाइस एक बार रीस्टार्ट होगा; इसे अनप्लग न करें।"
+			},
+			"power": {
+				"title": "पावर",
+				"restart": "रीस्टार्ट करें",
+				"shutDown": "शट डाउन करें",
+				"restarting": "रीस्टार्ट हो रहा है… डिवाइस के वापस आने का इंतज़ार है।",
+				"back": "डिवाइस वापस आ गया है।",
+				"notBack": "10 मिनट बाद भी डिवाइस वापस नहीं आया",
+				"shuttingDown": "डिवाइस शट डाउन हो रहा है।",
+				"restartTitle": "डिवाइस रीस्टार्ट करें?",
+				"restartText": "लोड किए गए मॉडल, चैट और एजेंट रुक जाएँगे, और कुछ मिनटों तक डिवाइस तक पहुँचा नहीं जा सकेगा।",
+				"shutDownTitle": "डिवाइस शट डाउन करें?",
+				"shutDownText": "लोड किए गए मॉडल, चैट और एजेंट रुक जाएँगे। डिवाइस तब तक बंद रहेगा जब तक उसे डिवाइस पर ही चालू न किया जाए (या ऑटो पावर-ऑन के साथ पावर से दोबारा न जोड़ा जाए)।"
+			}
+		},
+		"apiAccess": {
+			"title": "API एक्सेस",
+			"subheader": "अपने नेटवर्क के दूसरे ऐप से डिवाइस के मॉडल का उपयोग करें",
+			"loading": "API एक्सेस लोड हो रहा है",
+			"openaiCompatible": "OpenAI-संगत",
+			"uses": {
+				"openai": "टेक्स्ट, एम्बेडिंग, रीरैंक, इमेज, स्पीच",
+				"anthropic": "टेक्स्ट जनरेशन",
+				"ollama": "टेक्स्ट जनरेशन, एम्बेडिंग"
+			},
+			"copyBaseUrl": "{{format}} बेस URL कॉपी करें",
+			"apiKey": "API key",
+			"copyApiKey": "API key कॉपी करें",
+			"reveal": "दिखाएँ",
+			"hint": "मॉडल पेज से कोई मॉडल id इस्तेमाल करें, या सबसे हाल में उपयोग किए गए मॉडल के लिए <code>default</code>। key को निजी रखें: जिसके पास यह है, वह डिवाइस के API का उपयोग कर सकता है।"
+		},
+		"storage": {
+			"title": "स्टोरेज",
+			"subheader": "डिवाइस पर डिस्क का उपयोग",
+			"loading": "स्टोरेज लोड हो रहा है",
+			"used": "{{total}} में से {{used}} उपयोग में",
+			"usedBar": "उपयोग किया गया स्टोरेज",
+			"category": "{{name}}: {{size}}",
+			"modelFiles": "मॉडल फ़ाइलें",
+			"agentFiles": "एजेंट फ़ाइलें",
+			"size": "आकार",
+			"usedByVault": "वॉल्ट द्वारा उपयोग",
+			"deleted": "{{id}} हटा दिया गया।",
+			"deleteModelTitle": "मॉडल हटाएँ?",
+			"deleteModelText": "डिवाइस से {{id}} हटाएँ? इसका उपयोग करने के लिए आपको इसे फिर से डाउनलोड करना होगा।",
+			"deleteAgentTitle": "एजेंट हटाएँ?",
+			"deleteAgentText": "डिवाइस से {{id}} और उसका डेटा हटाएँ? इसे पूर्ववत नहीं किया जा सकता।"
+		},
+		"backup": {
+			"title": "बैकअप और रीस्टोर",
+			"subheader": "चैट इतिहास और वॉल्ट, इस कंप्यूटर पर सहेजे गए",
+			"backUp": {
+				"title": "बैकअप लें",
+				"loading": "बैकअप लोड हो रहा है",
+				"category": "{{name}} · लगभग {{size}}",
+				"categoryNotReady": "{{name}} · लगभग {{size}} (तैयार नहीं)",
+				"download": "बैकअप डाउनलोड करें",
+				"inProgress": "बैकअप लिया जा रहा है…",
+				"saved": "{{name}} सहेजा गया ({{size}})।",
+				"savedWithout": "{{name}} सहेजा गया ({{size}}), इनके बिना: {{failed}}।"
+			},
+			"restore": {
+				"title": "रीस्टोर",
+				"chooseFile": "बैकअप फ़ाइल चुनें",
+				"fileField": "बैकअप फ़ाइल",
+				"restore": "रीस्टोर करें",
+				"inProgress": "रीस्टोर हो रहा है…",
+				"otherDevice": "यह बैकअप किसी दूसरे डिवाइस ({{deviceId}}) पर बनाया गया था; इसे केवल वहीं रीस्टोर किया जा सकता है।",
+				"unknownDevice": "अज्ञात",
+				"result": "{{name}}: {{message}}",
+				"restored": "रीस्टोर हो गया",
+				"failed": "डिवाइस बैकअप रीस्टोर नहीं कर सका",
+				"confirmTitle": "बैकअप रीस्टोर करें?",
+				"confirmText": "डिवाइस पर {{categories}} को बैकअप की सामग्री से बदलें? बैकअप के बाद जो जोड़ा गया था, वह खो जाएगा।",
+				"categoryJoiner": " और "
+			}
+		},
+		"network": {
+			"title": "नेटवर्क",
+			"subheader": "डिवाइस के Wi-Fi और वायर्ड कनेक्शन",
+			"loading": "नेटवर्क लोड हो रहा है",
+			"wifi": "Wi-Fi",
+			"wifiTurnedOn": "Wi-Fi चालू किया गया।",
+			"wifiTurnedOff": "Wi-Fi बंद किया गया।",
+			"connectedTo": "{{ssid}} से कनेक्टेड (सिग्नल {{signal}}%)",
+			"notConnected": "कनेक्ट नहीं है",
+			"off": "बंद",
+			"wifiLink": "यह ऐप Wi-Fi ({{interface}}) के ज़रिए डिवाइस से जुड़ता है, इसलिए यहाँ Wi-Fi बंद करना, {{ssid}} को भूलना या किसी दूसरे नेटवर्क से जुड़ना अक्षम है। ये बदलाव करने के लिए TiinyOS का उपयोग करें या डिवाइस को केबल से जोड़ें।",
+			"interfaces": {
+				"interface": "इंटरफ़ेस",
+				"state": "स्थिति",
+				"addresses": "पते",
+				"appLink": "इस ऐप का लिंक"
+			},
+			"networks": {
+				"scanning": "नेटवर्क खोजे जा रहे हैं…",
+				"network": "नेटवर्क",
+				"autoJoin": "ऑटो-जॉइन",
+				"connected": "कनेक्टेड",
+				"connecting": "कनेक्ट हो रहा है…",
+				"saved": "सहेजा गया",
+				"open": "खुला",
+				"signal": "सिग्नल {{signal}}%",
+				"autoJoinSwitch": "{{ssid}} से ऑटो-जॉइन",
+				"autoJoinOn": "{{ssid}} के लिए ऑटो-जॉइन चालू।",
+				"autoJoinOff": "{{ssid}} के लिए ऑटो-जॉइन बंद।",
+				"join": "जुड़ें",
+				"joining": "{{ssid}} से जुड़ रहा है।",
+				"forget": "भूल जाएँ",
+				"forgotten": "{{ssid}} भुला दिया गया।"
+			},
+			"joinDialog": {
+				"title": "{{ssid}} से जुड़ें",
+				"password": "पासवर्ड"
+			},
+			"forgetDialog": {
+				"title": "नेटवर्क भूल जाएँ?",
+				"text": "डिवाइस {{ssid}} और उसका पासवर्ड भूल जाएगा।"
+			}
+		}
+	},
+	"models": {
+		"heading": "मॉडल",
+		"percent": "{{value}}%",
+		"tabs": {
+			"models": "मॉडल",
+			"store": "स्टोर"
+		},
+		"pages": {
+			"models": "डाउनलोड किए गए मॉडल को NPU मेमोरी में लोड करें, या जगह खाली करने के लिए उसे अनलोड करें।",
+			"store": "Tiiny स्टोर के मॉडल। डाउनलोड डिवाइस पर जाते हैं; उन्हें मॉडल टैब से लोड करें।",
+			"huggingFace": "Hugging Face से कस्टम मॉडल इम्पोर्ट करें। डिवाइस तय करता है कि वह क्या इम्पोर्ट कर सकता है: आमतौर पर उसके स्टोर के मॉडल के फ़ाइन-ट्यून और LoRA एडॉप्टर, कुछ केवल उस स्टोर मॉडल के डाउनलोड होने के बाद।"
+		},
+		"columns": {
+			"model": "मॉडल",
+			"type": "प्रकार",
+			"size": "आकार",
+			"npuShare": "NPU हिस्सा",
+			"status": "स्थिति",
+			"action": "कार्रवाई"
+		},
+		"table": {
+			"loading": "मॉडल लोड हो रहे हैं",
+			"title": "डाउनलोड किए गए मॉडल",
+			"npuFree": "NPU का {{percent}}% खाली है",
+			"empty": "डिवाइस पर कोई मॉडल डाउनलोड नहीं है।",
+			"status": {
+				"loaded": "लोड है",
+				"notLoaded": "लोड नहीं है",
+				"tooBig": "पर्याप्त खाली NPU नहीं",
+				"tooBigHint": "NPU का {{needed}}% चाहिए; {{free}}% खाली है। जगह बनाने के लिए कोई मॉडल अनलोड करें।"
+			},
+			"pending": {
+				"load": "शुरू हो रहा है…",
+				"unload": "अनलोड हो रहा है…",
+				"delete": "हटाया जा रहा है…"
+			},
+			"progress": {
+				"load": "लोड की प्रगति",
+				"unload": "अनलोड की प्रगति",
+				"delete": "हटाने की प्रगति"
+			},
+			"done": {
+				"load": "{{name}} लोड हो गया।",
+				"unload": "{{name}} अनलोड हो गया।",
+				"delete": "{{name}} हटा दिया गया।"
+			},
+			"failed": {
+				"load": "{{name}} लोड नहीं हो सका: {{reason}}",
+				"unload": "{{name}} अनलोड नहीं हो सका: {{reason}}",
+				"delete": "{{name}} हटाया नहीं जा सका: {{reason}}",
+				"unloadAll": "सभी मॉडल अनलोड नहीं हो सके: {{reason}}",
+				"interrupt": "{{name}} को बाधित नहीं किया जा सका: {{reason}}"
+			},
+			"allUnloaded": "सभी मॉडल अनलोड हो गए।",
+			"interrupted": "{{name}} जिस पर काम कर रहा था, उसे रोक दिया गया।",
+			"interrupt": "बाधित करें",
+			"interruptHint": "यह मॉडल जिन अनुरोधों पर काम कर रहा है उन्हें रोकें, किसी भी ऐप से",
+			"unload": "अनलोड करें",
+			"unloading": "अनलोड हो रहा है…",
+			"unloadAll": "सभी अनलोड करें",
+			"delete": "हटाएँ",
+			"load": "लोड करें",
+			"cancel": "रद्द करें",
+			"unloadAllDialog": {
+				"title": "सभी मॉडल अनलोड करें?",
+				"text": "हर लोड किया गया मॉडल NPU से हटा दिया जाएगा। इस ऐप या दूसरे क्लाइंट से चल रहे अनुरोध रुक जाएँगे।"
+			},
+			"deleteDialog": {
+				"title": "{{name}} हटाएँ?",
+				"text": "इससे मॉडल की फ़ाइलें डिवाइस से हट जाएँगी। आप इसे स्टोर से फिर से डाउनलोड कर सकते हैं।"
+			},
+			"unloadDialog": {
+				"title": "{{name}} अनलोड करें?",
+				"text": "इससे इसका NPU हिस्सा खाली हो जाएगा। इस समय मॉडल का उपयोग कर रहा कोई भी अनुरोध, इस ऐप या दूसरे क्लाइंट से, रोक दिया जाएगा।"
+			}
+		},
+		"store": {
+			"loading": "स्टोर लोड हो रहा है",
+			"search": "स्टोर में खोजें",
+			"searchPlaceholder": "मॉडल खोजें",
+			"allTypes": "सभी प्रकार",
+			"empty": "आपकी खोज से कोई स्टोर मॉडल मेल नहीं खाता।",
+			"tableLabel": "स्टोर मॉडल",
+			"trending": "ट्रेंडिंग",
+			"stage": {
+				"starting": "शुरू हो रहा है",
+				"downloading": "डाउनलोड हो रहा है",
+				"verifying": "सत्यापित हो रहा है",
+				"installing": "इंस्टॉल हो रहा है"
+			},
+			"status": {
+				"loaded": "लोड है",
+				"downloaded": "डाउनलोड हो चुका",
+				"paused": "रुका हुआ {{percent}}%",
+				"downloading": "डाउनलोड हो रहा है {{percent}}%",
+				"notDownloaded": "डाउनलोड नहीं हुआ"
+			},
+			"downloadProgress": "डाउनलोड की प्रगति",
+			"pause": "रोकें",
+			"cancel": "रद्द करें",
+			"resume": "फिर शुरू करें",
+			"download": "डाउनलोड करें",
+			"deviceReported": "डिवाइस ने {{status}} की सूचना दी",
+			"streamEnded": "मॉडल डाउनलोड होने से पहले ही डाउनलोड स्ट्रीम समाप्त हो गई",
+			"pausedDone": "{{name}} रोका गया। इसे कभी भी फिर शुरू करें।",
+			"downloaded": "{{name}} डाउनलोड हो गया। इसे मॉडल पेज से लोड करें।",
+			"cancelled": "{{name}} का डाउनलोड रद्द किया गया।",
+			"failed": {
+				"download": "{{name}} डाउनलोड नहीं हो सका: {{reason}}",
+				"pause": "{{name}} को रोका नहीं जा सका: {{reason}}",
+				"cancel": "{{name}} रद्द नहीं हो सका: {{reason}}"
+			},
+			"details": {
+				"tableLabel": "मॉडल विवरण",
+				"close": "बंद करें",
+				"modelId": "मॉडल id",
+				"type": "प्रकार",
+				"parameters": "पैरामीटर",
+				"inputOutput": "इनपुट → आउटपुट",
+				"npuShare": "NPU हिस्सा",
+				"contextWindow": "कॉन्टेक्स्ट विंडो",
+				"tokens_one": "{{tokens}} टोकन",
+				"tokens_other": "{{tokens}} टोकन",
+				"imageSize": "इमेज का आकार",
+				"defaultSteps": "डिफ़ॉल्ट चरण",
+				"guidanceScale": "गाइडेंस स्केल",
+				"reasoning": "रीज़निंग",
+				"loadTime": "लोड समय",
+				"loadSeconds": "लगभग {{seconds}} s",
+				"downloadsLikes": "डाउनलोड · लाइक",
+				"thinking": {
+					"none": "कोई नहीं",
+					"toggleable": "बंद किया जा सकता है",
+					"alwaysOn": "हमेशा चालू",
+					"levels": "स्तर {{levels}}",
+					"defaultLevel": "डिफ़ॉल्ट {{level}}"
+				}
+			}
+		},
+		"huggingFace": {
+			"verdict": {
+				"compatible": "संगत",
+				"needsBaseModel": "बेस मॉडल चाहिए",
+				"incompatible": "संगत नहीं"
+			},
+			"kind": {
+				"adapter": "LoRA एडॉप्टर",
+				"fineTune": "फ़ाइन-ट्यून"
+			},
+			"search": {
+				"title": "संगत मॉडल खोजें",
+				"subheader": "किसी स्टोर मॉडल पर बने Hugging Face के LoRA एडॉप्टर और फ़ाइन-ट्यून, डिवाइस से जाँचे गए।",
+				"baseModel": "बेस मॉडल",
+				"onDevice": "{{modelId}} (डिवाइस पर)",
+				"query": "खोज (वैकल्पिक)",
+				"submit": "Hugging Face पर खोजें",
+				"checkingBases": "डिवाइस से पूछा जा रहा है कि कौन-से स्टोर मॉडल इम्पोर्ट बेस हो सकते हैं…",
+				"autoCheck": "परिणाम अपने आप जाँचें",
+				"compatibleOnly": "केवल संगत",
+				"limit": "प्रति प्रकार परिणाम",
+				"searching": "Hugging Face पर खोजा जा रहा है",
+				"empty": "Hugging Face पर {{base}} का कोई एडॉप्टर या फ़ाइन-ट्यून नहीं मिला।",
+				"tableLabel": "Hugging Face रिपो",
+				"groups": {
+					"importable": "इम्पोर्ट योग्य बेस",
+					"checking": "डिवाइस से जाँच हो रही है…",
+					"notOnHf": "Hugging Face पर नहीं",
+					"unsupported": "इम्पोर्ट के लिए समर्थित नहीं"
+				},
+				"columns": {
+					"repo": "रिपो",
+					"kind": "प्रकार",
+					"downloads": "डाउनलोड",
+					"compatibility": "संगतता",
+					"action": "कार्रवाई"
+				},
+				"details": "विवरण",
+				"checking": "जाँच हो रही है…",
+				"notChecked": "जाँचा नहीं गया",
+				"checkFailed": "जाँच विफल",
+				"downloadBase": "पहले स्टोर से {{name}} डाउनलोड करें",
+				"summary": {
+					"checked": "{{total}} में से {{finished}} जाँचे गए · {{compatible}} संगत",
+					"needBase_one": "{{count}} को बेस मॉडल चाहिए",
+					"needBase_other": "{{count}} को बेस मॉडल चाहिए",
+					"hidden_one": "{{count}} असंगत छिपाया गया",
+					"hidden_other": "{{count}} असंगत छिपाए गए"
+				},
+				"checkingCompatibility": "संगतता जाँची जा रही है"
+			},
+			"check": {
+				"title": "रिपो जाँचें",
+				"subheader": "डिवाइस तय करता है कि वह कोई रिपो इम्पोर्ट कर सकता है या नहीं।",
+				"repo": "Hugging Face रिपो",
+				"placeholder": "org/name या https://huggingface.co/org/name",
+				"checking": "जाँच हो रही है…",
+				"check": "जाँचें",
+				"checkingRepo": "रिपो जाँची जा रही है",
+				"store": "स्टोर",
+				"needsBase": "स्टोर से {{name}} ({{modelId}}) डिवाइस पर डाउनलोड होने के बाद इम्पोर्ट किया जा सकता है।",
+				"cannotImport": "डिवाइस यह रिपो इम्पोर्ट नहीं कर सकता।",
+				"size": "आकार {{size}}",
+				"baseModel": "बेस मॉडल {{modelId}}",
+				"disk": "{{required}} डिस्क चाहिए, {{available}} खाली",
+				"toolkit": "इम्पोर्ट करने से पहले डिवाइस पर {{toolkit}} टूलकिट डाउनलोड होगा ({{size}})।",
+				"noDisk": "डिवाइस पर पर्याप्त खाली डिस्क स्पेस नहीं है।",
+				"bytes": "{{total}} में से {{downloaded}}",
+				"importProgress": "इम्पोर्ट की प्रगति",
+				"continues": "इम्पोर्ट डिवाइस पर चलता है और यह पेज छोड़ने पर भी जारी रहता है।",
+				"cancelImport": "इम्पोर्ट रद्द करें",
+				"import": "डिवाइस पर इम्पोर्ट करें",
+				"starting": "शुरू हो रहा है",
+				"importing": "इम्पोर्ट हो रहा है",
+				"importFailed": "इम्पोर्ट विफल",
+				"cancelled": "इम्पोर्ट रद्द किया गया।",
+				"imported": "{{repo}} इम्पोर्ट हो गया। इसे मॉडल पेज से लोड करें।",
+				"streamStopped": "प्रगति अपडेट रुक गए। हो सकता है इम्पोर्ट अभी भी डिवाइस पर चल रहा हो।"
+			}
+		}
+	},
+	"vault": {
+		"layout": {
+			"title": "वॉल्ट",
+			"description": "डिवाइस का नॉलेज बेस: आपकी फ़ाइलें और पिछली चैट के सारांश, डिवाइस पर इंडेक्स किए गए ताकि मॉडल उन्हें खोज सकें।",
+			"tabs": {
+				"files": "फ़ाइलें",
+				"chatHistory": "चैट इतिहास"
+			}
+		},
+		"files": {
+			"title": "फ़ाइलें",
+			"subheader": "PDF, Word, Excel, CSV, टेक्स्ट, Markdown या HTML, हर एक 200 MB तक। मॉडल इनका उपयोग टास्क मोड में करते हैं।",
+			"upload": "फ़ाइलें अपलोड करें",
+			"uploadInput": "अपलोड करने के लिए फ़ाइलें",
+			"loading": "वॉल्ट फ़ाइलें लोड हो रही हैं",
+			"empty": "अभी तक कोई फ़ाइल नहीं। मॉडल के उपयोग के लिए दस्तावेज़ अपलोड करें।",
+			"fileCount_one": "{{count}} फ़ाइल",
+			"fileCount_other": "{{count}} फ़ाइलें",
+			"columns": {
+				"file": "फ़ाइल",
+				"size": "आकार",
+				"added": "जोड़ी गई",
+				"status": "स्थिति"
+			},
+			"status": {
+				"indexed": "इंडेक्स हो गई",
+				"indexFailed": "इंडेक्सिंग विफल",
+				"notIndexed": "इंडेक्स नहीं हुई"
+			},
+			"actions": {
+				"index": "इंडेक्स करें",
+				"download": "डाउनलोड करें",
+				"rename": "नाम बदलें",
+				"delete": "हटाएँ"
+			},
+			"progress": {
+				"label": "वॉल्ट की प्रगति",
+				"line": "{{label}}: {{message}}",
+				"uploading": "अपलोड हो रहा है…",
+				"indexing": "इंडेक्स हो रहा है…",
+				"loadingModel": "एम्बेडिंग मॉडल लोड हो रहा है",
+				"stage": "इंडेक्सिंग: {{stage}}",
+				"withChunks": "{{stage}} ({{processed}}/{{total}} चंक)",
+				"retrying": "डिवाइस पर इंडेक्सिंग विफल हुई, फिर से कोशिश हो रही है…"
+			},
+			"outcome": {
+				"added": "{{label}} वॉल्ट में जोड़ा गया।",
+				"indexed": "{{name}} इंडेक्स हो गई।",
+				"renamed": "नाम बदलकर {{name}} किया गया।",
+				"deleted": "{{name}} हटा दी गई।"
+			},
+			"errors": {
+				"device": "डिवाइस ने त्रुटि की सूचना दी",
+				"uploadUnconfirmed": "डिवाइस ने अपलोड की पुष्टि नहीं की"
+			},
+			"renameDialog": {
+				"title": "फ़ाइल का नाम बदलें",
+				"name": "फ़ाइल का नाम",
+				"cancel": "रद्द करें",
+				"confirm": "नाम बदलें"
+			},
+			"deleteDialog": {
+				"title": "फ़ाइल हटाएँ?",
+				"text": "डिवाइस से {{name}} और उसका इंडेक्स हटाएँ? मॉडल इसे अब नहीं ढूँढ पाएँगे।",
+				"confirm": "हटाएँ"
+			}
+		},
+		"search": {
+			"title": "वॉल्ट में खोजें",
+			"subheader": "वॉल्ट में खोजने पर मॉडल को क्या मिलता है",
+			"label": "खोजें",
+			"submit": "खोजें",
+			"searching": "खोजा जा रहा है…",
+			"empty": "कुछ भी प्रासंगिक नहीं मिला।"
+		},
+		"chatHistory": {
+			"title": "चैट इतिहास",
+			"subheader": "पिछली बातचीत के दैनिक सारांश, वॉल्ट में रखे गए।",
+			"loading": "चैट इतिहास लोड हो रहा है",
+			"empty": "अभी तक कोई सारांश नहीं।",
+			"read": "पढ़ें",
+			"hide": "छिपाएँ",
+			"delete": "हटाएँ",
+			"loadingSummary": "सारांश लोड हो रहा है",
+			"deleted": "{{day}} का सारांश हटा दिया गया।",
+			"deleteDialog": {
+				"title": "सारांश हटाएँ?",
+				"text": "{{day}} का सारांश हटाएँ? मॉडल उस दिन की बातचीत अब याद नहीं कर पाएँगे।",
+				"confirm": "हटाएँ"
+			}
+		},
+		"summarySettings": {
+			"loading": "दैनिक सारांश लोड हो रहे हैं",
+			"enabled": "दैनिक सारांश",
+			"time": "समय",
+			"deviceTime": "डिवाइस पर {{time}} ({{zone}})",
+			"model": "मॉडल",
+			"save": "सहेजें",
+			"saving": "सहेजा जा रहा है…",
+			"savedOn": "दैनिक सारांश चालू, {{time}} पर।",
+			"savedOff": "दैनिक सारांश बंद।",
+			"description": "हर दिन डिवाइस उस दिन की बातचीत का सारांश वॉल्ट में बनाता है, ताकि मॉडल टास्क मोड में उन्हें याद कर सकें। काम के दौरान यह मॉडल को लोड करता है, जिससे वह मॉडल कुछ समय के लिए व्यस्त रह सकता है।"
+		}
+	},
+	"playground": {
+		"layout": {
+			"title": "प्लेग्राउंड",
+			"description": "डिवाइस के स्पीच, विज़न, एम्बेडिंग और रीरैंक मॉडल आज़माएँ, और टेक्स्ट मॉडल को बेंचमार्क करें (जैसा tiiny CLI करता है)। मॉडल पहली बार चलाने पर लोड होता है।"
+		},
+		"tabs": {
+			"asr": {
+				"label": "स्पीच से टेक्स्ट",
+				"intro": "स्पीच रिकग्निशन मॉडल से WAV रिकॉर्डिंग ट्रांसक्राइब करें।"
+			},
+			"tts": {
+				"label": "टेक्स्ट से स्पीच",
+				"intro": "वॉइस मॉडल से टेक्स्ट को स्पीच में बदलें।"
+			},
+			"ocr": {
+				"label": "OCR",
+				"intro": "इमेज में मौजूद टेक्स्ट पढ़ें।"
+			},
+			"embed": {
+				"label": "एम्बेडिंग",
+				"intro": "टेक्स्ट को वेक्टर में बदलें और देखें कि वे कितने मिलते-जुलते हैं।"
+			},
+			"rerank": {
+				"label": "रीरैंक",
+				"intro": "दस्तावेज़ों को इस क्रम में रखें कि वे क्वेरी का कितना अच्छा जवाब देते हैं।"
+			},
+			"text": {
+				"label": "बेंचमार्क",
+				"intro": "मापें कि टेक्स्ट मॉडल कितनी तेज़ी से जनरेट करता है, tiiny bench की तरह।"
+			}
+		},
+		"model": {
+			"label": "मॉडल",
+			"loadsWhenRun": "{{name}} (चलाने पर लोड होगा)"
+		},
+		"loading": "मॉडल लोड हो रहे हैं",
+		"noModel": "इसके लिए कोई मॉडल डाउनलोड नहीं है। स्टोर से एक लें।",
+		"run": "चलाएँ",
+		"running": "चल रहा है…",
+		"asr": {
+			"chooseFile": "WAV फ़ाइल चुनें",
+			"fileInput": "ऑडियो फ़ाइल"
+		},
+		"tts": {
+			"text": "टेक्स्ट",
+			"voice": "आवाज़ (वैकल्पिक)",
+			"voiceHelp": "केवल कुछ वॉइस मॉडल को इसकी ज़रूरत होती है, जैसे Supertonic।",
+			"download": "डाउनलोड करें"
+		},
+		"ocr": {
+			"chooseImage": "इमेज चुनें",
+			"imageInput": "इमेज फ़ाइल",
+			"noText": "कोई टेक्स्ट नहीं मिला।",
+			"lines": "पहचानी गई पंक्तियाँ",
+			"score": "{{value}}%"
+		},
+		"embed": {
+			"texts": "टेक्स्ट",
+			"textsHelp": "हर पंक्ति में एक टेक्स्ट",
+			"summary_one": "{{count}} डाइमेंशन। कोसाइन समानता:",
+			"summary_other": "{{count}} डाइमेंशन। कोसाइन समानता:"
+		},
+		"rerank": {
+			"query": "क्वेरी",
+			"documents": "दस्तावेज़",
+			"documentsHelp": "हर पंक्ति में एक दस्तावेज़",
+			"results": "रैंक किए गए दस्तावेज़"
+		},
+		"bench": {
+			"tokensInput": "जनरेट करने के लिए टोकन",
+			"results": "बेंचमार्क",
+			"speed": "जनरेशन स्पीड",
+			"speedValue": "{{value}} टोकन/s",
+			"firstToken": "पहले टोकन तक का समय",
+			"seconds": "{{value}} s",
+			"tokens": "टोकन",
+			"tokensValue": "{{prompt}} इनपुट · {{completion}} आउटपुट · कुल {{total}} s"
+		}
+	},
+	"overview": {
+		"title": "अवलोकन",
+		"npuReady": "NPU तैयार है।",
+		"loading": "डिवाइस की स्थिति लोड हो रही है",
+		"retry": "फिर से कोशिश करें",
+		"staleValues": "अंतिम ज्ञात मान दिखाए जा रहे हैं। {{error}}",
+		"percent": "{{value}}%",
+		"usedOfTotal": "{{total}} में से {{used}}",
+		"stats": {
+			"npuUtilization": "NPU उपयोग",
+			"npuReserved": "{{percent}} लोड किए गए मॉडल द्वारा आरक्षित",
+			"npuMemory": "NPU मेमोरी",
+			"systemMemory": "सिस्टम मेमोरी",
+			"systemMemoryCaption": "CPU {{cpu}} · {{total}} RAM में से {{used}}",
+			"storage": "स्टोरेज",
+			"progress": "{{title}} {{percent}}"
+		},
+		"running": {
+			"title": "लोड किए गए मॉडल",
+			"empty": "कोई मॉडल लोड नहीं है। मॉडल पेज से एक लोड करें।",
+			"columns": {
+				"model": "मॉडल",
+				"type": "प्रकार",
+				"status": "स्थिति",
+				"npuShare": "NPU हिस्सा",
+				"activeRequests": "सक्रिय अनुरोध"
+			}
+		},
+		"usage": {
+			"title": "टोकन उपयोग",
+			"subheader": "{{requests}} में {{tokens}} (टेक्स्ट मॉडल)",
+			"subheaderLoading": "टेक्स्ट मॉडल",
+			"tokens_one": "{{value}} टोकन",
+			"tokens_other": "{{value}} टोकन",
+			"requests_one": "{{value}} अनुरोध",
+			"requests_other": "{{value}} अनुरोध",
+			"previousWeek": "पिछला सप्ताह",
+			"nextWeek": "अगला सप्ताह",
+			"weekRange": "{{start}} – {{end}}",
+			"dayBar": "{{day}}: {{tokens}}",
+			"segment": "{{day}} · {{model}}: {{tokens}}",
+			"other": "अन्य",
+			"showTable": "तालिका के रूप में दिखाएँ",
+			"showChart": "चार्ट दिखाएँ",
+			"loading": "टोकन उपयोग लोड हो रहा है",
+			"empty": "इस सप्ताह कोई टोकन नहीं।",
+			"table": {
+				"label": "दिन के अनुसार टोकन उपयोग",
+				"day": "दिन",
+				"model": "मॉडल",
+				"requests": "अनुरोध",
+				"prompt": "प्रॉम्प्ट",
+				"completion": "कम्प्लीशन",
+				"total": "कुल"
+			}
+		},
+		"apps": {
+			"title": "ऐप के अनुसार उपयोग",
+			"subheader": "इस सप्ताह के टोकन, ऐप के अनुसार",
+			"label": "ऐप के अनुसार उपयोग",
+			"loading": "ऐप उपयोग लोड हो रहा है",
+			"empty": "इस सप्ताह कोई टोकन नहीं।"
+		}
+	},
+	"server": {
+		"done": "पूरा हुआ",
+		"models": {
+			"allUnloaded": "सभी मॉडल अनलोड हो गए"
+		},
+		"settings": {
+			"shuttingDown": "शट डाउन हो रहा है",
+			"restarting": "रीस्टार्ट हो रहा है",
+			"enabled": "सक्षम",
+			"disabled": "अक्षम",
+			"specs": {
+				"peakInt8": "पीक INT8",
+				"storage": "स्टोरेज",
+				"network": "नेटवर्क"
+			}
+		},
+		"connectors": {
+			"connected": "कनेक्टेड",
+			"notConnected": "कनेक्ट नहीं है",
+			"unavailable": "उपलब्ध नहीं",
+			"waitingForQr": "QR स्कैन का इंतज़ार",
+			"scanQr": "WhatsApp से QR कोड स्कैन करें",
+			"signIn": "अपने {{provider}} अकाउंट से साइन इन करें",
+			"names": {
+				"email": "ईमेल (IMAP/SMTP)",
+				"telegram": "Telegram बॉट",
+				"discord": "Discord बॉट"
+			}
+		},
+		"backup": {
+			"categories": {
+				"conversationService": "चैट इतिहास",
+				"knowledgeBase": "वॉल्ट और वैयक्तिकरण",
+				"agentUsage": "एजेंट उपयोग",
+				"connectorService": "कनेक्टर",
+				"scheduled": "शेड्यूल किए गए टास्क",
+				"skills": "स्किल"
+			}
+		},
+		"usage": {
+			"otherApps": "API और अन्य ऐप"
+		},
+		"task": {
+			"searchedVault": "वॉल्ट में खोजा: {{query}}",
+			"readHost": "{{host}} पढ़ा",
+			"readWebPage": "एक वेब पेज पढ़ा",
+			"updatedOccupation": "आपका पेशा अपडेट किया",
+			"updatedPreferences": "आपकी पसंद अपडेट की",
+			"updatedRecentFocus": "आपका हाल का फ़ोकस अपडेट किया",
+			"updatedProfile": "आपकी प्रोफ़ाइल अपडेट की",
+			"updatedField": "आपका {{field}} अपडेट किया"
+		}
+	}
+}

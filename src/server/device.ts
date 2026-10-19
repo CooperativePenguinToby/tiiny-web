@@ -1,29 +1,33 @@
 import { lookup } from "node:dns";
 import type { LookupFunction } from "node:net";
 
+import type { ParseKeys } from "i18next";
 import { Agent, fetch as undiciFetch, type FormData } from "undici";
+
+import { DEFAULT_LANGUAGE } from "@/i18n/languages";
+import { fixedT } from "@/i18n/translate";
 
 import { resolveDeviceTarget } from "./shared/device-target.mjs";
 
 // The one client for the Tiiny device HTTP API. Everything the web UI shows or does goes
 // through here; the device auth key never leaves the server.
 
+// `key` names the message in src/locales; `message` is its English text, for logs and matching.
+// API routes reply with it translated into the request's language.
 export class DeviceError extends Error {
 	constructor(
-		message: string,
-		readonly status: number
+		readonly key: ParseKeys,
+		readonly status: number,
+		readonly values: Record<string, unknown> = {}
 	) {
-		super(message);
+		super(fixedT(DEFAULT_LANGUAGE)(key, values));
 	}
 }
 
 function resolveTarget(): { baseUrl: string; authKey: string } {
 	const target = resolveDeviceTarget();
 	if (!target) {
-		throw new DeviceError(
-			"Device not configured: set TIINY_DEVICE_URL and TIINY_AUTH_KEY, or sign in with the tiiny CLI first",
-			503
-		);
+		throw new DeviceError("errors.device.notConfigured", 503);
 	}
 	return target;
 }
@@ -61,9 +65,16 @@ async function deviceErrorFrom(response: Response): Promise<DeviceError> {
 			text;
 	} catch {
 		// Not JSON. The gateway answers with an HTML page while a service is down (e.g. during a restart).
-		if (/^\s*</.test(text)) message = response.statusText || "the service is unavailable";
+		if (/^\s*</.test(text)) {
+			if (!response.statusText)
+				return new DeviceError("errors.device.respondedUnavailable", response.status, { status: response.status });
+			message = response.statusText;
+		}
 	}
-	return new DeviceError(`Device responded ${response.status}: ${message || response.statusText}`, response.status);
+	return new DeviceError("errors.device.responded", response.status, {
+		status: response.status,
+		message: message || response.statusText,
+	});
 }
 
 // Host names of the device's services; the main API is served on the device's own address.
@@ -124,7 +135,10 @@ async function request(pathname: string, init: DeviceRequest = {}): Promise<Resp
 	} catch (error) {
 		if (init.signal?.aborted) throw error;
 		const cause = (error as { cause?: { code?: string; message?: string } }).cause;
-		throw new DeviceError(`Device unreachable at ${baseUrl}: ${cause?.code ?? cause?.message ?? String(error)}`, 502);
+		throw new DeviceError("errors.device.unreachable", 502, {
+			url: baseUrl,
+			reason: cause?.code ?? cause?.message ?? String(error),
+		});
 	}
 	if (!response.ok) throw await deviceErrorFrom(response);
 	return response;
@@ -140,7 +154,7 @@ export async function deviceStream(
 	init: Omit<DeviceRequest, "stream" | "slow">
 ): Promise<ReadableStream<Uint8Array>> {
 	const response = await request(pathname, { ...init, stream: true });
-	if (!response.body) throw new DeviceError("Device returned an empty stream", 502);
+	if (!response.body) throw new DeviceError("errors.device.emptyStream", 502);
 	return response.body;
 }
 

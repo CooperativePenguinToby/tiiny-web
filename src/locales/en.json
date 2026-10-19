@@ -1,0 +1,1207 @@
+{
+	"nav": {
+		"overview": "Overview",
+		"models": "Models",
+		"agents": "Agents",
+		"chat": "Chat",
+		"playground": "Playground",
+		"vault": "Vault",
+		"connectors": "Connectors",
+		"settings": "Settings",
+		"openNavigation": "Open navigation",
+		"signOut": "Sign out",
+		"language": "Language",
+		"languageCurrent": "Language: {{language}}"
+	},
+	"titles": {
+		"page": "{{page}} | {{site}}",
+		"notFound": "Not found",
+		"settings": "Settings",
+		"overview": "Overview",
+		"agents": "Agents",
+		"history": "History",
+		"signIn": "Sign in",
+		"playground": "Playground",
+		"connectors": "Connectors",
+		"models": "Models",
+		"store": "Store",
+		"chat": "Chat",
+		"vault": "Vault",
+		"huggingFace": "Hugging Face"
+	},
+	"errors": {
+		"notSignedIn": "Not signed in",
+		"internal": "Internal error",
+		"unknownLanguage": "Unknown language",
+		"incorrectPassword": "Incorrect password",
+		"passthrough": "{{message}}",
+		"request": {
+			"expected": "Expected {{shape}}",
+			"required": "{{field}} is required",
+			"mustBeText": "{{field}} must be text",
+			"tooLong_one": "{{field}} is longer than {{count}} character",
+			"tooLong_other": "{{field}} is longer than {{count}} characters",
+			"modelIdFormat": "{{field}} must look like Org/Name",
+			"modelIdLike": "{{field}} must be a model id like Org/Name",
+			"range": "{{field}} must be {{min}}-{{max}}",
+			"oneOf": "{{field}} must be one of {{options}}",
+			"dateFormat": "{{field}} must be a date like {{example}}",
+			"jsonList": "{{field}} must be a JSON list",
+			"emptySearch": "Enter something to search for"
+		},
+		"device": {
+			"notConfigured": "Device not configured: set TIINY_DEVICE_URL and TIINY_AUTH_KEY, or sign in with the tiiny CLI first",
+			"notConfiguredShort": "Device not configured",
+			"responded": "Device responded {{status}}: {{message}}",
+			"respondedUnavailable": "Device responded {{status}}: the service is unavailable",
+			"unreachable": "Device unreachable at {{url}}: {{reason}}",
+			"emptyStream": "Device returned an empty stream",
+			"refusedChange": "The device refused the change",
+			"reportedError": "The device reported an error"
+		},
+		"file": {
+			"tooLarge": "{{name}} is larger than {{megabytes}} MB"
+		},
+		"hf": {
+			"invalidRepo": "Enter a Hugging Face repo as org/name or its huggingface.co URL",
+			"unreachable": "Hugging Face is unreachable: {{reason}}",
+			"responded": "Hugging Face responded {{status}}"
+		},
+		"models": {
+			"didNotLoad": "The model did not load",
+			"didNotLoadStatus": "The model did not load ({{status}})",
+			"didNotLoadNoStatus": "The model did not load (no status)"
+		},
+		"connectors": {
+			"unknown": "Unknown connector",
+			"noAccountSignIn": "This connector does not sign in with an account",
+			"accountSignIn": "This connector signs in with an account",
+			"tokenRejected": "The device rejected the token",
+			"xLoginRejected": "X rejected the login",
+			"mailLoginRefused": "The mail server refused the login",
+			"whatsappFailed": "The device could not start WhatsApp",
+			"invalidMcpId": "Invalid MCP server id",
+			"mcpConfig": "Expected a JSON object like {{example}}"
+		},
+		"chat": {
+			"invalidAttachment": "Invalid attachment",
+			"tooManyAttachments_one": "At most {{count}} attachment",
+			"tooManyAttachments_other": "At most {{count}} attachments",
+			"chooseFile": "Choose a file",
+			"unsupportedFile": "{{name}}: attach images or {{extensions}} files",
+			"noText": "The device found no text in {{name}}",
+			"invalidMediaId": "Invalid media id"
+		},
+		"task": {
+			"interrupted": "Interrupted.",
+			"tooManySteps_one": "Stopped after {{count}} step without a final answer.",
+			"tooManySteps_other": "Stopped after {{count}} steps without a final answer."
+		},
+		"history": {
+			"invalidConversationId": "Invalid conversation id"
+		},
+		"vault": {
+			"invalidSourceId": "Invalid source id",
+			"chooseFiles": "Choose at least one file",
+			"tooManyFiles_one": "Upload at most {{count}} file at a time",
+			"tooManyFiles_other": "Upload at most {{count}} files at a time",
+			"unsupportedFile": "{{name}}: Vault accepts {{extensions}} files",
+			"invalidName": "Enter a file name without slashes"
+		},
+		"memory": {
+			"chooseTextModel": "Choose a downloaded text model"
+		},
+		"settings": {
+			"deviceNameLength_one": "Device name must be 1-{{count}} character",
+			"deviceNameLength_other": "Device name must be 1-{{count}} characters"
+		},
+		"agents": {
+			"noDomain": "Agent subdomains are not configured (AGENT_DOMAIN)"
+		},
+		"playground": {
+			"textRequired": "Text is required",
+			"textTooLong_one": "Text is longer than {{count}} character",
+			"textTooLong_other": "Text is longer than {{count}} characters",
+			"queryRequired": "Query is required",
+			"queryTooLong_one": "Query is longer than {{count}} character",
+			"queryTooLong_other": "Query is longer than {{count}} characters",
+			"numberedTextRequired": "Text {{number}} is required",
+			"numberedTextTooLong_one": "Text {{number}} is longer than {{count}} character",
+			"numberedTextTooLong_other": "Text {{number}} is longer than {{count}} characters",
+			"documentRequired": "Document {{number}} is required",
+			"documentTooLong_one": "Document {{number}} is longer than {{count}} character",
+			"documentTooLong_other": "Document {{number}} is longer than {{count}} characters",
+			"textCount": "Give {{min}} to {{max}} texts",
+			"documentCount": "Give {{min}} to {{max}} documents",
+			"chooseAudio": "Choose or record some audio",
+			"audioTooLarge": "Audio is larger than {{megabytes}} MB",
+			"wavOnly": "The device can only transcribe WAV audio. Convert the file to WAV first.",
+			"chooseImage": "Choose an image",
+			"imageTooLarge": "Image is larger than {{megabytes}} MB"
+		},
+		"backup": {
+			"chooseFile": "Choose a backup file",
+			"chooseCategory": "Choose at least one category the device offers",
+			"unexpectedReply": "Unexpected backup reply ({{type}})",
+			"unexpectedReplyNoType": "Unexpected backup reply (no type)",
+			"noArchive": "The device's backup had no archive in it",
+			"notBackup": "That file is not a Tiiny backup",
+			"otherDevice": "This backup was made on another device; it can only be restored there",
+			"missing": "The backup does not contain {{services}}"
+		},
+		"wifi": {
+			"unknownAction": "Unknown Wi-Fi action",
+			"wouldDropLink": "This app reaches the device over Wi-Fi, so this change would cut it off. Make it from TiinyOS or with the device on a cable."
+		},
+		"update": {
+			"upToDate": "TiinyOS is up to date",
+			"notReady": "No downloaded update is ready to install",
+			"unknownAction": "Unknown update action"
+		},
+		"agentProxy": {
+			"noAnswer": "The agent did not answer ({{reason}}). It may be stopped.",
+			"linkExpired": "This link has expired. Open the agent again from tiiny-web's Agents page.",
+			"signIn": "Sign in to tiiny-web and open this agent from its Agents page."
+		}
+	},
+	"chat": {
+		"title": "Chat",
+		"tabs": {
+			"chat": "Chat",
+			"history": "History"
+		},
+		"intro": "Talk to a loaded model. Chats are kept in the device's chat history, shared with TiinyOS. The device answers one request per model at a time, so replies may queue.",
+		"message": {
+			"you": "You",
+			"assistant": "Assistant",
+			"thinking": "Thinking"
+		},
+		"notes": {
+			"stopped": "Stopped.",
+			"noReply": "No complete reply.",
+			"interrupted": "Interrupted.",
+			"drawing": "Drawing… step {{step}} of {{total}}",
+			"picture_one": "{{size}}, {{count}} step",
+			"picture_other": "{{size}}, {{count}} steps"
+		},
+		"errors": {
+			"openConversation": "Could not open the conversation: {{message}}",
+			"load": "Could not load {{name}}: {{message}}",
+			"device": "The device reported an error",
+			"gaveUp": "The device gave up waiting: the model was busy with other requests. Try again. ({{message}})",
+			"drawFailed": "The device could not draw the picture",
+			"noPicture": "The device finished without a picture",
+			"notSaved": "Not saved to history: {{message}}"
+		},
+		"models": {
+			"loading": "Loading chat models",
+			"none": "No chat or image model is downloaded. Get one from the Store, then load it.",
+			"modelsButton": "Models",
+			"label": "Model",
+			"choose": "Choose a model",
+			"notLoadedOption": "{{name}} (not loaded)"
+		},
+		"loading": {
+			"starting": "Starting",
+			"unloading": "Unloading {{name}}",
+			"status": "Loading {{name}}: {{message}}",
+			"statusProgress": "Loading {{name}}: {{message}} {{progress}}%",
+			"progressLabel": "Model loading",
+			"notLoaded": "{{name}} is not loaded.",
+			"load": "Load"
+		},
+		"makeRoom": {
+			"title": "Make room for {{name}}?",
+			"text": "The device does not have enough free NPU memory. Unload {{models}} first? Apps using them stop.",
+			"otherModels": "other models",
+			"cancel": "Cancel",
+			"confirm": "Unload and load"
+		},
+		"mode": {
+			"label": "Mode",
+			"chat": "Chat",
+			"chatTitle": "The model answers directly",
+			"task": "Task",
+			"taskTitle": "The model works in steps with Vault, web pages and MCP tools"
+		},
+		"tools": {
+			"vault": "Vault",
+			"vaultTitle": "Let the model search your Vault files and chat summaries",
+			"web": "Web",
+			"webTitle": "Let the model read web pages"
+		},
+		"image": {
+			"size": "Size",
+			"steps": "Steps"
+		},
+		"thinking": {
+			"label": "Thinking",
+			"off": "Off"
+		},
+		"newChat": "New chat",
+		"conversation": {
+			"opening": "Opening the conversation",
+			"empty": "Send a message to start chatting with {{name}}.",
+			"theModel": "the model",
+			"waiting": "Waiting for the device · {{seconds}}s",
+			"waitingQueued_one": "Waiting for the device · {{seconds}}s · the model is busy with {{count}} other request, yours is queued",
+			"waitingQueued_other": "Waiting for the device · {{seconds}}s · the model is busy with {{count}} other requests, yours is queued"
+		},
+		"composer": {
+			"files": "Files to attach",
+			"attachImagesOrDocuments": "Attach images or documents",
+			"attachDocuments": "Attach documents",
+			"message": "Message",
+			"placeholder": "Enter to send, Shift+Enter for a new line",
+			"stop": "Stop",
+			"send": "Send"
+		},
+		"attachments": {
+			"charactersRead_one": "{{characters}} character read by the device",
+			"charactersRead_other": "{{characters}} characters read by the device",
+			"uploading": "{{name}}…",
+			"missing": "{{name}} (no longer on the device)",
+			"download": "Download"
+		},
+		"task": {
+			"running": "{{label}} running",
+			"showResult": "Show result",
+			"hideResult": "Hide result"
+		},
+		"history": {
+			"intro": "Conversations kept on the device, from this app and from TiinyOS.",
+			"search": "Search conversations",
+			"searchButton": "Search",
+			"searching": "Searching…",
+			"loading": "Loading conversations",
+			"noMatches": "No conversations mention “{{query}}”.",
+			"empty": "No conversations yet. Chats you have are kept here.",
+			"untitled": "Untitled",
+			"delete": "Delete",
+			"confirmTitle": "Delete conversation?",
+			"confirmText": "Delete “{{title}}” from the device? It is removed from TiinyOS too."
+		}
+	},
+	"auth": {
+		"layout": {
+			"welcome": "Welcome to <brand>Tiiny</brand>",
+			"tagline": "Monitor the device, manage loaded models and chat from any browser on your network."
+		},
+		"signIn": {
+			"title": "Sign in",
+			"description": "Enter the admin password configured for this server.",
+			"password": "Password",
+			"passwordRequired": "Password is required",
+			"showPassword": "Show password",
+			"hidePassword": "Hide password",
+			"submit": "Sign in",
+			"submitting": "Signing in…",
+			"failed": "Sign in failed ({{status}})",
+			"unreachable": "Could not reach the server"
+		}
+	},
+	"core": {
+		"backHome": "Go back to home",
+		"notFound": {
+			"heading": "404: The page you are looking for isn't here",
+			"hint": "Use the navigation to get back to the dashboard."
+		},
+		"errors": {
+			"requestFailed": "Request failed ({{status}})",
+			"deviceReported": "Device reported {{status}}"
+		}
+	},
+	"agents": {
+		"page": {
+			"title": "Agents",
+			"description": "Agents installed on the device open here over HTTPS, behind this app's sign-in."
+		},
+		"loading": "Loading agents",
+		"recommendedModels_one": "Recommended model: {{models}}",
+		"recommendedModels_other": "Recommended models: {{models}}",
+		"stream": {
+			"failed": "Failed",
+			"working": "Working"
+		},
+		"progress": {
+			"percent": "{{message}} {{percent}}%",
+			"ariaLabel": "{{name}} progress",
+			"startingInstall": "Starting install…",
+			"resumingInstall": "Resuming install…",
+			"updating": "Updating…",
+			"stopping": "Stopping…",
+			"starting": "Starting…",
+			"deleting": "Deleting…"
+		},
+		"install": {
+			"paused": "Install paused at {{percent}}%",
+			"running": "Installing {{percent}}%",
+			"ariaLabel": "{{name}} install"
+		},
+		"outcome": {
+			"installed": "{{name}} installed.",
+			"installPaused": "{{name}} install paused.",
+			"updated": "{{name}} updated to {{version}}.",
+			"stopped": "{{name}} stopped.",
+			"started": "{{name}} started.",
+			"deleted": "{{name}} deleted.",
+			"error": "{{name}}: {{message}}"
+		},
+		"actions": {
+			"resume": "Resume",
+			"pause": "Pause",
+			"cancelInstall": "Cancel install",
+			"update": "Update",
+			"open": "Open",
+			"stop": "Stop",
+			"start": "Start",
+			"delete": "Delete",
+			"installOnDevice": "Install on device",
+			"cancel": "Cancel"
+		},
+		"installed": {
+			"heading": "On this device",
+			"empty": "No agents are installed on the device. Install one from the store below.",
+			"version": "Version {{version}}",
+			"versionWithUpdate": "Version {{version}} · {{latest}} available",
+			"unknownVersion": "unknown",
+			"usage": "CPU {{cpu}}% · memory {{memory}}",
+			"containersStopped": "The device reports this agent's containers have stopped unexpectedly. Start it again, or Stop to reset it.",
+			"proxyError": "Proxy on port {{port}}: {{error}}"
+		},
+		"store": {
+			"heading": "Agent store: run on the device",
+			"allInstalled": "Every web agent from the store is already installed.",
+			"version": "Version {{version}}"
+		},
+		"desktop": {
+			"heading": "Agent store: run on your computer",
+			"description": "These agents run on a computer and use the device's OpenAI-compatible API. Point them at the device (for example <code>http://&lt;device address&gt;/v1</code>) with the key from <code>tiiny auth key</code>.",
+			"noDownloads": "No downloads published."
+		},
+		"deleteDialog": {
+			"title": "Delete {{name}}?",
+			"text": "This removes the agent from the device. You can install it again from the agent store."
+		},
+		"status": {
+			"created": "created",
+			"running": "running",
+			"starting": "starting",
+			"stopped": "stopped",
+			"exited": "exited",
+			"paused": "paused",
+			"error": "error"
+		}
+	},
+	"connectors": {
+		"page": {
+			"title": "Connectors",
+			"description": "Email, calendars, messaging and MCP tools that models can use in Task mode."
+		},
+		"category": {
+			"email": "Email",
+			"calendar": "Calendar",
+			"messaging": "Messaging"
+		},
+		"state": {
+			"connected": "Connected",
+			"notConnected": "Not connected",
+			"notReachable": "Not reachable"
+		},
+		"actions": {
+			"connect": "Connect",
+			"disconnect": "Disconnect",
+			"cancel": "Cancel",
+			"close": "Close",
+			"remove": "Remove"
+		},
+		"services": {
+			"heading": "Services",
+			"description": "Models use connected services in Task mode, within what you authorize. Connections live on the device and are shared with TiinyOS.",
+			"loading": "Loading connectors",
+			"waitingForSignIn": "Waiting for you to finish signing in… <link>Open the sign-in page</link>"
+		},
+		"outcome": {
+			"connected": "{{name}} connected: {{detail}}.",
+			"whatsappConnected": "WhatsApp connected.",
+			"disconnected": "{{name}} disconnected.",
+			"error": "{{name}}: {{message}}"
+		},
+		"disconnectDialog": {
+			"title": "Disconnect?",
+			"text": "Disconnect {{name}}? The device forgets the stored sign-in, and models can no longer use it."
+		},
+		"connect": {
+			"title": "Connect {{name}}",
+			"telegramIntro": "Create a bot with @BotFather in Telegram (/newbot) and paste the token it gives you.",
+			"discordIntro": "Create a bot in the Discord Developer Portal, turn on Message Content Intent, invite it to your server and paste its token.",
+			"xIntro": "Sign in to x.com in a browser and copy the auth_token and ct0 cookies.",
+			"botToken": "Bot token",
+			"channelId": "Channel ID",
+			"channelIdHelp": "The channel the bot may read and post in.",
+			"whatsappQrAlt": "WhatsApp pairing QR code",
+			"whatsappIntro": "In WhatsApp on your phone open Settings → Linked devices → Link a device, and scan this code.",
+			"newCode": "New code",
+			"emailIntro": "Use an app password (Gmail, Outlook and iCloud require one when two-step sign-in is on).",
+			"provider": "Provider",
+			"otherProvider": "Other",
+			"emailAddress": "Email address",
+			"appPassword": "App password",
+			"imapServer": "IMAP server",
+			"smtpServer": "SMTP server",
+			"checking": "Checking…"
+		},
+		"mcp": {
+			"heading": "Custom MCP servers",
+			"addServer": "Add MCP server",
+			"description": "Tools from these servers are offered to models in Task mode. They run on the device.",
+			"loading": "Loading MCP servers",
+			"empty": "No MCP servers yet.",
+			"tools": "Tools",
+			"hideTools": "Hide tools",
+			"loadingTools": "Loading tools",
+			"added": "MCP server added.",
+			"removed": "{{name}} removed.",
+			"removeDialog": {
+				"title": "Remove MCP server?",
+				"text": "Remove {{name}} from the device? Models can no longer use its tools."
+			},
+			"addDialog": {
+				"title": "Add an MCP server",
+				"description": "The server runs on the device, so it must be reachable from there. Servers that need a desktop or a browser will not work on the device.",
+				"byUrl": "By URL",
+				"fromJson": "From JSON",
+				"name": "Name",
+				"url": "URL",
+				"urlHelp": "HTTP or SSE endpoint, e.g. {{example}}",
+				"config": "MCP config",
+				"invalidJson": "That is not valid JSON",
+				"add": "Add",
+				"adding": "Adding…"
+			}
+		}
+	},
+	"settings": {
+		"page": {
+			"title": "Settings",
+			"subtitle": "The device's own settings, as in TiinyOS."
+		},
+		"actions": {
+			"cancel": "Cancel",
+			"save": "Save",
+			"saving": "Saving…",
+			"retry": "Retry",
+			"copy": "Copy",
+			"copied": "Copied",
+			"delete": "Delete",
+			"deleting": "Deleting…"
+		},
+		"section": {
+			"staleValues": "Showing last known values. {{error}}"
+		},
+		"device": {
+			"title": "My device",
+			"subheader": "Reported by the device",
+			"loading": "Loading device information",
+			"name": "Name",
+			"rename": "Rename",
+			"nameField": "Device name",
+			"serialNumber": "Serial number",
+			"copySerialNumber": "Copy serial number",
+			"model": "Model",
+			"osService": "TiinyOS service"
+		},
+		"personalization": {
+			"title": "Personalization",
+			"subheader": "Context the device gives models about you in Task mode",
+			"loading": "Loading personalization",
+			"fields": {
+				"userName": {
+					"label": "Name",
+					"hint": "What models call you."
+				},
+				"occupation": {
+					"label": "Occupation",
+					"hint": "For example: software engineer."
+				},
+				"preferences": {
+					"label": "Preferences",
+					"hint": "How you like answers."
+				},
+				"recentFocus": {
+					"label": "Recent focus",
+					"hint": "What you are working on."
+				}
+			},
+			"fieldHelper": "{{hint}} {{length}}/{{limit}}",
+			"saved": "Saved. Models see it from the next Task mode conversation.",
+			"discardChanges": "Discard changes"
+		},
+		"power": {
+			"title": "System",
+			"subheader": "Power and TiinyOS updates",
+			"autoPowerOn": {
+				"title": "Auto power-on",
+				"description": "The device turns on by itself when connected to power. The device does not report whether this is on (it always reads as off), so only the result of a change is shown.",
+				"turnOn": "Turn on",
+				"turnOff": "Turn off",
+				"deviceReply": "Device: {{message}}"
+			},
+			"update": {
+				"title": "System update",
+				"current": "TiinyOS {{version}}",
+				"available": "TiinyOS {{version}} · version {{available}} is available",
+				"upToDate": "TiinyOS {{version}} · up to date",
+				"loading": "Loading update status",
+				"inProgress": "Update {{state}}…",
+				"progress": "Update progress",
+				"check": "Check for updates",
+				"checking": "Checking…",
+				"download": "Download update",
+				"install": "Install update",
+				"confirmTitle": "Install update?",
+				"confirmText": "Models stop and the device restarts during the installation. Don't unplug it until it is back.",
+				"confirmLabel": "Install",
+				"installing": "Installing the update. The device restarts once; don't unplug it."
+			},
+			"power": {
+				"title": "Power",
+				"restart": "Restart",
+				"shutDown": "Shut down",
+				"restarting": "Restarting… waiting for the device to come back.",
+				"back": "The device is back.",
+				"notBack": "The device has not come back after 10 minutes",
+				"shuttingDown": "The device is shutting down.",
+				"restartTitle": "Restart the device?",
+				"restartText": "Loaded models, chats and agents stop, and the device is unreachable for a few minutes.",
+				"shutDownTitle": "Shut down the device?",
+				"shutDownText": "Loaded models, chats and agents stop. The device stays off until it is turned on at the device (or reconnected to power with Auto power-on)."
+			}
+		},
+		"apiAccess": {
+			"title": "API access",
+			"subheader": "Use the device's models from other apps on your network",
+			"loading": "Loading API access",
+			"openaiCompatible": "OpenAI-compatible",
+			"uses": {
+				"openai": "Text, embeddings, rerank, images, speech",
+				"anthropic": "Text generation",
+				"ollama": "Text generation, embeddings"
+			},
+			"copyBaseUrl": "Copy {{format}} base URL",
+			"apiKey": "API key",
+			"copyApiKey": "Copy API key",
+			"reveal": "Reveal",
+			"hint": "Use a model id from the Models page, or <code>default</code> for the model most recently used. Keep the key private: anyone with it can use the device's API."
+		},
+		"storage": {
+			"title": "Storage",
+			"subheader": "Disk usage on the device",
+			"loading": "Loading storage",
+			"used": "{{used}} of {{total}} used",
+			"usedBar": "Storage used",
+			"category": "{{name}}: {{size}}",
+			"modelFiles": "Model files",
+			"agentFiles": "Agent files",
+			"size": "Size",
+			"usedByVault": "Used by Vault",
+			"deleted": "{{id}} deleted.",
+			"deleteModelTitle": "Delete model?",
+			"deleteModelText": "Delete {{id}} from the device? You will have to download it again to use it.",
+			"deleteAgentTitle": "Delete agent?",
+			"deleteAgentText": "Delete {{id}} and its data from the device? This cannot be undone."
+		},
+		"backup": {
+			"title": "Backup & restore",
+			"subheader": "Chat history and Vault, saved to this computer",
+			"backUp": {
+				"title": "Back up",
+				"loading": "Loading backup",
+				"category": "{{name}} · about {{size}}",
+				"categoryNotReady": "{{name}} · about {{size}} (not ready)",
+				"download": "Download backup",
+				"inProgress": "Backing up…",
+				"saved": "Saved {{name}} ({{size}}).",
+				"savedWithout": "Saved {{name}} ({{size}}), without: {{failed}}."
+			},
+			"restore": {
+				"title": "Restore",
+				"chooseFile": "Choose a backup file",
+				"fileField": "Backup file",
+				"restore": "Restore",
+				"inProgress": "Restoring…",
+				"otherDevice": "This backup was made on another device ({{deviceId}}); it can only be restored there.",
+				"unknownDevice": "unknown",
+				"result": "{{name}}: {{message}}",
+				"restored": "restored",
+				"failed": "The device could not restore the backup",
+				"confirmTitle": "Restore backup?",
+				"confirmText": "Replace {{categories}} on the device with the backup's contents? What was added since the backup is lost.",
+				"categoryJoiner": " and "
+			}
+		},
+		"network": {
+			"title": "Network",
+			"subheader": "Wi-Fi and wired connections of the device",
+			"loading": "Loading network",
+			"wifi": "Wi-Fi",
+			"wifiTurnedOn": "Wi-Fi turned on.",
+			"wifiTurnedOff": "Wi-Fi turned off.",
+			"connectedTo": "Connected to {{ssid}} (signal {{signal}}%)",
+			"notConnected": "Not connected",
+			"off": "Off",
+			"wifiLink": "This app reaches the device over Wi-Fi ({{interface}}), so turning Wi-Fi off, forgetting {{ssid}} or joining another network is disabled here. Use TiinyOS or connect the device by cable to make those changes.",
+			"interfaces": {
+				"interface": "Interface",
+				"state": "State",
+				"addresses": "Addresses",
+				"appLink": "This app's link"
+			},
+			"networks": {
+				"scanning": "Scanning for networks…",
+				"network": "Network",
+				"autoJoin": "Auto-join",
+				"connected": "Connected",
+				"connecting": "Connecting…",
+				"saved": "Saved",
+				"open": "Open",
+				"signal": "Signal {{signal}}%",
+				"autoJoinSwitch": "Auto-join {{ssid}}",
+				"autoJoinOn": "Auto-join on for {{ssid}}.",
+				"autoJoinOff": "Auto-join off for {{ssid}}.",
+				"join": "Join",
+				"joining": "Joining {{ssid}}.",
+				"forget": "Forget",
+				"forgotten": "{{ssid}} forgotten."
+			},
+			"joinDialog": {
+				"title": "Join {{ssid}}",
+				"password": "Password"
+			},
+			"forgetDialog": {
+				"title": "Forget network?",
+				"text": "The device will forget {{ssid}} and its password."
+			}
+		}
+	},
+	"models": {
+		"heading": "Models",
+		"percent": "{{value}}%",
+		"tabs": {
+			"models": "Models",
+			"store": "Store"
+		},
+		"pages": {
+			"models": "Load a downloaded model into NPU memory, or unload it to free space.",
+			"store": "Models from the Tiiny store. Downloads go to the device; load them from the Models tab.",
+			"huggingFace": "Import custom models from Hugging Face. The device decides what it can import: typically fine-tunes and LoRA adapters of models in its store, some only after that store model is downloaded."
+		},
+		"columns": {
+			"model": "Model",
+			"type": "Type",
+			"size": "Size",
+			"npuShare": "NPU share",
+			"status": "Status",
+			"action": "Action"
+		},
+		"table": {
+			"loading": "Loading models",
+			"title": "Downloaded models",
+			"npuFree": "{{percent}}% of the NPU is free",
+			"empty": "No models are downloaded on the device.",
+			"status": {
+				"loaded": "loaded",
+				"notLoaded": "not loaded",
+				"tooBig": "not enough free NPU",
+				"tooBigHint": "Needs {{needed}}% of the NPU; {{free}}% is free. Unload a model to make room."
+			},
+			"pending": {
+				"load": "Starting…",
+				"unload": "Unloading…",
+				"delete": "Deleting…"
+			},
+			"progress": {
+				"load": "load progress",
+				"unload": "unload progress",
+				"delete": "delete progress"
+			},
+			"done": {
+				"load": "{{name}} loaded.",
+				"unload": "{{name}} unloaded.",
+				"delete": "{{name}} deleted."
+			},
+			"failed": {
+				"load": "Could not load {{name}}: {{reason}}",
+				"unload": "Could not unload {{name}}: {{reason}}",
+				"delete": "Could not delete {{name}}: {{reason}}",
+				"unloadAll": "Could not unload all models: {{reason}}",
+				"interrupt": "Could not interrupt {{name}}: {{reason}}"
+			},
+			"allUnloaded": "All models unloaded.",
+			"interrupted": "Stopped what {{name}} was working on.",
+			"interrupt": "Interrupt",
+			"interruptHint": "Stop the requests this model is working on, from any app",
+			"unload": "Unload",
+			"unloading": "Unloading…",
+			"unloadAll": "Unload all",
+			"delete": "Delete",
+			"load": "Load",
+			"cancel": "Cancel",
+			"unloadAllDialog": {
+				"title": "Unload all models?",
+				"text": "Every loaded model is released from the NPU. Requests in progress, from this app or other clients, stop."
+			},
+			"deleteDialog": {
+				"title": "Delete {{name}}?",
+				"text": "This removes the model's files from the device. You can download it again from the store."
+			},
+			"unloadDialog": {
+				"title": "Unload {{name}}?",
+				"text": "This frees its NPU share. Any request currently using the model, from this app or other clients, will be stopped."
+			}
+		},
+		"store": {
+			"loading": "Loading store",
+			"search": "Search store",
+			"searchPlaceholder": "Search models",
+			"allTypes": "All types",
+			"empty": "No store models match your search.",
+			"tableLabel": "Store models",
+			"trending": "trending",
+			"stage": {
+				"starting": "Starting",
+				"downloading": "Downloading",
+				"verifying": "Verifying",
+				"installing": "Installing"
+			},
+			"status": {
+				"loaded": "loaded",
+				"downloaded": "downloaded",
+				"paused": "paused {{percent}}%",
+				"downloading": "downloading {{percent}}%",
+				"notDownloaded": "not downloaded"
+			},
+			"downloadProgress": "download progress",
+			"pause": "Pause",
+			"cancel": "Cancel",
+			"resume": "Resume",
+			"download": "Download",
+			"deviceReported": "Device reported {{status}}",
+			"streamEnded": "The download stream ended before the model was downloaded",
+			"pausedDone": "{{name}} paused. Resume it any time.",
+			"downloaded": "{{name}} downloaded. Load it from the Models page.",
+			"cancelled": "Download of {{name}} cancelled.",
+			"failed": {
+				"download": "Could not download {{name}}: {{reason}}",
+				"pause": "Could not pause {{name}}: {{reason}}",
+				"cancel": "Could not cancel {{name}}: {{reason}}"
+			},
+			"details": {
+				"tableLabel": "Model details",
+				"close": "Close",
+				"modelId": "Model id",
+				"type": "Type",
+				"parameters": "Parameters",
+				"inputOutput": "Input → output",
+				"npuShare": "NPU share",
+				"contextWindow": "Context window",
+				"tokens_one": "{{tokens}} token",
+				"tokens_other": "{{tokens}} tokens",
+				"imageSize": "Image size",
+				"defaultSteps": "Default steps",
+				"guidanceScale": "Guidance scale",
+				"reasoning": "Reasoning",
+				"loadTime": "Load time",
+				"loadSeconds": "about {{seconds}} s",
+				"downloadsLikes": "Downloads · likes",
+				"thinking": {
+					"none": "None",
+					"toggleable": "Can be turned off",
+					"alwaysOn": "Always on",
+					"levels": "levels {{levels}}",
+					"defaultLevel": "default {{level}}"
+				}
+			}
+		},
+		"huggingFace": {
+			"verdict": {
+				"compatible": "compatible",
+				"needsBaseModel": "needs base model",
+				"incompatible": "not compatible"
+			},
+			"kind": {
+				"adapter": "LoRA adapter",
+				"fineTune": "fine-tune"
+			},
+			"search": {
+				"title": "Find compatible models",
+				"subheader": "LoRA adapters and fine-tunes on Hugging Face built on a store model, checked against the device.",
+				"baseModel": "Base model",
+				"onDevice": "{{modelId}} (on device)",
+				"query": "Search (optional)",
+				"submit": "Search Hugging Face",
+				"checkingBases": "Asking the device which store models can be import bases…",
+				"autoCheck": "Auto-check results",
+				"compatibleOnly": "Compatible only",
+				"limit": "Results per kind",
+				"searching": "Searching Hugging Face",
+				"empty": "No adapters or fine-tunes of {{base}} found on Hugging Face.",
+				"tableLabel": "Hugging Face repos",
+				"groups": {
+					"importable": "Importable bases",
+					"checking": "Checking with the device…",
+					"notOnHf": "Not on Hugging Face",
+					"unsupported": "Not supported for import"
+				},
+				"columns": {
+					"repo": "Repo",
+					"kind": "Kind",
+					"downloads": "Downloads",
+					"compatibility": "Compatibility",
+					"action": "Action"
+				},
+				"details": "Details",
+				"checking": "checking…",
+				"notChecked": "not checked",
+				"checkFailed": "check failed",
+				"downloadBase": "Download {{name}} from the Store first",
+				"summary": {
+					"checked": "Checked {{finished}} of {{total}} · {{compatible}} compatible",
+					"needBase_one": "{{count}} need a base model",
+					"needBase_other": "{{count}} need a base model",
+					"hidden_one": "{{count}} incompatible hidden",
+					"hidden_other": "{{count}} incompatible hidden"
+				},
+				"checkingCompatibility": "Checking compatibility"
+			},
+			"check": {
+				"title": "Check a repo",
+				"subheader": "The device decides whether it can import a repo.",
+				"repo": "Hugging Face repo",
+				"placeholder": "org/name or https://huggingface.co/org/name",
+				"checking": "Checking…",
+				"check": "Check",
+				"checkingRepo": "Checking repo",
+				"store": "Store",
+				"needsBase": "Importable once {{name}} ({{modelId}}) is downloaded to the device from the Store.",
+				"cannotImport": "The device cannot import this repo.",
+				"size": "Size {{size}}",
+				"baseModel": "base model {{modelId}}",
+				"disk": "needs {{required}} of disk, {{available}} free",
+				"toolkit": "Importing first downloads the {{toolkit}} toolkit to the device ({{size}}).",
+				"noDisk": "Not enough free disk space on the device.",
+				"bytes": "{{downloaded}} of {{total}}",
+				"importProgress": "import progress",
+				"continues": "The import runs on the device and continues if you leave this page.",
+				"cancelImport": "Cancel import",
+				"import": "Import to device",
+				"starting": "Starting",
+				"importing": "Importing",
+				"importFailed": "Import failed",
+				"cancelled": "Import cancelled.",
+				"imported": "{{repo}} imported. Load it from the Models page.",
+				"streamStopped": "Progress updates stopped. The import may still be running on the device."
+			}
+		}
+	},
+	"vault": {
+		"layout": {
+			"title": "Vault",
+			"description": "The device's knowledge base: your files and summaries of past chats, indexed on the device for models to search.",
+			"tabs": {
+				"files": "Files",
+				"chatHistory": "Chat history"
+			}
+		},
+		"files": {
+			"title": "Files",
+			"subheader": "PDF, Word, Excel, CSV, text, Markdown or HTML, up to 200 MB each. Models use them in Task mode.",
+			"upload": "Upload files",
+			"uploadInput": "Files to upload",
+			"loading": "Loading Vault files",
+			"empty": "No files yet. Upload documents for models to use.",
+			"fileCount_one": "{{count}} file",
+			"fileCount_other": "{{count}} files",
+			"columns": {
+				"file": "File",
+				"size": "Size",
+				"added": "Added",
+				"status": "Status"
+			},
+			"status": {
+				"indexed": "Indexed",
+				"indexFailed": "Indexing failed",
+				"notIndexed": "Not indexed"
+			},
+			"actions": {
+				"index": "Index",
+				"download": "Download",
+				"rename": "Rename",
+				"delete": "Delete"
+			},
+			"progress": {
+				"label": "Vault progress",
+				"line": "{{label}}: {{message}}",
+				"uploading": "Uploading…",
+				"indexing": "Indexing…",
+				"loadingModel": "Loading the embedding model",
+				"stage": "Indexing: {{stage}}",
+				"withChunks": "{{stage}} ({{processed}}/{{total}} chunks)",
+				"retrying": "Indexing failed on the device, trying again…"
+			},
+			"outcome": {
+				"added": "{{label}} added to Vault.",
+				"indexed": "{{name}} indexed.",
+				"renamed": "Renamed to {{name}}.",
+				"deleted": "{{name}} deleted."
+			},
+			"errors": {
+				"device": "The device reported an error",
+				"uploadUnconfirmed": "The device did not confirm the upload"
+			},
+			"renameDialog": {
+				"title": "Rename file",
+				"name": "File name",
+				"cancel": "Cancel",
+				"confirm": "Rename"
+			},
+			"deleteDialog": {
+				"title": "Delete file?",
+				"text": "Delete {{name}} and its index from the device? Models will no longer find it.",
+				"confirm": "Delete"
+			}
+		},
+		"search": {
+			"title": "Search Vault",
+			"subheader": "What models find when they search Vault",
+			"label": "Search",
+			"submit": "Search",
+			"searching": "Searching…",
+			"empty": "Nothing relevant found."
+		},
+		"chatHistory": {
+			"title": "Chat history",
+			"subheader": "Daily summaries of past conversations, kept in Vault.",
+			"loading": "Loading chat history",
+			"empty": "No summaries yet.",
+			"read": "Read",
+			"hide": "Hide",
+			"delete": "Delete",
+			"loadingSummary": "Loading summary",
+			"deleted": "Summary of {{day}} deleted.",
+			"deleteDialog": {
+				"title": "Delete summary?",
+				"text": "Delete the summary of {{day}}? Models will no longer recall that day's conversations.",
+				"confirm": "Delete"
+			}
+		},
+		"summarySettings": {
+			"loading": "Loading daily summaries",
+			"enabled": "Daily summaries",
+			"time": "Time",
+			"deviceTime": "{{time}} on the device ({{zone}})",
+			"model": "Model",
+			"save": "Save",
+			"saving": "Saving…",
+			"savedOn": "Daily summaries on, at {{time}}.",
+			"savedOff": "Daily summaries off.",
+			"description": "Each day the device summarises the day's conversations into Vault, so models can recall them in Task mode. It loads the model while it works, which can make that model busy for a while."
+		}
+	},
+	"playground": {
+		"layout": {
+			"title": "Playground",
+			"description": "Try the device's speech, vision, embedding and rerank models, and benchmark text models (as the tiiny CLI does). A model loads on its first run."
+		},
+		"tabs": {
+			"asr": {
+				"label": "Speech to text",
+				"intro": "Transcribe a WAV recording with a speech recognition model."
+			},
+			"tts": {
+				"label": "Text to speech",
+				"intro": "Turn text into speech with a voice model."
+			},
+			"ocr": {
+				"label": "OCR",
+				"intro": "Read the text in an image."
+			},
+			"embed": {
+				"label": "Embeddings",
+				"intro": "Turn texts into vectors and compare how similar they are."
+			},
+			"rerank": {
+				"label": "Rerank",
+				"intro": "Order documents by how well they answer a query."
+			},
+			"text": {
+				"label": "Benchmark",
+				"intro": "Measure how fast a text model generates, like tiiny bench."
+			}
+		},
+		"model": {
+			"label": "Model",
+			"loadsWhenRun": "{{name}} (loads when run)"
+		},
+		"loading": "Loading models",
+		"noModel": "No model for this is downloaded. Get one from the Store.",
+		"run": "Run",
+		"running": "Running…",
+		"asr": {
+			"chooseFile": "Choose a WAV file",
+			"fileInput": "Audio file"
+		},
+		"tts": {
+			"text": "Text",
+			"voice": "Voice (optional)",
+			"voiceHelp": "Only some voice models need one, e.g. Supertonic.",
+			"download": "Download"
+		},
+		"ocr": {
+			"chooseImage": "Choose image",
+			"imageInput": "Image file",
+			"noText": "No text found.",
+			"lines": "Recognized lines",
+			"score": "{{value}}%"
+		},
+		"embed": {
+			"texts": "Texts",
+			"textsHelp": "One text per line",
+			"summary_one": "{{count}} dimension. Cosine similarity:",
+			"summary_other": "{{count}} dimensions. Cosine similarity:"
+		},
+		"rerank": {
+			"query": "Query",
+			"documents": "Documents",
+			"documentsHelp": "One document per line",
+			"results": "Ranked documents"
+		},
+		"bench": {
+			"tokensInput": "Tokens to generate",
+			"results": "Benchmark",
+			"speed": "Generation speed",
+			"speedValue": "{{value}} tokens/s",
+			"firstToken": "Time to first token",
+			"seconds": "{{value}} s",
+			"tokens": "Tokens",
+			"tokensValue": "{{prompt}} in · {{completion}} out · {{total}} s total"
+		}
+	},
+	"overview": {
+		"title": "Overview",
+		"npuReady": "The NPU is ready.",
+		"loading": "Loading device status",
+		"retry": "Retry",
+		"staleValues": "Showing last known values. {{error}}",
+		"percent": "{{value}}%",
+		"usedOfTotal": "{{used}} of {{total}}",
+		"stats": {
+			"npuUtilization": "NPU utilization",
+			"npuReserved": "{{percent}} reserved by loaded models",
+			"npuMemory": "NPU memory",
+			"systemMemory": "System memory",
+			"systemMemoryCaption": "CPU {{cpu}} · {{used}} of {{total}} RAM",
+			"storage": "Storage",
+			"progress": "{{title}} {{percent}}"
+		},
+		"running": {
+			"title": "Loaded models",
+			"empty": "No models are loaded. Load one from the Models page.",
+			"columns": {
+				"model": "Model",
+				"type": "Type",
+				"status": "Status",
+				"npuShare": "NPU share",
+				"activeRequests": "Active requests"
+			}
+		},
+		"usage": {
+			"title": "Token usage",
+			"subheader": "{{tokens}} in {{requests}} (text models)",
+			"subheaderLoading": "Text models",
+			"tokens_one": "{{value}} token",
+			"tokens_other": "{{value}} tokens",
+			"requests_one": "{{value}} request",
+			"requests_other": "{{value}} requests",
+			"previousWeek": "Previous week",
+			"nextWeek": "Next week",
+			"weekRange": "{{start}} – {{end}}",
+			"dayBar": "{{day}}: {{tokens}}",
+			"segment": "{{day}} · {{model}}: {{tokens}}",
+			"other": "Other",
+			"showTable": "Show as table",
+			"showChart": "Show chart",
+			"loading": "Loading token usage",
+			"empty": "No tokens this week.",
+			"table": {
+				"label": "Token usage by day",
+				"day": "Day",
+				"model": "Model",
+				"requests": "Requests",
+				"prompt": "Prompt",
+				"completion": "Completion",
+				"total": "Total"
+			}
+		},
+		"apps": {
+			"title": "Usage by app",
+			"subheader": "Tokens this week, by app",
+			"label": "Usage by app",
+			"loading": "Loading app usage",
+			"empty": "No tokens this week."
+		}
+	},
+	"server": {
+		"done": "Done",
+		"models": {
+			"allUnloaded": "All models unloaded"
+		},
+		"settings": {
+			"shuttingDown": "Shutting down",
+			"restarting": "Restarting",
+			"enabled": "Enabled",
+			"disabled": "Disabled",
+			"specs": {
+				"peakInt8": "Peak INT8",
+				"storage": "Storage",
+				"network": "Network"
+			}
+		},
+		"connectors": {
+			"connected": "Connected",
+			"notConnected": "Not connected",
+			"unavailable": "Unavailable",
+			"waitingForQr": "Waiting for a QR scan",
+			"scanQr": "Scan the QR code with WhatsApp",
+			"signIn": "Sign in with your {{provider}} account",
+			"names": {
+				"email": "Email (IMAP/SMTP)",
+				"telegram": "Telegram bot",
+				"discord": "Discord bot"
+			}
+		},
+		"backup": {
+			"categories": {
+				"conversationService": "Chat history",
+				"knowledgeBase": "Vault & personalization",
+				"agentUsage": "Agent usage",
+				"connectorService": "Connectors",
+				"scheduled": "Scheduled tasks",
+				"skills": "Skills"
+			}
+		},
+		"usage": {
+			"otherApps": "API and other apps"
+		},
+		"task": {
+			"searchedVault": "Searched Vault: {{query}}",
+			"readHost": "Read {{host}}",
+			"readWebPage": "Read a web page",
+			"updatedOccupation": "Updated your occupation",
+			"updatedPreferences": "Updated your preferences",
+			"updatedRecentFocus": "Updated your recent focus",
+			"updatedProfile": "Updated your profile",
+			"updatedField": "Updated your {{field}}"
+		}
+	}
+}

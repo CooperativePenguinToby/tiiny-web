@@ -12,6 +12,7 @@ import httpProxy from "http-proxy";
 
 import { agentDomain, HANDOFF_PATH } from "./agent-domain.mjs";
 import { resolveDeviceTarget } from "./device-target.mjs";
+import { translate } from "./messages.mjs";
 import { createSessionToken, isValidSessionToken, readHandoffToken, SESSION_COOKIE } from "./session-token.mjs";
 
 const REFRESH_MS = 30_000;
@@ -133,8 +134,8 @@ function agentProxy() {
 			// relative redirect: already correct
 		}
 	});
-	proxy.on("error", (error, _request, response) => {
-		const message = `The agent did not answer (${error.message}). It may be stopped.`;
+	proxy.on("error", (error, request, response) => {
+		const message = translateFor(request, "errors.agentProxy.noAnswer", { reason: error.message });
 		if (response && "writeHead" in response && !response.headersSent) {
 			response.writeHead(502, { "content-type": "text/plain; charset=utf-8" });
 			response.end(message);
@@ -144,6 +145,15 @@ function agentProxy() {
 	});
 	shared.proxy = proxy;
 	return proxy;
+}
+
+/**
+A message in the request's language. On an agent's own host the browser sends no "lang" cookie (it is
+set on the web UI's host), so Accept-Language decides there.
+@param {import("node:http").IncomingMessage} request @param {string} key @param {Record<string, string>} [values]
+*/
+function translateFor(request, key, values) {
+	return translate(request, parseCookies(request.headers.cookie).lang, key, values);
 }
 
 /**
@@ -165,7 +175,7 @@ function handOff(request, response, serviceId) {
 	const token = new URL(request.url ?? "/", "https://agent").searchParams.get("token") ?? "";
 	const handoff = readHandoffToken(token);
 	if (!handoff || handoff.serviceId !== serviceId || usedHandoffs.has(token)) {
-		refuse(response, "This link has expired. Open the agent again from tiiny-web's Agents page.");
+		refuse(response, translateFor(request, "errors.agentProxy.linkExpired"));
 		return;
 	}
 	usedHandoffs.set(token, handoff.expires);
@@ -190,7 +200,7 @@ export function handleAgentRequest(request, response) {
 		return true;
 	}
 	if (!authorized(request)) {
-		refuse(response, "Sign in to tiiny-web and open this agent from its Agents page.");
+		refuse(response, translateFor(request, "errors.agentProxy.signIn"));
 		return true;
 	}
 	retarget(request, serviceId, new URL(device.baseUrl).hostname);

@@ -12,7 +12,7 @@ export async function modelIdFrom(request: Request): Promise<string> {
 	}
 	const { modelId } = body;
 	if (typeof modelId !== "string" || !/^[\w.-]+\/[\w.-]+$/.test(modelId)) {
-		throw new DeviceError("modelId must look like Org/Name", 400);
+		throw new DeviceError("errors.request.modelIdFormat", 400, { field: "modelId" });
 	}
 	return modelId;
 }
@@ -37,10 +37,17 @@ async function loadModel(modelId: string): Promise<void> {
 	for await (const { data } of events) {
 		last = JSON.parse(data) as typeof last;
 		if (last.startup_error || last.status === "failed" || last.success === false) {
-			throw new DeviceError(last.startup_error || last.toast?.message || last.error || "The model did not load", 502);
+			const reason = last.startup_error || last.toast?.message || last.error;
+			throw reason
+				? new DeviceError("errors.passthrough", 502, { message: reason })
+				: new DeviceError("errors.models.didNotLoad", 502);
 		}
 	}
-	if (last.status !== "running") throw new DeviceError(`The model did not load (${last.status ?? "no status"})`, 502);
+	if (last.status !== "running") {
+		throw last.status === undefined
+			? new DeviceError("errors.models.didNotLoadNoStatus", 502)
+			: new DeviceError("errors.models.didNotLoadStatus", 502, { status: last.status });
+	}
 }
 
 // For a few seconds after the device reports a model as running, its server answers "The upstream model

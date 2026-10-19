@@ -18,6 +18,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { PlugIcon } from "@phosphor-icons/react/dist/ssr/Plug";
+import { useTranslation } from "react-i18next";
 
 import type { McpServer, McpTool } from "@/types/device";
 import { paths } from "@/paths";
@@ -47,6 +48,7 @@ function AddServerDialog({
 	onClose: () => void;
 	onAdded: () => void;
 }): React.JSX.Element {
+	const { t } = useTranslation();
 	const [name, setName] = React.useState("");
 	const [url, setUrl] = React.useState("");
 	const [json, setJson] = React.useState("");
@@ -62,7 +64,7 @@ function AddServerDialog({
 				try {
 					config = JSON.parse(json);
 				} catch {
-					throw new Error("That is not valid JSON");
+					throw new Error(t("connectors.mcp.addDialog.invalidJson"));
 				}
 			} else {
 				// TiinyOS treats a URL ending in /mcp as streamable HTTP and anything else as SSE.
@@ -81,25 +83,27 @@ function AddServerDialog({
 	const isValid = mode === "json" ? json.trim().length > 0 : name.trim().length > 0 && /^https?:\/\//.test(url.trim());
 	return (
 		<Dialog fullWidth maxWidth="sm" onClose={onClose} open={open}>
-			<DialogTitle>Add an MCP server</DialogTitle>
+			<DialogTitle>{t("connectors.mcp.addDialog.title")}</DialogTitle>
 			<DialogContent>
 				<Stack spacing={2}>
-					<DialogContentText>
-						The server runs on the device, so it must be reachable from there. Servers that need a desktop or a browser
-						will not work on the device.
-					</DialogContentText>
+					<DialogContentText>{t("connectors.mcp.addDialog.description")}</DialogContentText>
 					<RouteTabs
 						tabs={[
-							{ label: "By URL", href: paths.dashboard.addMcpServer },
-							{ label: "From JSON", href: paths.dashboard.addMcpServerJson },
+							{ label: t("connectors.mcp.addDialog.byUrl"), href: paths.dashboard.addMcpServer },
+							{ label: t("connectors.mcp.addDialog.fromJson"), href: paths.dashboard.addMcpServerJson },
 						]}
 					/>
 					{mode === "url" ? (
 						<>
-							<TextField label="Name" onChange={(event) => setName(event.target.value)} size="small" value={name} />
 							<TextField
-								helperText="HTTP or SSE endpoint, e.g. https://mcp.deepwiki.com/mcp"
-								label="URL"
+								label={t("connectors.mcp.addDialog.name")}
+								onChange={(event) => setName(event.target.value)}
+								size="small"
+								value={name}
+							/>
+							<TextField
+								helperText={t("connectors.mcp.addDialog.urlHelp", { example: "https://mcp.deepwiki.com/mcp" })}
+								label={t("connectors.mcp.addDialog.url")}
 								onChange={(event) => setUrl(event.target.value)}
 								size="small"
 								value={url}
@@ -107,7 +111,7 @@ function AddServerDialog({
 						</>
 					) : (
 						<TextField
-							label="MCP config"
+							label={t("connectors.mcp.addDialog.config")}
 							minRows={6}
 							multiline
 							onChange={(event) => setJson(event.target.value)}
@@ -120,9 +124,9 @@ function AddServerDialog({
 				</Stack>
 			</DialogContent>
 			<DialogActions>
-				<Button onClick={onClose}>Cancel</Button>
+				<Button onClick={onClose}>{t("connectors.actions.cancel")}</Button>
 				<Button disabled={!isValid || busy} onClick={() => void add()} variant="contained">
-					{busy ? "Adding…" : "Add"}
+					{t(busy ? "connectors.mcp.addDialog.adding" : "connectors.mcp.addDialog.add")}
 				</Button>
 			</DialogActions>
 		</Dialog>
@@ -130,6 +134,7 @@ function AddServerDialog({
 }
 
 function ServerTools({ id }: { id: string }): React.JSX.Element {
+	const { t } = useTranslation();
 	const [tools, setTools] = React.useState<McpTool[] | null>(null);
 	const [error, setError] = React.useState<string | null>(null);
 	React.useEffect(() => {
@@ -145,7 +150,7 @@ function ServerTools({ id }: { id: string }): React.JSX.Element {
 		return () => controller.abort();
 	}, [id]);
 	if (error) return <Alert severity="error">{error}</Alert>;
-	if (!tools) return <CircularProgress aria-label="Loading tools" size={18} />;
+	if (!tools) return <CircularProgress aria-label={t("connectors.mcp.loadingTools")} size={18} />;
 	return (
 		<Stack data-testid="mcp-tools" spacing={1}>
 			{tools.map((tool) => (
@@ -168,6 +173,7 @@ function ServerTools({ id }: { id: string }): React.JSX.Element {
 }
 
 export function McpServers(): React.JSX.Element {
+	const { t } = useTranslation();
 	const polled = usePolling<McpServer[]>("/api/mcp", 15_000);
 	const pathname = usePathname();
 	const router = useRouter();
@@ -180,7 +186,7 @@ export function McpServers(): React.JSX.Element {
 		setDeleting(null);
 		try {
 			await postJson("/api/mcp/delete", { id: server.id });
-			setOutcome({ severity: "success", message: `${server.name} removed.` });
+			setOutcome({ severity: "success", message: t("connectors.mcp.removed", { name: server.name }) });
 		} catch (error) {
 			setOutcome({ severity: "error", message: errorMessage(error) });
 		} finally {
@@ -191,14 +197,14 @@ export function McpServers(): React.JSX.Element {
 	return (
 		<Stack spacing={2}>
 			<Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
-				<Typography variant="h6">Custom MCP servers</Typography>
+				<Typography variant="h6">{t("connectors.mcp.heading")}</Typography>
 				<Button
 					component={RouterLink}
 					href={paths.dashboard.addMcpServer}
 					startIcon={<PlugIcon fontSize="var(--icon-fontSize-md)" />}
 					variant="contained"
 				>
-					Add MCP server
+					{t("connectors.mcp.addServer")}
 				</Button>
 			</Stack>
 			<Typography
@@ -207,7 +213,7 @@ export function McpServers(): React.JSX.Element {
 					color: "text.secondary",
 				}}
 			>
-				Tools from these servers are offered to models in Task mode. They run on the device.
+				{t("connectors.mcp.description")}
 			</Typography>
 			{outcome ? (
 				<Alert onClose={() => setOutcome(null)} severity={outcome.severity}>
@@ -217,7 +223,7 @@ export function McpServers(): React.JSX.Element {
 			{polled.error ? <Alert severity="error">{polled.error}</Alert> : null}
 			{polled.data === null ? (
 				polled.isLoading ? (
-					<CircularProgress aria-label="Loading MCP servers" />
+					<CircularProgress aria-label={t("connectors.mcp.loading")} />
 				) : null
 			) : polled.data.length === 0 ? (
 				<Typography
@@ -226,7 +232,7 @@ export function McpServers(): React.JSX.Element {
 						color: "text.secondary",
 					}}
 				>
-					No MCP servers yet.
+					{t("connectors.mcp.empty")}
 				</Typography>
 			) : (
 				<Card>
@@ -238,7 +244,7 @@ export function McpServers(): React.JSX.Element {
 									<Typography variant="subtitle2">{server.name}</Typography>
 									<Chip
 										color={server.connected ? "success" : "error"}
-										label={server.connected ? "Connected" : "Not reachable"}
+										label={t(server.connected ? "connectors.state.connected" : "connectors.state.notReachable")}
 										size="small"
 									/>
 									<Typography
@@ -252,10 +258,10 @@ export function McpServers(): React.JSX.Element {
 										{server.transport} · {server.target}
 									</Typography>
 									<Button onClick={() => setShownTools(shownTools === server.id ? null : server.id)} size="small">
-										{shownTools === server.id ? "Hide tools" : "Tools"}
+										{t(shownTools === server.id ? "connectors.mcp.hideTools" : "connectors.mcp.tools")}
 									</Button>
 									<Button color="error" onClick={() => setDeleting(server)} size="small">
-										Remove
+										{t("connectors.actions.remove")}
 									</Button>
 								</Stack>
 								{!server.connected && server.detail ? (
@@ -274,19 +280,19 @@ export function McpServers(): React.JSX.Element {
 				mode={pathname === paths.dashboard.addMcpServerJson ? "json" : "url"}
 				onAdded={() => {
 					router.push(paths.dashboard.connectors);
-					setOutcome({ severity: "success", message: "MCP server added." });
+					setOutcome({ severity: "success", message: t("connectors.mcp.added") });
 					void polled.refresh();
 				}}
 				onClose={() => router.push(paths.dashboard.connectors)}
 				open={isAdding}
 			/>
 			<ConfirmDialog
-				confirmLabel="Remove"
+				confirmLabel={t("connectors.actions.remove")}
 				onCancel={() => setDeleting(null)}
 				onConfirm={() => deleting && void remove(deleting)}
 				open={deleting !== null}
-				text={`Remove ${deleting?.name ?? ""} from the device? Models can no longer use its tools.`}
-				title="Remove MCP server?"
+				text={t("connectors.mcp.removeDialog.text", { name: deleting?.name ?? "" })}
+				title={t("connectors.mcp.removeDialog.title")}
 			/>
 		</Stack>
 	);

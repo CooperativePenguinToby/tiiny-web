@@ -59,16 +59,16 @@ export async function memorySettings(): Promise<MemorySettings> {
 // modelId "" turns daily summaries off. The window starts at the given time, as TiinyOS sets it.
 export async function saveMemorySettings(body: unknown): Promise<void> {
 	const { modelId, startHour, startMinute } = body as Record<string, unknown>;
-	if (typeof modelId !== "string") throw new DeviceError("modelId must be text", 400);
+	if (typeof modelId !== "string") throw new DeviceError("errors.request.mustBeText", 400, { field: "modelId" });
 	if (!Number.isSafeInteger(startHour) || (startHour as number) < 0 || (startHour as number) > 23) {
-		throw new DeviceError("startHour must be 0-23", 400);
+		throw new DeviceError("errors.request.range", 400, { field: "startHour", min: 0, max: 23 });
 	}
 	if (!Number.isSafeInteger(startMinute) || (startMinute as number) < 0 || (startMinute as number) > 59) {
-		throw new DeviceError("startMinute must be 0-59", 400);
+		throw new DeviceError("errors.request.range", 400, { field: "startMinute", min: 0, max: 59 });
 	}
 	const current = await memorySettings();
 	if (modelId && current.models.every((model) => model.modelId !== modelId)) {
-		throw new DeviceError("Choose a downloaded text model", 400);
+		throw new DeviceError("errors.memory.chooseTextModel", 400);
 	}
 	const headers = await kbHeaders();
 	await deviceJson("/kb/memory/schedule", {

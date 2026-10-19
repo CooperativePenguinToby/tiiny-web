@@ -1,0 +1,1247 @@
+{
+	"nav": {
+		"overview": "Обзор",
+		"models": "Модели",
+		"agents": "Агенты",
+		"chat": "Чат",
+		"playground": "Песочница",
+		"vault": "Хранилище",
+		"connectors": "Коннекторы",
+		"settings": "Настройки",
+		"openNavigation": "Открыть навигацию",
+		"signOut": "Выйти",
+		"language": "Язык",
+		"languageCurrent": "Язык: {{language}}"
+	},
+	"titles": {
+		"page": "{{page}} | {{site}}",
+		"notFound": "Не найдено",
+		"settings": "Настройки",
+		"overview": "Обзор",
+		"agents": "Агенты",
+		"history": "История",
+		"signIn": "Вход",
+		"playground": "Песочница",
+		"connectors": "Коннекторы",
+		"models": "Модели",
+		"store": "Магазин",
+		"chat": "Чат",
+		"vault": "Хранилище",
+		"huggingFace": "Hugging Face"
+	},
+	"errors": {
+		"notSignedIn": "Вход не выполнен",
+		"internal": "Внутренняя ошибка",
+		"unknownLanguage": "Неизвестный язык",
+		"incorrectPassword": "Неверный пароль",
+		"passthrough": "{{message}}",
+		"request": {
+			"expected": "Ожидается {{shape}}",
+			"required": "Поле {{field}} обязательно",
+			"mustBeText": "{{field}} должно быть текстом",
+			"tooLong_one": "{{field}} длиннее {{count}} символа",
+			"tooLong_few": "{{field}} длиннее {{count}} символов",
+			"tooLong_many": "{{field}} длиннее {{count}} символов",
+			"tooLong_other": "{{field}} длиннее {{count}} символа",
+			"modelIdFormat": "{{field}} должно иметь вид Org/Name",
+			"modelIdLike": "{{field}} должно быть id модели вида Org/Name",
+			"range": "{{field}} должно быть от {{min}} до {{max}}",
+			"oneOf": "{{field}} должно быть одним из: {{options}}",
+			"dateFormat": "{{field}} должно быть датой вида {{example}}",
+			"jsonList": "{{field}} должно быть списком JSON",
+			"emptySearch": "Введите запрос для поиска"
+		},
+		"device": {
+			"notConfigured": "Устройство не настроено: задайте TIINY_DEVICE_URL и TIINY_AUTH_KEY или сначала войдите через tiiny CLI",
+			"notConfiguredShort": "Устройство не настроено",
+			"responded": "Устройство ответило {{status}}: {{message}}",
+			"respondedUnavailable": "Устройство ответило {{status}}: служба недоступна",
+			"unreachable": "Устройство недоступно по адресу {{url}}: {{reason}}",
+			"emptyStream": "Устройство вернуло пустой поток",
+			"refusedChange": "Устройство отклонило изменение",
+			"reportedError": "Устройство сообщило об ошибке"
+		},
+		"file": {
+			"tooLarge": "{{name}} больше {{megabytes}} MB"
+		},
+		"hf": {
+			"invalidRepo": "Укажите репозиторий Hugging Face в виде org/name или его URL на huggingface.co",
+			"unreachable": "Hugging Face недоступен: {{reason}}",
+			"responded": "Hugging Face ответил {{status}}"
+		},
+		"models": {
+			"didNotLoad": "Модель не загрузилась",
+			"didNotLoadStatus": "Модель не загрузилась ({{status}})",
+			"didNotLoadNoStatus": "Модель не загрузилась (без статуса)"
+		},
+		"connectors": {
+			"unknown": "Неизвестный коннектор",
+			"noAccountSignIn": "Этот коннектор не использует вход через аккаунт",
+			"accountSignIn": "Этот коннектор использует вход через аккаунт",
+			"tokenRejected": "Устройство отклонило токен",
+			"xLoginRejected": "X отклонил вход",
+			"mailLoginRefused": "Почтовый сервер отклонил вход",
+			"whatsappFailed": "Устройству не удалось запустить WhatsApp",
+			"invalidMcpId": "Недопустимый id MCP-сервера",
+			"mcpConfig": "Ожидается объект JSON вида {{example}}"
+		},
+		"chat": {
+			"invalidAttachment": "Недопустимое вложение",
+			"tooManyAttachments_one": "Не более {{count}} вложения",
+			"tooManyAttachments_few": "Не более {{count}} вложений",
+			"tooManyAttachments_many": "Не более {{count}} вложений",
+			"tooManyAttachments_other": "Не более {{count}} вложения",
+			"chooseFile": "Выберите файл",
+			"unsupportedFile": "{{name}}: прикрепляйте изображения или файлы {{extensions}}",
+			"noText": "Устройство не нашло текста в {{name}}",
+			"invalidMediaId": "Недопустимый id медиафайла"
+		},
+		"task": {
+			"interrupted": "Прервано.",
+			"tooManySteps_one": "Остановлено после {{count}} шага без окончательного ответа.",
+			"tooManySteps_few": "Остановлено после {{count}} шагов без окончательного ответа.",
+			"tooManySteps_many": "Остановлено после {{count}} шагов без окончательного ответа.",
+			"tooManySteps_other": "Остановлено после {{count}} шага без окончательного ответа."
+		},
+		"history": {
+			"invalidConversationId": "Недопустимый id беседы"
+		},
+		"vault": {
+			"invalidSourceId": "Недопустимый id источника",
+			"chooseFiles": "Выберите хотя бы один файл",
+			"tooManyFiles_one": "Загружайте не более {{count}} файла за раз",
+			"tooManyFiles_few": "Загружайте не более {{count}} файлов за раз",
+			"tooManyFiles_many": "Загружайте не более {{count}} файлов за раз",
+			"tooManyFiles_other": "Загружайте не более {{count}} файла за раз",
+			"unsupportedFile": "{{name}}: Хранилище принимает файлы {{extensions}}",
+			"invalidName": "Введите имя файла без косых черт"
+		},
+		"memory": {
+			"chooseTextModel": "Выберите скачанную текстовую модель"
+		},
+		"settings": {
+			"deviceNameLength_one": "Имя устройства должно содержать от 1 до {{count}} символа",
+			"deviceNameLength_few": "Имя устройства должно содержать от 1 до {{count}} символов",
+			"deviceNameLength_many": "Имя устройства должно содержать от 1 до {{count}} символов",
+			"deviceNameLength_other": "Имя устройства должно содержать от 1 до {{count}} символа"
+		},
+		"agents": {
+			"noDomain": "Поддомены агентов не настроены (AGENT_DOMAIN)"
+		},
+		"playground": {
+			"textRequired": "Требуется текст",
+			"textTooLong_one": "Текст длиннее {{count}} символа",
+			"textTooLong_few": "Текст длиннее {{count}} символов",
+			"textTooLong_many": "Текст длиннее {{count}} символов",
+			"textTooLong_other": "Текст длиннее {{count}} символа",
+			"queryRequired": "Требуется запрос",
+			"queryTooLong_one": "Запрос длиннее {{count}} символа",
+			"queryTooLong_few": "Запрос длиннее {{count}} символов",
+			"queryTooLong_many": "Запрос длиннее {{count}} символов",
+			"queryTooLong_other": "Запрос длиннее {{count}} символа",
+			"numberedTextRequired": "Требуется текст {{number}}",
+			"numberedTextTooLong_one": "Текст {{number}} длиннее {{count}} символа",
+			"numberedTextTooLong_few": "Текст {{number}} длиннее {{count}} символов",
+			"numberedTextTooLong_many": "Текст {{number}} длиннее {{count}} символов",
+			"numberedTextTooLong_other": "Текст {{number}} длиннее {{count}} символа",
+			"documentRequired": "Требуется документ {{number}}",
+			"documentTooLong_one": "Документ {{number}} длиннее {{count}} символа",
+			"documentTooLong_few": "Документ {{number}} длиннее {{count}} символов",
+			"documentTooLong_many": "Документ {{number}} длиннее {{count}} символов",
+			"documentTooLong_other": "Документ {{number}} длиннее {{count}} символа",
+			"textCount": "Укажите от {{min}} до {{max}} текстов",
+			"documentCount": "Укажите от {{min}} до {{max}} документов",
+			"chooseAudio": "Выберите или запишите аудио",
+			"audioTooLarge": "Аудио больше {{megabytes}} MB",
+			"wavOnly": "Устройство распознаёт только аудио WAV. Сначала преобразуйте файл в WAV.",
+			"chooseImage": "Выберите изображение",
+			"imageTooLarge": "Изображение больше {{megabytes}} MB"
+		},
+		"backup": {
+			"chooseFile": "Выберите файл резервной копии",
+			"chooseCategory": "Выберите хотя бы одну категорию, доступную на устройстве",
+			"unexpectedReply": "Неожиданный ответ резервного копирования ({{type}})",
+			"unexpectedReplyNoType": "Неожиданный ответ резервного копирования (без типа)",
+			"noArchive": "В резервной копии устройства нет архива",
+			"notBackup": "Этот файл не является резервной копией Tiiny",
+			"otherDevice": "Эта резервная копия создана на другом устройстве; восстановить её можно только там",
+			"missing": "Резервная копия не содержит: {{services}}"
+		},
+		"wifi": {
+			"unknownAction": "Неизвестное действие Wi-Fi",
+			"wouldDropLink": "Это приложение подключается к устройству по Wi-Fi, поэтому такое изменение оборвёт связь. Выполните его в TiinyOS или подключив устройство кабелем."
+		},
+		"update": {
+			"upToDate": "TiinyOS обновлена",
+			"notReady": "Нет скачанного обновления, готового к установке",
+			"unknownAction": "Неизвестное действие обновления"
+		},
+		"agentProxy": {
+			"noAnswer": "Агент не ответил ({{reason}}). Возможно, он остановлен.",
+			"linkExpired": "Срок действия ссылки истёк. Откройте агента снова со страницы «Агенты» в tiiny-web.",
+			"signIn": "Войдите в tiiny-web и откройте этого агента со страницы «Агенты»."
+		}
+	},
+	"chat": {
+		"title": "Чат",
+		"tabs": {
+			"chat": "Чат",
+			"history": "История"
+		},
+		"intro": "Общайтесь с загруженной моделью. Чаты хранятся в истории чатов устройства, общей с TiinyOS. Устройство обрабатывает по одному запросу на модель, поэтому ответы могут ждать в очереди.",
+		"message": {
+			"you": "Вы",
+			"assistant": "Ассистент",
+			"thinking": "Размышления"
+		},
+		"notes": {
+			"stopped": "Остановлено.",
+			"noReply": "Ответ неполный.",
+			"interrupted": "Прервано.",
+			"drawing": "Рисование… шаг {{step}} из {{total}}",
+			"picture_one": "{{size}}, {{count}} шаг",
+			"picture_few": "{{size}}, {{count}} шага",
+			"picture_many": "{{size}}, {{count}} шагов",
+			"picture_other": "{{size}}, {{count}} шага"
+		},
+		"errors": {
+			"openConversation": "Не удалось открыть беседу: {{message}}",
+			"load": "Не удалось загрузить {{name}}: {{message}}",
+			"device": "Устройство сообщило об ошибке",
+			"gaveUp": "Устройство перестало ждать: модель была занята другими запросами. Повторите попытку. ({{message}})",
+			"drawFailed": "Устройству не удалось нарисовать изображение",
+			"noPicture": "Устройство завершило работу без изображения",
+			"notSaved": "Не сохранено в историю: {{message}}"
+		},
+		"models": {
+			"loading": "Загрузка моделей чата",
+			"none": "Нет скачанных моделей для чата или изображений. Получите модель в магазине, затем загрузите её.",
+			"modelsButton": "Модели",
+			"label": "Модель",
+			"choose": "Выберите модель",
+			"notLoadedOption": "{{name}} (не загружена)"
+		},
+		"loading": {
+			"starting": "Запуск",
+			"unloading": "Выгрузка {{name}}",
+			"status": "Загрузка {{name}}: {{message}}",
+			"statusProgress": "Загрузка {{name}}: {{message}} {{progress}}%",
+			"progressLabel": "Загрузка модели",
+			"notLoaded": "{{name}} не загружена.",
+			"load": "Загрузить"
+		},
+		"makeRoom": {
+			"title": "Освободить место для {{name}}?",
+			"text": "На устройстве недостаточно свободной памяти NPU. Сначала выгрузить {{models}}? Приложения, которые их используют, остановятся.",
+			"otherModels": "другие модели",
+			"cancel": "Отмена",
+			"confirm": "Выгрузить и загрузить"
+		},
+		"mode": {
+			"label": "Режим",
+			"chat": "Чат",
+			"chatTitle": "Модель отвечает напрямую",
+			"task": "Задача",
+			"taskTitle": "Модель работает по шагам с Хранилищем, веб-страницами и инструментами MCP"
+		},
+		"tools": {
+			"vault": "Хранилище",
+			"vaultTitle": "Разрешить модели искать по файлам Хранилища и сводкам чатов",
+			"web": "Веб",
+			"webTitle": "Разрешить модели читать веб-страницы"
+		},
+		"image": {
+			"size": "Размер",
+			"steps": "Шаги"
+		},
+		"thinking": {
+			"label": "Размышления",
+			"off": "Выкл."
+		},
+		"newChat": "Новый чат",
+		"conversation": {
+			"opening": "Открытие беседы",
+			"empty": "Отправьте сообщение, чтобы начать чат с {{name}}.",
+			"theModel": "моделью",
+			"waiting": "Ожидание устройства · {{seconds}} с",
+			"waitingQueued_one": "Ожидание устройства · {{seconds}} с · модель занята {{count}} другим запросом, ваш в очереди",
+			"waitingQueued_few": "Ожидание устройства · {{seconds}} с · модель занята {{count}} другими запросами, ваш в очереди",
+			"waitingQueued_many": "Ожидание устройства · {{seconds}} с · модель занята {{count}} другими запросами, ваш в очереди",
+			"waitingQueued_other": "Ожидание устройства · {{seconds}} с · модель занята другими запросами ({{count}}), ваш в очереди"
+		},
+		"composer": {
+			"files": "Файлы для вложения",
+			"attachImagesOrDocuments": "Прикрепить изображения или документы",
+			"attachDocuments": "Прикрепить документы",
+			"message": "Сообщение",
+			"placeholder": "Enter — отправить, Shift+Enter — новая строка",
+			"stop": "Остановить",
+			"send": "Отправить"
+		},
+		"attachments": {
+			"charactersRead_one": "Устройство прочитало {{characters}} символ",
+			"charactersRead_few": "Устройство прочитало {{characters}} символа",
+			"charactersRead_many": "Устройство прочитало {{characters}} символов",
+			"charactersRead_other": "Устройство прочитало {{characters}} символа",
+			"uploading": "{{name}}…",
+			"missing": "{{name}} (больше нет на устройстве)",
+			"download": "Скачать"
+		},
+		"task": {
+			"running": "{{label}}: выполняется",
+			"showResult": "Показать результат",
+			"hideResult": "Скрыть результат"
+		},
+		"history": {
+			"intro": "Беседы, хранящиеся на устройстве, из этого приложения и из TiinyOS.",
+			"search": "Поиск бесед",
+			"searchButton": "Найти",
+			"searching": "Поиск…",
+			"loading": "Загрузка бесед",
+			"noMatches": "Нет бесед, где упоминается «{{query}}».",
+			"empty": "Бесед пока нет. Здесь сохраняются ваши чаты.",
+			"untitled": "Без названия",
+			"delete": "Удалить",
+			"confirmTitle": "Удалить беседу?",
+			"confirmText": "Удалить «{{title}}» с устройства? Она будет удалена и из TiinyOS."
+		}
+	},
+	"auth": {
+		"layout": {
+			"welcome": "Добро пожаловать в <brand>Tiiny</brand>",
+			"tagline": "Следите за устройством, управляйте загруженными моделями и общайтесь в чате из любого браузера в вашей сети."
+		},
+		"signIn": {
+			"title": "Вход",
+			"description": "Введите пароль администратора, заданный для этого сервера.",
+			"password": "Пароль",
+			"passwordRequired": "Требуется пароль",
+			"showPassword": "Показать пароль",
+			"hidePassword": "Скрыть пароль",
+			"submit": "Войти",
+			"submitting": "Вход…",
+			"failed": "Не удалось войти ({{status}})",
+			"unreachable": "Не удалось связаться с сервером"
+		}
+	},
+	"core": {
+		"backHome": "Вернуться на главную",
+		"notFound": {
+			"heading": "404: Страница, которую вы ищете, не найдена",
+			"hint": "Воспользуйтесь навигацией, чтобы вернуться на панель управления."
+		},
+		"errors": {
+			"requestFailed": "Ошибка запроса ({{status}})",
+			"deviceReported": "Устройство сообщило {{status}}"
+		}
+	},
+	"agents": {
+		"page": {
+			"title": "Агенты",
+			"description": "Установленные на устройстве агенты открываются здесь по HTTPS, за входом в это приложение."
+		},
+		"loading": "Загрузка агентов",
+		"recommendedModels_one": "Рекомендуемая модель: {{models}}",
+		"recommendedModels_few": "Рекомендуемые модели: {{models}}",
+		"recommendedModels_many": "Рекомендуемые модели: {{models}}",
+		"recommendedModels_other": "Рекомендуемые модели: {{models}}",
+		"stream": {
+			"failed": "Ошибка",
+			"working": "Выполняется"
+		},
+		"progress": {
+			"percent": "{{message}} {{percent}}%",
+			"ariaLabel": "Ход операции: {{name}}",
+			"startingInstall": "Начало установки…",
+			"resumingInstall": "Возобновление установки…",
+			"updating": "Обновление…",
+			"stopping": "Остановка…",
+			"starting": "Запуск…",
+			"deleting": "Удаление…"
+		},
+		"install": {
+			"paused": "Установка приостановлена на {{percent}}%",
+			"running": "Установка {{percent}}%",
+			"ariaLabel": "Установка {{name}}"
+		},
+		"outcome": {
+			"installed": "{{name}} установлен.",
+			"installPaused": "Установка {{name}} приостановлена.",
+			"updated": "{{name}} обновлён до {{version}}.",
+			"stopped": "{{name}} остановлен.",
+			"started": "{{name}} запущен.",
+			"deleted": "{{name}} удалён.",
+			"error": "{{name}}: {{message}}"
+		},
+		"actions": {
+			"resume": "Возобновить",
+			"pause": "Приостановить",
+			"cancelInstall": "Отменить установку",
+			"update": "Обновить",
+			"open": "Открыть",
+			"stop": "Остановить",
+			"start": "Запустить",
+			"delete": "Удалить",
+			"installOnDevice": "Установить на устройство",
+			"cancel": "Отмена"
+		},
+		"installed": {
+			"heading": "На этом устройстве",
+			"empty": "На устройстве нет установленных агентов. Установите агента из магазина ниже.",
+			"version": "Версия {{version}}",
+			"versionWithUpdate": "Версия {{version}} · доступна {{latest}}",
+			"unknownVersion": "неизвестна",
+			"usage": "CPU {{cpu}}% · память {{memory}}",
+			"containersStopped": "Устройство сообщает, что контейнеры этого агента неожиданно остановились. Запустите его снова или нажмите «Остановить», чтобы сбросить его.",
+			"proxyError": "Прокси на порту {{port}}: {{error}}"
+		},
+		"store": {
+			"heading": "Магазин агентов: запуск на устройстве",
+			"allInstalled": "Все веб-агенты из магазина уже установлены.",
+			"version": "Версия {{version}}"
+		},
+		"desktop": {
+			"heading": "Магазин агентов: запуск на вашем компьютере",
+			"description": "Эти агенты работают на компьютере и используют OpenAI-совместимый API устройства. Укажите им адрес устройства (например, <code>http://&lt;адрес устройства&gt;/v1</code>) и ключ из <code>tiiny auth key</code>.",
+			"noDownloads": "Нет опубликованных загрузок."
+		},
+		"deleteDialog": {
+			"title": "Удалить {{name}}?",
+			"text": "Агент будет удалён с устройства. Его можно снова установить из магазина агентов."
+		},
+		"status": {
+			"created": "создан",
+			"running": "работает",
+			"starting": "запускается",
+			"stopped": "остановлен",
+			"exited": "завершён",
+			"paused": "приостановлен",
+			"error": "ошибка"
+		}
+	},
+	"connectors": {
+		"page": {
+			"title": "Коннекторы",
+			"description": "Почта, календари, мессенджеры и инструменты MCP, которыми модели могут пользоваться в режиме «Задача»."
+		},
+		"category": {
+			"email": "Почта",
+			"calendar": "Календарь",
+			"messaging": "Мессенджеры"
+		},
+		"state": {
+			"connected": "Подключено",
+			"notConnected": "Не подключено",
+			"notReachable": "Недоступно"
+		},
+		"actions": {
+			"connect": "Подключить",
+			"disconnect": "Отключить",
+			"cancel": "Отмена",
+			"close": "Закрыть",
+			"remove": "Удалить"
+		},
+		"services": {
+			"heading": "Сервисы",
+			"description": "Модели используют подключённые сервисы в режиме «Задача» в пределах того, что вы разрешили. Подключения хранятся на устройстве и общие с TiinyOS.",
+			"loading": "Загрузка коннекторов",
+			"waitingForSignIn": "Ожидаем завершения входа… <link>Открыть страницу входа</link>"
+		},
+		"outcome": {
+			"connected": "{{name}} подключён: {{detail}}.",
+			"whatsappConnected": "WhatsApp подключён.",
+			"disconnected": "{{name}} отключён.",
+			"error": "{{name}}: {{message}}"
+		},
+		"disconnectDialog": {
+			"title": "Отключить?",
+			"text": "Отключить {{name}}? Устройство забудет сохранённые данные входа, и модели больше не смогут его использовать."
+		},
+		"connect": {
+			"title": "Подключение: {{name}}",
+			"telegramIntro": "Создайте бота через @BotFather в Telegram (/newbot) и вставьте полученный токен.",
+			"discordIntro": "Создайте бота в Discord Developer Portal, включите Message Content Intent, пригласите его на свой сервер и вставьте его токен.",
+			"xIntro": "Войдите на x.com в браузере и скопируйте cookie auth_token и ct0.",
+			"botToken": "Токен бота",
+			"channelId": "ID канала",
+			"channelIdHelp": "Канал, который бот может читать и в котором может писать.",
+			"whatsappQrAlt": "QR-код для привязки WhatsApp",
+			"whatsappIntro": "В WhatsApp на телефоне откройте Настройки → Связанные устройства → Привязка устройства и отсканируйте этот код.",
+			"newCode": "Новый код",
+			"emailIntro": "Используйте пароль приложения (Gmail, Outlook и iCloud требуют его при включённой двухэтапной проверке).",
+			"provider": "Провайдер",
+			"otherProvider": "Другой",
+			"emailAddress": "Адрес эл. почты",
+			"appPassword": "Пароль приложения",
+			"imapServer": "Сервер IMAP",
+			"smtpServer": "Сервер SMTP",
+			"checking": "Проверка…"
+		},
+		"mcp": {
+			"heading": "Собственные MCP-серверы",
+			"addServer": "Добавить MCP-сервер",
+			"description": "Инструменты этих серверов предлагаются моделям в режиме «Задача». Серверы работают на устройстве.",
+			"loading": "Загрузка MCP-серверов",
+			"empty": "MCP-серверов пока нет.",
+			"tools": "Инструменты",
+			"hideTools": "Скрыть инструменты",
+			"loadingTools": "Загрузка инструментов",
+			"added": "MCP-сервер добавлен.",
+			"removed": "{{name}} удалён.",
+			"removeDialog": {
+				"title": "Удалить MCP-сервер?",
+				"text": "Удалить {{name}} с устройства? Модели больше не смогут использовать его инструменты."
+			},
+			"addDialog": {
+				"title": "Добавление MCP-сервера",
+				"description": "Сервер работает на устройстве, поэтому должен быть доступен оттуда. Серверы, которым нужен рабочий стол или браузер, на устройстве работать не будут.",
+				"byUrl": "По URL",
+				"fromJson": "Из JSON",
+				"name": "Название",
+				"url": "URL",
+				"urlHelp": "Конечная точка HTTP или SSE, например {{example}}",
+				"config": "Конфигурация MCP",
+				"invalidJson": "Это недопустимый JSON",
+				"add": "Добавить",
+				"adding": "Добавление…"
+			}
+		}
+	},
+	"settings": {
+		"page": {
+			"title": "Настройки",
+			"subtitle": "Собственные настройки устройства, как в TiinyOS."
+		},
+		"actions": {
+			"cancel": "Отмена",
+			"save": "Сохранить",
+			"saving": "Сохранение…",
+			"retry": "Повторить",
+			"copy": "Копировать",
+			"copied": "Скопировано",
+			"delete": "Удалить",
+			"deleting": "Удаление…"
+		},
+		"section": {
+			"staleValues": "Показаны последние известные значения. {{error}}"
+		},
+		"device": {
+			"title": "Моё устройство",
+			"subheader": "Данные от устройства",
+			"loading": "Загрузка сведений об устройстве",
+			"name": "Имя",
+			"rename": "Переименовать",
+			"nameField": "Имя устройства",
+			"serialNumber": "Серийный номер",
+			"copySerialNumber": "Копировать серийный номер",
+			"model": "Модель",
+			"osService": "Служба TiinyOS"
+		},
+		"personalization": {
+			"title": "Персонализация",
+			"subheader": "Сведения о вас, которые устройство передаёт моделям в режиме «Задача»",
+			"loading": "Загрузка персонализации",
+			"fields": {
+				"userName": {
+					"label": "Имя",
+					"hint": "Как модели обращаются к вам."
+				},
+				"occupation": {
+					"label": "Род занятий",
+					"hint": "Например: инженер-программист."
+				},
+				"preferences": {
+					"label": "Предпочтения",
+					"hint": "Какие ответы вам нравятся."
+				},
+				"recentFocus": {
+					"label": "Текущие задачи",
+					"hint": "Над чем вы сейчас работаете."
+				}
+			},
+			"fieldHelper": "{{hint}} {{length}}/{{limit}}",
+			"saved": "Сохранено. Модели увидят это со следующей беседы в режиме «Задача».",
+			"discardChanges": "Отменить изменения"
+		},
+		"power": {
+			"title": "Система",
+			"subheader": "Питание и обновления TiinyOS",
+			"autoPowerOn": {
+				"title": "Автовключение",
+				"description": "Устройство включается само при подключении к питанию. Устройство не сообщает, включена ли эта функция (всегда показывается как выключенная), поэтому отображается только результат изменения.",
+				"turnOn": "Включить",
+				"turnOff": "Выключить",
+				"deviceReply": "Устройство: {{message}}"
+			},
+			"update": {
+				"title": "Обновление системы",
+				"current": "TiinyOS {{version}}",
+				"available": "TiinyOS {{version}} · доступна версия {{available}}",
+				"upToDate": "TiinyOS {{version}} · актуальная версия",
+				"loading": "Загрузка состояния обновления",
+				"inProgress": "Обновление: {{state}}…",
+				"progress": "Ход обновления",
+				"check": "Проверить обновления",
+				"checking": "Проверка…",
+				"download": "Скачать обновление",
+				"install": "Установить обновление",
+				"confirmTitle": "Установить обновление?",
+				"confirmText": "Во время установки модели остановятся, а устройство перезагрузится. Не отключайте его от питания, пока оно снова не заработает.",
+				"confirmLabel": "Установить",
+				"installing": "Устанавливается обновление. Устройство перезагрузится один раз; не отключайте его от питания."
+			},
+			"power": {
+				"title": "Питание",
+				"restart": "Перезагрузить",
+				"shutDown": "Выключить",
+				"restarting": "Перезагрузка… ожидание возвращения устройства.",
+				"back": "Устройство снова в сети.",
+				"notBack": "Устройство не вернулось в сеть за 10 минут",
+				"shuttingDown": "Устройство выключается.",
+				"restartTitle": "Перезагрузить устройство?",
+				"restartText": "Загруженные модели, чаты и агенты остановятся, а устройство будет недоступно несколько минут.",
+				"shutDownTitle": "Выключить устройство?",
+				"shutDownText": "Загруженные модели, чаты и агенты остановятся. Устройство останется выключенным, пока его не включат на самом устройстве (или не подключат снова к питанию при включённом автовключении)."
+			}
+		},
+		"apiAccess": {
+			"title": "Доступ к API",
+			"subheader": "Используйте модели устройства из других приложений в вашей сети",
+			"loading": "Загрузка доступа к API",
+			"openaiCompatible": "Совместимо с OpenAI",
+			"uses": {
+				"openai": "Текст, эмбеддинги, реранжирование, изображения, речь",
+				"anthropic": "Генерация текста",
+				"ollama": "Генерация текста, эмбеддинги"
+			},
+			"copyBaseUrl": "Копировать базовый URL {{format}}",
+			"apiKey": "Ключ API",
+			"copyApiKey": "Копировать ключ API",
+			"reveal": "Показать",
+			"hint": "Укажите id модели со страницы «Модели» или <code>default</code> для последней использованной модели. Храните ключ в секрете: любой, у кого он есть, может пользоваться API устройства."
+		},
+		"storage": {
+			"title": "Диск",
+			"subheader": "Использование диска на устройстве",
+			"loading": "Загрузка сведений о диске",
+			"used": "Использовано {{used}} из {{total}}",
+			"usedBar": "Занято на диске",
+			"category": "{{name}}: {{size}}",
+			"modelFiles": "Файлы моделей",
+			"agentFiles": "Файлы агентов",
+			"size": "Размер",
+			"usedByVault": "Занято Хранилищем",
+			"deleted": "{{id}} удалено.",
+			"deleteModelTitle": "Удалить модель?",
+			"deleteModelText": "Удалить {{id}} с устройства? Чтобы снова её использовать, придётся скачать её заново.",
+			"deleteAgentTitle": "Удалить агента?",
+			"deleteAgentText": "Удалить {{id}} и его данные с устройства? Это действие нельзя отменить."
+		},
+		"backup": {
+			"title": "Резервное копирование",
+			"subheader": "История чатов и Хранилище, сохраняемые на этот компьютер",
+			"backUp": {
+				"title": "Создать копию",
+				"loading": "Загрузка резервного копирования",
+				"category": "{{name}} · около {{size}}",
+				"categoryNotReady": "{{name}} · около {{size}} (не готово)",
+				"download": "Скачать резервную копию",
+				"inProgress": "Создание копии…",
+				"saved": "Сохранено: {{name}} ({{size}}).",
+				"savedWithout": "Сохранено: {{name}} ({{size}}), без: {{failed}}."
+			},
+			"restore": {
+				"title": "Восстановление",
+				"chooseFile": "Выберите файл резервной копии",
+				"fileField": "Файл резервной копии",
+				"restore": "Восстановить",
+				"inProgress": "Восстановление…",
+				"otherDevice": "Эта резервная копия создана на другом устройстве ({{deviceId}}); восстановить её можно только там.",
+				"unknownDevice": "неизвестно",
+				"result": "{{name}}: {{message}}",
+				"restored": "восстановлено",
+				"failed": "Устройству не удалось восстановить резервную копию",
+				"confirmTitle": "Восстановить резервную копию?",
+				"confirmText": "Заменить на устройстве {{categories}} содержимым резервной копии? Всё, что добавлено после её создания, будет потеряно.",
+				"categoryJoiner": " и "
+			}
+		},
+		"network": {
+			"title": "Сеть",
+			"subheader": "Wi-Fi и проводные подключения устройства",
+			"loading": "Загрузка сети",
+			"wifi": "Wi-Fi",
+			"wifiTurnedOn": "Wi-Fi включён.",
+			"wifiTurnedOff": "Wi-Fi выключен.",
+			"connectedTo": "Подключено к {{ssid}} (сигнал {{signal}}%)",
+			"notConnected": "Не подключено",
+			"off": "Выкл.",
+			"wifiLink": "Это приложение подключается к устройству по Wi-Fi ({{interface}}), поэтому выключение Wi-Fi, удаление сети {{ssid}} или подключение к другой сети здесь недоступны. Внесите эти изменения в TiinyOS или подключите устройство кабелем.",
+			"interfaces": {
+				"interface": "Интерфейс",
+				"state": "Состояние",
+				"addresses": "Адреса",
+				"appLink": "Связь этого приложения"
+			},
+			"networks": {
+				"scanning": "Поиск сетей…",
+				"network": "Сеть",
+				"autoJoin": "Автоподключение",
+				"connected": "Подключено",
+				"connecting": "Подключение…",
+				"saved": "Сохранена",
+				"open": "Открытая",
+				"signal": "Сигнал {{signal}}%",
+				"autoJoinSwitch": "Автоподключение к {{ssid}}",
+				"autoJoinOn": "Автоподключение к {{ssid}} включено.",
+				"autoJoinOff": "Автоподключение к {{ssid}} выключено.",
+				"join": "Подключиться",
+				"joining": "Подключение к {{ssid}}.",
+				"forget": "Забыть",
+				"forgotten": "Сеть {{ssid}} забыта."
+			},
+			"joinDialog": {
+				"title": "Подключение к {{ssid}}",
+				"password": "Пароль"
+			},
+			"forgetDialog": {
+				"title": "Забыть сеть?",
+				"text": "Устройство забудет сеть {{ssid}} и её пароль."
+			}
+		}
+	},
+	"models": {
+		"heading": "Модели",
+		"percent": "{{value}}%",
+		"tabs": {
+			"models": "Модели",
+			"store": "Магазин"
+		},
+		"pages": {
+			"models": "Загрузите скачанную модель в память NPU или выгрузите её, чтобы освободить место.",
+			"store": "Модели из магазина Tiiny. Загрузки сохраняются на устройство; загружайте их на вкладке «Модели».",
+			"huggingFace": "Импорт собственных моделей с Hugging Face. Что можно импортировать, решает устройство: обычно это дообученные версии и адаптеры LoRA моделей из его магазина, некоторые — только после скачивания соответствующей модели из магазина."
+		},
+		"columns": {
+			"model": "Модель",
+			"type": "Тип",
+			"size": "Размер",
+			"npuShare": "Доля NPU",
+			"status": "Статус",
+			"action": "Действие"
+		},
+		"table": {
+			"loading": "Загрузка моделей",
+			"title": "Скачанные модели",
+			"npuFree": "Свободно {{percent}}% NPU",
+			"empty": "На устройстве нет скачанных моделей.",
+			"status": {
+				"loaded": "загружена",
+				"notLoaded": "не загружена",
+				"tooBig": "мало свободной NPU",
+				"tooBigHint": "Требуется {{needed}}% NPU; свободно {{free}}%. Выгрузите модель, чтобы освободить место."
+			},
+			"pending": {
+				"load": "Запуск…",
+				"unload": "Выгрузка…",
+				"delete": "Удаление…"
+			},
+			"progress": {
+				"load": "ход загрузки",
+				"unload": "ход выгрузки",
+				"delete": "ход удаления"
+			},
+			"done": {
+				"load": "{{name}} загружена.",
+				"unload": "{{name}} выгружена.",
+				"delete": "{{name}} удалена."
+			},
+			"failed": {
+				"load": "Не удалось загрузить {{name}}: {{reason}}",
+				"unload": "Не удалось выгрузить {{name}}: {{reason}}",
+				"delete": "Не удалось удалить {{name}}: {{reason}}",
+				"unloadAll": "Не удалось выгрузить все модели: {{reason}}",
+				"interrupt": "Не удалось прервать {{name}}: {{reason}}"
+			},
+			"allUnloaded": "Все модели выгружены.",
+			"interrupted": "Работа {{name}} прервана.",
+			"interrupt": "Прервать",
+			"interruptHint": "Остановить запросы, которые обрабатывает эта модель, из любого приложения",
+			"unload": "Выгрузить",
+			"unloading": "Выгрузка…",
+			"unloadAll": "Выгрузить все",
+			"delete": "Удалить",
+			"load": "Загрузить",
+			"cancel": "Отмена",
+			"unloadAllDialog": {
+				"title": "Выгрузить все модели?",
+				"text": "Все загруженные модели будут выгружены из NPU. Выполняющиеся запросы из этого приложения и других клиентов будут остановлены."
+			},
+			"deleteDialog": {
+				"title": "Удалить {{name}}?",
+				"text": "Файлы модели будут удалены с устройства. Её можно снова скачать из магазина."
+			},
+			"unloadDialog": {
+				"title": "Выгрузить {{name}}?",
+				"text": "Это освободит её долю NPU. Все запросы, использующие модель сейчас, из этого приложения или других клиентов, будут остановлены."
+			}
+		},
+		"store": {
+			"loading": "Загрузка магазина",
+			"search": "Поиск в магазине",
+			"searchPlaceholder": "Поиск моделей",
+			"allTypes": "Все типы",
+			"empty": "Нет моделей в магазине, соответствующих запросу.",
+			"tableLabel": "Модели магазина",
+			"trending": "популярное",
+			"stage": {
+				"starting": "Запуск",
+				"downloading": "Скачивание",
+				"verifying": "Проверка",
+				"installing": "Установка"
+			},
+			"status": {
+				"loaded": "загружена",
+				"downloaded": "скачана",
+				"paused": "пауза {{percent}}%",
+				"downloading": "скачивание {{percent}}%",
+				"notDownloaded": "не скачана"
+			},
+			"downloadProgress": "ход скачивания",
+			"pause": "Приостановить",
+			"cancel": "Отмена",
+			"resume": "Возобновить",
+			"download": "Скачать",
+			"deviceReported": "Устройство сообщило {{status}}",
+			"streamEnded": "Поток загрузки завершился до того, как модель была скачана",
+			"pausedDone": "{{name}}: скачивание приостановлено. Возобновите его в любой момент.",
+			"downloaded": "{{name}} скачана. Загрузите её на странице «Модели».",
+			"cancelled": "Скачивание {{name}} отменено.",
+			"failed": {
+				"download": "Не удалось скачать {{name}}: {{reason}}",
+				"pause": "Не удалось приостановить {{name}}: {{reason}}",
+				"cancel": "Не удалось отменить {{name}}: {{reason}}"
+			},
+			"details": {
+				"tableLabel": "Сведения о модели",
+				"close": "Закрыть",
+				"modelId": "Id модели",
+				"type": "Тип",
+				"parameters": "Параметры",
+				"inputOutput": "Вход → выход",
+				"npuShare": "Доля NPU",
+				"contextWindow": "Контекстное окно",
+				"tokens_one": "{{tokens}} токен",
+				"tokens_few": "{{tokens}} токена",
+				"tokens_many": "{{tokens}} токенов",
+				"tokens_other": "{{tokens}} токена",
+				"imageSize": "Размер изображения",
+				"defaultSteps": "Шагов по умолчанию",
+				"guidanceScale": "Guidance scale",
+				"reasoning": "Рассуждения",
+				"loadTime": "Время загрузки",
+				"loadSeconds": "около {{seconds}} с",
+				"downloadsLikes": "Скачивания · лайки",
+				"thinking": {
+					"none": "Нет",
+					"toggleable": "Можно отключить",
+					"alwaysOn": "Всегда включены",
+					"levels": "уровни {{levels}}",
+					"defaultLevel": "по умолчанию {{level}}"
+				}
+			}
+		},
+		"huggingFace": {
+			"verdict": {
+				"compatible": "совместима",
+				"needsBaseModel": "нужна базовая модель",
+				"incompatible": "несовместима"
+			},
+			"kind": {
+				"adapter": "адаптер LoRA",
+				"fineTune": "дообученная"
+			},
+			"search": {
+				"title": "Поиск совместимых моделей",
+				"subheader": "Адаптеры LoRA и дообученные модели на Hugging Face, построенные на модели из магазина и проверенные устройством.",
+				"baseModel": "Базовая модель",
+				"onDevice": "{{modelId}} (на устройстве)",
+				"query": "Поиск (необязательно)",
+				"submit": "Искать на Hugging Face",
+				"checkingBases": "Запрашиваем у устройства, какие модели магазина могут служить базой для импорта…",
+				"autoCheck": "Автопроверка результатов",
+				"compatibleOnly": "Только совместимые",
+				"limit": "Результатов каждого вида",
+				"searching": "Поиск на Hugging Face",
+				"empty": "На Hugging Face не найдено адаптеров или дообученных версий {{base}}.",
+				"tableLabel": "Репозитории Hugging Face",
+				"groups": {
+					"importable": "Базы для импорта",
+					"checking": "Проверка на устройстве…",
+					"notOnHf": "Нет на Hugging Face",
+					"unsupported": "Импорт не поддерживается"
+				},
+				"columns": {
+					"repo": "Репозиторий",
+					"kind": "Вид",
+					"downloads": "Скачивания",
+					"compatibility": "Совместимость",
+					"action": "Действие"
+				},
+				"details": "Подробнее",
+				"checking": "проверка…",
+				"notChecked": "не проверено",
+				"checkFailed": "ошибка проверки",
+				"downloadBase": "Сначала скачайте {{name}} из магазина",
+				"summary": {
+					"checked": "Проверено {{finished}} из {{total}} · совместимых: {{compatible}}",
+					"needBase_one": "{{count}} требует базовую модель",
+					"needBase_few": "{{count}} требуют базовую модель",
+					"needBase_many": "{{count}} требуют базовую модель",
+					"needBase_other": "{{count}} требуют базовую модель",
+					"hidden_one": "{{count}} несовместимая скрыта",
+					"hidden_few": "{{count}} несовместимые скрыты",
+					"hidden_many": "{{count}} несовместимых скрыто",
+					"hidden_other": "{{count}} несовместимых скрыто"
+				},
+				"checkingCompatibility": "Проверка совместимости"
+			},
+			"check": {
+				"title": "Проверка репозитория",
+				"subheader": "Можно ли импортировать репозиторий, решает устройство.",
+				"repo": "Репозиторий Hugging Face",
+				"placeholder": "org/name или https://huggingface.co/org/name",
+				"checking": "Проверка…",
+				"check": "Проверить",
+				"checkingRepo": "Проверка репозитория",
+				"store": "Магазин",
+				"needsBase": "Можно импортировать после скачивания {{name}} ({{modelId}}) из магазина на устройство.",
+				"cannotImport": "Устройство не может импортировать этот репозиторий.",
+				"size": "Размер {{size}}",
+				"baseModel": "базовая модель {{modelId}}",
+				"disk": "требуется {{required}} на диске, свободно {{available}}",
+				"toolkit": "Перед импортом на устройство будет скачан набор инструментов {{toolkit}} ({{size}}).",
+				"noDisk": "Недостаточно свободного места на диске устройства.",
+				"bytes": "{{downloaded}} из {{total}}",
+				"importProgress": "ход импорта",
+				"continues": "Импорт выполняется на устройстве и продолжится, если вы уйдёте с этой страницы.",
+				"cancelImport": "Отменить импорт",
+				"import": "Импортировать на устройство",
+				"starting": "Запуск",
+				"importing": "Импорт",
+				"importFailed": "Ошибка импорта",
+				"cancelled": "Импорт отменён.",
+				"imported": "{{repo}} импортирован. Загрузите его на странице «Модели».",
+				"streamStopped": "Обновления хода импорта прекратились. Возможно, импорт ещё выполняется на устройстве."
+			}
+		}
+	},
+	"vault": {
+		"layout": {
+			"title": "Хранилище",
+			"description": "База знаний устройства: ваши файлы и сводки прошлых чатов, проиндексированные на устройстве для поиска моделями.",
+			"tabs": {
+				"files": "Файлы",
+				"chatHistory": "История чатов"
+			}
+		},
+		"files": {
+			"title": "Файлы",
+			"subheader": "PDF, Word, Excel, CSV, текст, Markdown или HTML, до 200 MB каждый. Модели используют их в режиме «Задача».",
+			"upload": "Загрузить файлы",
+			"uploadInput": "Файлы для загрузки",
+			"loading": "Загрузка файлов Хранилища",
+			"empty": "Файлов пока нет. Загрузите документы, чтобы модели могли их использовать.",
+			"fileCount_one": "{{count}} файл",
+			"fileCount_few": "{{count}} файла",
+			"fileCount_many": "{{count}} файлов",
+			"fileCount_other": "{{count}} файла",
+			"columns": {
+				"file": "Файл",
+				"size": "Размер",
+				"added": "Добавлен",
+				"status": "Статус"
+			},
+			"status": {
+				"indexed": "Проиндексирован",
+				"indexFailed": "Ошибка индексации",
+				"notIndexed": "Не проиндексирован"
+			},
+			"actions": {
+				"index": "Индексировать",
+				"download": "Скачать",
+				"rename": "Переименовать",
+				"delete": "Удалить"
+			},
+			"progress": {
+				"label": "Ход работы Хранилища",
+				"line": "{{label}}: {{message}}",
+				"uploading": "Загрузка…",
+				"indexing": "Индексация…",
+				"loadingModel": "Загрузка модели эмбеддингов",
+				"stage": "Индексация: {{stage}}",
+				"withChunks": "{{stage}} ({{processed}}/{{total}} фрагментов)",
+				"retrying": "Индексация на устройстве не удалась, повторная попытка…"
+			},
+			"outcome": {
+				"added": "{{label}}: добавлено в Хранилище.",
+				"indexed": "{{name}} проиндексирован.",
+				"renamed": "Переименовано в {{name}}.",
+				"deleted": "{{name}} удалён."
+			},
+			"errors": {
+				"device": "Устройство сообщило об ошибке",
+				"uploadUnconfirmed": "Устройство не подтвердило загрузку"
+			},
+			"renameDialog": {
+				"title": "Переименовать файл",
+				"name": "Имя файла",
+				"cancel": "Отмена",
+				"confirm": "Переименовать"
+			},
+			"deleteDialog": {
+				"title": "Удалить файл?",
+				"text": "Удалить {{name}} и его индекс с устройства? Модели больше не смогут его найти.",
+				"confirm": "Удалить"
+			}
+		},
+		"search": {
+			"title": "Поиск в Хранилище",
+			"subheader": "То, что находят модели при поиске в Хранилище",
+			"label": "Поиск",
+			"submit": "Найти",
+			"searching": "Поиск…",
+			"empty": "Ничего подходящего не найдено."
+		},
+		"chatHistory": {
+			"title": "История чатов",
+			"subheader": "Ежедневные сводки прошлых бесед, хранящиеся в Хранилище.",
+			"loading": "Загрузка истории чатов",
+			"empty": "Сводок пока нет.",
+			"read": "Читать",
+			"hide": "Скрыть",
+			"delete": "Удалить",
+			"loadingSummary": "Загрузка сводки",
+			"deleted": "Сводка за {{day}} удалена.",
+			"deleteDialog": {
+				"title": "Удалить сводку?",
+				"text": "Удалить сводку за {{day}}? Модели больше не смогут вспомнить беседы того дня.",
+				"confirm": "Удалить"
+			}
+		},
+		"summarySettings": {
+			"loading": "Загрузка ежедневных сводок",
+			"enabled": "Ежедневные сводки",
+			"time": "Время",
+			"deviceTime": "{{time}} на устройстве ({{zone}})",
+			"model": "Модель",
+			"save": "Сохранить",
+			"saving": "Сохранение…",
+			"savedOn": "Ежедневные сводки включены, в {{time}}.",
+			"savedOff": "Ежедневные сводки выключены.",
+			"description": "Каждый день устройство подводит итоги бесед за день и сохраняет их в Хранилище, чтобы модели могли вспомнить их в режиме «Задача». На время работы оно загружает модель, поэтому та может быть какое-то время занята."
+		}
+	},
+	"playground": {
+		"layout": {
+			"title": "Песочница",
+			"description": "Испытайте модели речи, зрения, эмбеддингов и реранжирования устройства, а также измерьте скорость текстовых моделей (как в tiiny CLI). Модель загружается при первом запуске."
+		},
+		"tabs": {
+			"asr": {
+				"label": "Речь в текст",
+				"intro": "Расшифруйте запись WAV с помощью модели распознавания речи."
+			},
+			"tts": {
+				"label": "Текст в речь",
+				"intro": "Озвучьте текст с помощью голосовой модели."
+			},
+			"ocr": {
+				"label": "OCR",
+				"intro": "Распознайте текст на изображении."
+			},
+			"embed": {
+				"label": "Эмбеддинги",
+				"intro": "Преобразуйте тексты в векторы и сравните, насколько они похожи."
+			},
+			"rerank": {
+				"label": "Реранжирование",
+				"intro": "Упорядочьте документы по тому, насколько хорошо они отвечают на запрос."
+			},
+			"text": {
+				"label": "Бенчмарк",
+				"intro": "Измерьте скорость генерации текстовой модели, как tiiny bench."
+			}
+		},
+		"model": {
+			"label": "Модель",
+			"loadsWhenRun": "{{name}} (загрузится при запуске)"
+		},
+		"loading": "Загрузка моделей",
+		"noModel": "Нет скачанной модели для этого. Получите её в магазине.",
+		"run": "Запустить",
+		"running": "Выполнение…",
+		"asr": {
+			"chooseFile": "Выберите файл WAV",
+			"fileInput": "Аудиофайл"
+		},
+		"tts": {
+			"text": "Текст",
+			"voice": "Голос (необязательно)",
+			"voiceHelp": "Нужен лишь некоторым голосовым моделям, например Supertonic.",
+			"download": "Скачать"
+		},
+		"ocr": {
+			"chooseImage": "Выбрать изображение",
+			"imageInput": "Файл изображения",
+			"noText": "Текст не найден.",
+			"lines": "Распознанные строки",
+			"score": "{{value}}%"
+		},
+		"embed": {
+			"texts": "Тексты",
+			"textsHelp": "По одному тексту на строку",
+			"summary_one": "{{count}} измерение. Косинусное сходство:",
+			"summary_few": "{{count}} измерения. Косинусное сходство:",
+			"summary_many": "{{count}} измерений. Косинусное сходство:",
+			"summary_other": "{{count}} измерения. Косинусное сходство:"
+		},
+		"rerank": {
+			"query": "Запрос",
+			"documents": "Документы",
+			"documentsHelp": "По одному документу на строку",
+			"results": "Упорядоченные документы"
+		},
+		"bench": {
+			"tokensInput": "Токенов для генерации",
+			"results": "Бенчмарк",
+			"speed": "Скорость генерации",
+			"speedValue": "{{value}} токенов/с",
+			"firstToken": "Время до первого токена",
+			"seconds": "{{value}} с",
+			"tokens": "Токены",
+			"tokensValue": "{{prompt}} на входе · {{completion}} на выходе · всего {{total}} с"
+		}
+	},
+	"overview": {
+		"title": "Обзор",
+		"npuReady": "NPU готов к работе.",
+		"loading": "Загрузка состояния устройства",
+		"retry": "Повторить",
+		"staleValues": "Показаны последние известные значения. {{error}}",
+		"percent": "{{value}}%",
+		"usedOfTotal": "{{used}} из {{total}}",
+		"stats": {
+			"npuUtilization": "Загрузка NPU",
+			"npuReserved": "{{percent}} зарезервировано загруженными моделями",
+			"npuMemory": "Память NPU",
+			"systemMemory": "Системная память",
+			"systemMemoryCaption": "CPU {{cpu}} · {{used}} из {{total}} RAM",
+			"storage": "Диск",
+			"progress": "{{title}} {{percent}}"
+		},
+		"running": {
+			"title": "Загруженные модели",
+			"empty": "Нет загруженных моделей. Загрузите модель на странице «Модели».",
+			"columns": {
+				"model": "Модель",
+				"type": "Тип",
+				"status": "Статус",
+				"npuShare": "Доля NPU",
+				"activeRequests": "Активные запросы"
+			}
+		},
+		"usage": {
+			"title": "Использование токенов",
+			"subheader": "{{tokens}} за {{requests}} (текстовые модели)",
+			"subheaderLoading": "Текстовые модели",
+			"tokens_one": "{{value}} токен",
+			"tokens_few": "{{value}} токена",
+			"tokens_many": "{{value}} токенов",
+			"tokens_other": "{{value}} токена",
+			"requests_one": "{{value}} запрос",
+			"requests_few": "{{value}} запроса",
+			"requests_many": "{{value}} запросов",
+			"requests_other": "{{value}} запроса",
+			"previousWeek": "Предыдущая неделя",
+			"nextWeek": "Следующая неделя",
+			"weekRange": "{{start}} – {{end}}",
+			"dayBar": "{{day}}: {{tokens}}",
+			"segment": "{{day}} · {{model}}: {{tokens}}",
+			"other": "Другое",
+			"showTable": "Показать таблицей",
+			"showChart": "Показать график",
+			"loading": "Загрузка использования токенов",
+			"empty": "На этой неделе токенов нет.",
+			"table": {
+				"label": "Использование токенов по дням",
+				"day": "День",
+				"model": "Модель",
+				"requests": "Запросы",
+				"prompt": "Запрос",
+				"completion": "Ответ",
+				"total": "Всего"
+			}
+		},
+		"apps": {
+			"title": "Использование по приложениям",
+			"subheader": "Токены за эту неделю по приложениям",
+			"label": "Использование по приложениям",
+			"loading": "Загрузка использования приложениями",
+			"empty": "На этой неделе токенов нет."
+		}
+	},
+	"server": {
+		"done": "Готово",
+		"models": {
+			"allUnloaded": "Все модели выгружены"
+		},
+		"settings": {
+			"shuttingDown": "Выключение",
+			"restarting": "Перезагрузка",
+			"enabled": "Включено",
+			"disabled": "Выключено",
+			"specs": {
+				"peakInt8": "Пиковая INT8",
+				"storage": "Диск",
+				"network": "Сеть"
+			}
+		},
+		"connectors": {
+			"connected": "Подключено",
+			"notConnected": "Не подключено",
+			"unavailable": "Недоступно",
+			"waitingForQr": "Ожидание сканирования QR-кода",
+			"scanQr": "Отсканируйте QR-код в WhatsApp",
+			"signIn": "Войдите с аккаунтом {{provider}}",
+			"names": {
+				"email": "Почта (IMAP/SMTP)",
+				"telegram": "Бот Telegram",
+				"discord": "Бот Discord"
+			}
+		},
+		"backup": {
+			"categories": {
+				"conversationService": "История чатов",
+				"knowledgeBase": "Хранилище и персонализация",
+				"agentUsage": "Использование агентов",
+				"connectorService": "Коннекторы",
+				"scheduled": "Запланированные задачи",
+				"skills": "Навыки"
+			}
+		},
+		"usage": {
+			"otherApps": "API и другие приложения"
+		},
+		"task": {
+			"searchedVault": "Поиск в Хранилище: {{query}}",
+			"readHost": "Прочитано: {{host}}",
+			"readWebPage": "Прочитана веб-страница",
+			"updatedOccupation": "Обновлён ваш род занятий",
+			"updatedPreferences": "Обновлены ваши предпочтения",
+			"updatedRecentFocus": "Обновлены ваши текущие задачи",
+			"updatedProfile": "Обновлён ваш профиль",
+			"updatedField": "Обновлено поле «{{field}}»"
+		}
+	}
+}

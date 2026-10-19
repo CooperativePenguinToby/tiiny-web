@@ -23,9 +23,9 @@ async function hubSearch(filter: string, query: string, limit: number): Promise<
 	try {
 		response = await fetch(url, { signal: AbortSignal.timeout(15_000) });
 	} catch (error) {
-		throw new DeviceError(`Hugging Face is unreachable: ${String(error)}`, 502);
+		throw new DeviceError("errors.hf.unreachable", 502, { reason: String(error) });
 	}
-	if (!response.ok) throw new DeviceError(`Hugging Face responded ${response.status}`, 502);
+	if (!response.ok) throw new DeviceError("errors.hf.responded", 502, { status: response.status });
 	return (await response.json()) as HubModel[];
 }
 
@@ -34,9 +34,10 @@ async function hubSearch(filter: string, query: string, limit: number): Promise<
 export const GET = apiRoute(async (request) => {
 	const parameters = new URL(request.url).searchParams;
 	const base = parameters.get("base") ?? "";
-	if (!/^[\w.-]+\/[\w.-]+$/.test(base)) throw new DeviceError("base must be a model id like Org/Name", 400);
+	if (!/^[\w.-]+\/[\w.-]+$/.test(base)) throw new DeviceError("errors.request.modelIdLike", 400, { field: "base" });
 	const limit = Number(parameters.get("limit") ?? 40);
-	if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) throw new DeviceError("limit must be 1-100", 400);
+	if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100)
+		throw new DeviceError("errors.request.range", 400, { field: "limit", min: 1, max: 100 });
 	const query = (parameters.get("q") ?? "").trim();
 	const results = await Promise.all(
 		RELATIONS.map(async (relation) => {

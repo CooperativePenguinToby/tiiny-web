@@ -1,0 +1,1187 @@
+{
+	"nav": {
+		"overview": "概要",
+		"models": "モデル",
+		"agents": "エージェント",
+		"chat": "チャット",
+		"playground": "プレイグラウンド",
+		"vault": "Vault",
+		"connectors": "コネクタ",
+		"settings": "設定",
+		"openNavigation": "ナビゲーションを開く",
+		"signOut": "サインアウト",
+		"language": "言語",
+		"languageCurrent": "言語：{{language}}"
+	},
+	"titles": {
+		"page": "{{page}} | {{site}}",
+		"notFound": "見つかりません",
+		"settings": "設定",
+		"overview": "概要",
+		"agents": "エージェント",
+		"history": "履歴",
+		"signIn": "サインイン",
+		"playground": "プレイグラウンド",
+		"connectors": "コネクタ",
+		"models": "モデル",
+		"store": "ストア",
+		"chat": "チャット",
+		"vault": "Vault",
+		"huggingFace": "Hugging Face"
+	},
+	"errors": {
+		"notSignedIn": "サインインしていません",
+		"internal": "内部エラー",
+		"unknownLanguage": "不明な言語",
+		"incorrectPassword": "パスワードが正しくありません",
+		"passthrough": "{{message}}",
+		"request": {
+			"expected": "{{shape}} が必要です",
+			"required": "{{field}} は必須です",
+			"mustBeText": "{{field}} はテキストで指定してください",
+			"tooLong_other": "{{field}} が {{count}} 文字を超えています",
+			"modelIdFormat": "{{field}} は Org/Name の形式で指定してください",
+			"modelIdLike": "{{field}} は Org/Name のようなモデル ID で指定してください",
+			"range": "{{field}} は {{min}}～{{max}} で指定してください",
+			"oneOf": "{{field}} は次のいずれかで指定してください：{{options}}",
+			"dateFormat": "{{field}} は {{example}} のような日付で指定してください",
+			"jsonList": "{{field}} は JSON リストで指定してください",
+			"emptySearch": "検索語を入力してください"
+		},
+		"device": {
+			"notConfigured": "デバイスが設定されていません。TIINY_DEVICE_URL と TIINY_AUTH_KEY を設定するか、先に tiiny CLI でサインインしてください",
+			"notConfiguredShort": "デバイスが設定されていません",
+			"responded": "デバイスの応答 {{status}}：{{message}}",
+			"respondedUnavailable": "デバイスの応答 {{status}}：サービスを利用できません",
+			"unreachable": "{{url}} のデバイスに接続できません：{{reason}}",
+			"emptyStream": "デバイスから空のストリームが返されました",
+			"refusedChange": "デバイスが変更を拒否しました",
+			"reportedError": "デバイスがエラーを報告しました"
+		},
+		"file": {
+			"tooLarge": "{{name}} が {{megabytes}} MB を超えています"
+		},
+		"hf": {
+			"invalidRepo": "Hugging Face のリポジトリを org/name または huggingface.co の URL で入力してください",
+			"unreachable": "Hugging Face に接続できません：{{reason}}",
+			"responded": "Hugging Face の応答 {{status}}"
+		},
+		"models": {
+			"didNotLoad": "モデルを読み込めませんでした",
+			"didNotLoadStatus": "モデルを読み込めませんでした（{{status}}）",
+			"didNotLoadNoStatus": "モデルを読み込めませんでした（ステータスなし）"
+		},
+		"connectors": {
+			"unknown": "不明なコネクタ",
+			"noAccountSignIn": "このコネクタはアカウントでサインインしません",
+			"accountSignIn": "このコネクタはアカウントでサインインします",
+			"tokenRejected": "デバイスがトークンを拒否しました",
+			"xLoginRejected": "X がログインを拒否しました",
+			"mailLoginRefused": "メールサーバーがログインを拒否しました",
+			"whatsappFailed": "デバイスで WhatsApp を起動できませんでした",
+			"invalidMcpId": "無効な MCP サーバー ID",
+			"mcpConfig": "{{example}} のような JSON オブジェクトが必要です"
+		},
+		"chat": {
+			"invalidAttachment": "無効な添付ファイル",
+			"tooManyAttachments_other": "添付ファイルは {{count}} 個までです",
+			"chooseFile": "ファイルを選択してください",
+			"unsupportedFile": "{{name}}：画像または {{extensions}} ファイルを添付してください",
+			"noText": "{{name}} にテキストが見つかりませんでした",
+			"invalidMediaId": "無効なメディア ID"
+		},
+		"task": {
+			"interrupted": "中断しました。",
+			"tooManySteps_other": "{{count}} ステップを実行しても最終回答が得られなかったため停止しました。"
+		},
+		"history": {
+			"invalidConversationId": "無効な会話 ID"
+		},
+		"vault": {
+			"invalidSourceId": "無効なソース ID",
+			"chooseFiles": "ファイルを 1 つ以上選択してください",
+			"tooManyFiles_other": "一度にアップロードできるのは {{count}} ファイルまでです",
+			"unsupportedFile": "{{name}}：Vault で扱えるのは {{extensions}} ファイルです",
+			"invalidName": "スラッシュを含まないファイル名を入力してください"
+		},
+		"memory": {
+			"chooseTextModel": "ダウンロード済みのテキストモデルを選択してください"
+		},
+		"settings": {
+			"deviceNameLength_other": "デバイス名は 1～{{count}} 文字で入力してください"
+		},
+		"agents": {
+			"noDomain": "エージェントのサブドメインが設定されていません（AGENT_DOMAIN）"
+		},
+		"playground": {
+			"textRequired": "テキストは必須です",
+			"textTooLong_other": "テキストが {{count}} 文字を超えています",
+			"queryRequired": "クエリは必須です",
+			"queryTooLong_other": "クエリが {{count}} 文字を超えています",
+			"numberedTextRequired": "テキスト {{number}} は必須です",
+			"numberedTextTooLong_other": "テキスト {{number}} が {{count}} 文字を超えています",
+			"documentRequired": "ドキュメント {{number}} は必須です",
+			"documentTooLong_other": "ドキュメント {{number}} が {{count}} 文字を超えています",
+			"textCount": "テキストを {{min}}～{{max}} 件入力してください",
+			"documentCount": "ドキュメントを {{min}}～{{max}} 件入力してください",
+			"chooseAudio": "音声を選択または録音してください",
+			"audioTooLarge": "音声が {{megabytes}} MB を超えています",
+			"wavOnly": "デバイスで文字起こしできるのは WAV 音声のみです。先にファイルを WAV に変換してください。",
+			"chooseImage": "画像を選択してください",
+			"imageTooLarge": "画像が {{megabytes}} MB を超えています"
+		},
+		"backup": {
+			"chooseFile": "バックアップファイルを選択してください",
+			"chooseCategory": "デバイスが提供するカテゴリを 1 つ以上選択してください",
+			"unexpectedReply": "予期しないバックアップ応答（{{type}}）",
+			"unexpectedReplyNoType": "予期しないバックアップ応答（種類なし）",
+			"noArchive": "デバイスのバックアップにアーカイブが含まれていません",
+			"notBackup": "このファイルは Tiiny のバックアップではありません",
+			"otherDevice": "このバックアップは別のデバイスで作成されたため、そのデバイスでのみ復元できます",
+			"missing": "バックアップに {{services}} が含まれていません"
+		},
+		"wifi": {
+			"unknownAction": "不明な Wi-Fi 操作",
+			"wouldDropLink": "このアプリは Wi-Fi 経由でデバイスに接続しているため、この変更を行うと接続が切断されます。TiinyOS から行うか、デバイスをケーブルで接続してから行ってください。"
+		},
+		"update": {
+			"upToDate": "TiinyOS は最新です",
+			"notReady": "インストール可能なダウンロード済みアップデートはありません",
+			"unknownAction": "不明なアップデート操作"
+		},
+		"agentProxy": {
+			"noAnswer": "エージェントが応答しませんでした（{{reason}}）。停止している可能性があります。",
+			"linkExpired": "このリンクは期限切れです。tiiny-web のエージェントページからエージェントを開き直してください。",
+			"signIn": "tiiny-web にサインインし、エージェントページからこのエージェントを開いてください。"
+		}
+	},
+	"chat": {
+		"title": "チャット",
+		"tabs": {
+			"chat": "チャット",
+			"history": "履歴"
+		},
+		"intro": "読み込み済みのモデルと会話します。チャットはデバイスのチャット履歴に保存され、TiinyOS と共有されます。デバイスはモデルごとに一度に 1 件のリクエストしか処理しないため、応答が順番待ちになることがあります。",
+		"message": {
+			"you": "あなた",
+			"assistant": "アシスタント",
+			"thinking": "思考"
+		},
+		"notes": {
+			"stopped": "停止しました。",
+			"noReply": "応答が完了していません。",
+			"interrupted": "中断しました。",
+			"drawing": "描画中… ステップ {{step}}/{{total}}",
+			"picture_other": "{{size}}、{{count}} ステップ"
+		},
+		"errors": {
+			"openConversation": "会話を開けませんでした：{{message}}",
+			"load": "{{name}} を読み込めませんでした：{{message}}",
+			"device": "デバイスがエラーを報告しました",
+			"gaveUp": "デバイスの待機がタイムアウトしました。モデルが他のリクエストを処理中でした。もう一度お試しください。（{{message}}）",
+			"drawFailed": "デバイスで画像を描画できませんでした",
+			"noPicture": "デバイスの処理は完了しましたが、画像は生成されませんでした",
+			"notSaved": "履歴に保存されませんでした：{{message}}"
+		},
+		"models": {
+			"loading": "チャットモデルを読み込み中",
+			"none": "チャットモデルも画像モデルもダウンロードされていません。ストアから入手して読み込んでください。",
+			"modelsButton": "モデル",
+			"label": "モデル",
+			"choose": "モデルを選択",
+			"notLoadedOption": "{{name}}（未読み込み）"
+		},
+		"loading": {
+			"starting": "開始中",
+			"unloading": "{{name}} をアンロード中",
+			"status": "{{name}} を読み込み中：{{message}}",
+			"statusProgress": "{{name}} を読み込み中：{{message}} {{progress}}%",
+			"progressLabel": "モデルの読み込み",
+			"notLoaded": "{{name}} は読み込まれていません。",
+			"load": "読み込む"
+		},
+		"makeRoom": {
+			"title": "{{name}} のための空きを作りますか？",
+			"text": "デバイスの NPU メモリの空きが足りません。先に {{models}} をアンロードしますか？これらを使用しているアプリは停止します。",
+			"otherModels": "他のモデル",
+			"cancel": "キャンセル",
+			"confirm": "アンロードして読み込む"
+		},
+		"mode": {
+			"label": "モード",
+			"chat": "チャット",
+			"chatTitle": "モデルが直接回答します",
+			"task": "タスク",
+			"taskTitle": "モデルが Vault、Web ページ、MCP ツールを使って段階的に作業します"
+		},
+		"tools": {
+			"vault": "Vault",
+			"vaultTitle": "Vault のファイルとチャットの要約をモデルに検索させます",
+			"web": "Web",
+			"webTitle": "Web ページをモデルに読ませます"
+		},
+		"image": {
+			"size": "サイズ",
+			"steps": "ステップ数"
+		},
+		"thinking": {
+			"label": "思考",
+			"off": "オフ"
+		},
+		"newChat": "新しいチャット",
+		"conversation": {
+			"opening": "会話を開いています",
+			"empty": "メッセージを送信して {{name}} とのチャットを始めましょう。",
+			"theModel": "モデル",
+			"waiting": "デバイスを待機中 · {{seconds}} 秒",
+			"waitingQueued_other": "デバイスを待機中 · {{seconds}} 秒 · モデルは他の {{count}} 件のリクエストを処理中のため、順番待ちです"
+		},
+		"composer": {
+			"files": "添付するファイル",
+			"attachImagesOrDocuments": "画像またはドキュメントを添付",
+			"attachDocuments": "ドキュメントを添付",
+			"message": "メッセージ",
+			"placeholder": "Enter で送信、Shift+Enter で改行",
+			"stop": "停止",
+			"send": "送信"
+		},
+		"attachments": {
+			"charactersRead_other": "デバイスが {{characters}} 文字を読み取りました",
+			"uploading": "{{name}}…",
+			"missing": "{{name}}（デバイス上にありません）",
+			"download": "ダウンロード"
+		},
+		"task": {
+			"running": "{{label}} を実行中",
+			"showResult": "結果を表示",
+			"hideResult": "結果を非表示"
+		},
+		"history": {
+			"intro": "このアプリと TiinyOS での会話で、デバイスに保存されているもの。",
+			"search": "会話を検索",
+			"searchButton": "検索",
+			"searching": "検索中…",
+			"loading": "会話を読み込み中",
+			"noMatches": "「{{query}}」を含む会話はありません。",
+			"empty": "まだ会話はありません。チャットするとここに保存されます。",
+			"untitled": "無題",
+			"delete": "削除",
+			"confirmTitle": "会話を削除しますか？",
+			"confirmText": "「{{title}}」をデバイスから削除しますか？TiinyOS からも削除されます。"
+		}
+	},
+	"auth": {
+		"layout": {
+			"welcome": "<brand>Tiiny</brand> へようこそ",
+			"tagline": "ネットワーク上のどのブラウザからでも、デバイスの監視、読み込み済みモデルの管理、チャットができます。"
+		},
+		"signIn": {
+			"title": "サインイン",
+			"description": "このサーバーに設定された管理者パスワードを入力してください。",
+			"password": "パスワード",
+			"passwordRequired": "パスワードは必須です",
+			"showPassword": "パスワードを表示",
+			"hidePassword": "パスワードを非表示",
+			"submit": "サインイン",
+			"submitting": "サインイン中…",
+			"failed": "サインインに失敗しました（{{status}}）",
+			"unreachable": "サーバーに接続できませんでした"
+		}
+	},
+	"core": {
+		"backHome": "ホームに戻る",
+		"notFound": {
+			"heading": "404：お探しのページは見つかりません",
+			"hint": "ナビゲーションを使ってダッシュボードに戻ってください。"
+		},
+		"errors": {
+			"requestFailed": "リクエストに失敗しました（{{status}}）",
+			"deviceReported": "デバイスの応答 {{status}}"
+		}
+	},
+	"agents": {
+		"page": {
+			"title": "エージェント",
+			"description": "デバイスにインストールされたエージェントは、このアプリのサインインで保護された HTTPS 経由でここに開きます。"
+		},
+		"loading": "エージェントを読み込み中",
+		"recommendedModels_other": "推奨モデル：{{models}}",
+		"stream": {
+			"failed": "失敗",
+			"working": "処理中"
+		},
+		"progress": {
+			"percent": "{{message}} {{percent}}%",
+			"ariaLabel": "{{name}} の進行状況",
+			"startingInstall": "インストールを開始中…",
+			"resumingInstall": "インストールを再開中…",
+			"updating": "アップデート中…",
+			"stopping": "停止中…",
+			"starting": "起動中…",
+			"deleting": "削除中…"
+		},
+		"install": {
+			"paused": "インストールは {{percent}}% で一時停止中",
+			"running": "インストール中 {{percent}}%",
+			"ariaLabel": "{{name}} のインストール"
+		},
+		"outcome": {
+			"installed": "{{name}} をインストールしました。",
+			"installPaused": "{{name}} のインストールを一時停止しました。",
+			"updated": "{{name}} を {{version}} にアップデートしました。",
+			"stopped": "{{name}} を停止しました。",
+			"started": "{{name}} を起動しました。",
+			"deleted": "{{name}} を削除しました。",
+			"error": "{{name}}：{{message}}"
+		},
+		"actions": {
+			"resume": "再開",
+			"pause": "一時停止",
+			"cancelInstall": "インストールをキャンセル",
+			"update": "アップデート",
+			"open": "開く",
+			"stop": "停止",
+			"start": "起動",
+			"delete": "削除",
+			"installOnDevice": "デバイスにインストール",
+			"cancel": "キャンセル"
+		},
+		"installed": {
+			"heading": "このデバイス",
+			"empty": "デバイスにエージェントがインストールされていません。下のストアからインストールしてください。",
+			"version": "バージョン {{version}}",
+			"versionWithUpdate": "バージョン {{version}} · {{latest}} が利用可能",
+			"unknownVersion": "不明",
+			"usage": "CPU {{cpu}}% · メモリ {{memory}}",
+			"containersStopped": "このエージェントのコンテナが予期せず停止したとデバイスが報告しています。再度起動するか、「停止」でリセットしてください。",
+			"proxyError": "ポート {{port}} のプロキシ：{{error}}"
+		},
+		"store": {
+			"heading": "エージェントストア：デバイスで実行",
+			"allInstalled": "ストアの Web エージェントはすべてインストール済みです。",
+			"version": "バージョン {{version}}"
+		},
+		"desktop": {
+			"heading": "エージェントストア：お使いのコンピューターで実行",
+			"description": "これらのエージェントはコンピューター上で動作し、デバイスの OpenAI 互換 API を使用します。接続先をデバイス（例：<code>http://&lt;device address&gt;/v1</code>）に設定し、<code>tiiny auth key</code> で取得したキーを使用してください。",
+			"noDownloads": "公開されているダウンロードはありません。"
+		},
+		"deleteDialog": {
+			"title": "{{name}} を削除しますか？",
+			"text": "デバイスからエージェントを削除します。エージェントストアから再度インストールできます。"
+		},
+		"status": {
+			"created": "作成済み",
+			"running": "実行中",
+			"starting": "起動中",
+			"stopped": "停止",
+			"exited": "終了",
+			"paused": "一時停止",
+			"error": "エラー"
+		}
+	},
+	"connectors": {
+		"page": {
+			"title": "コネクタ",
+			"description": "タスクモードでモデルが使用できるメール、カレンダー、メッセージング、MCP ツール。"
+		},
+		"category": {
+			"email": "メール",
+			"calendar": "カレンダー",
+			"messaging": "メッセージング"
+		},
+		"state": {
+			"connected": "接続済み",
+			"notConnected": "未接続",
+			"notReachable": "接続不可"
+		},
+		"actions": {
+			"connect": "接続",
+			"disconnect": "接続解除",
+			"cancel": "キャンセル",
+			"close": "閉じる",
+			"remove": "削除"
+		},
+		"services": {
+			"heading": "サービス",
+			"description": "タスクモードでは、許可した範囲内でモデルが接続済みのサービスを使用します。接続情報はデバイスに保存され、TiinyOS と共有されます。",
+			"loading": "コネクタを読み込み中",
+			"waitingForSignIn": "サインインの完了を待っています… <link>サインインページを開く</link>"
+		},
+		"outcome": {
+			"connected": "{{name}} に接続しました：{{detail}}。",
+			"whatsappConnected": "WhatsApp に接続しました。",
+			"disconnected": "{{name}} の接続を解除しました。",
+			"error": "{{name}}：{{message}}"
+		},
+		"disconnectDialog": {
+			"title": "接続を解除しますか？",
+			"text": "{{name}} の接続を解除しますか？保存されたサインイン情報はデバイスから消去され、モデルは使用できなくなります。"
+		},
+		"connect": {
+			"title": "{{name}} に接続",
+			"telegramIntro": "Telegram の @BotFather でボットを作成し（/newbot）、発行されたトークンを貼り付けてください。",
+			"discordIntro": "Discord Developer Portal でボットを作成し、Message Content Intent を有効にしてサーバーに招待してから、トークンを貼り付けてください。",
+			"xIntro": "ブラウザで x.com にサインインし、auth_token と ct0 の Cookie をコピーしてください。",
+			"botToken": "ボットトークン",
+			"channelId": "チャンネル ID",
+			"channelIdHelp": "ボットが読み取りと投稿を行えるチャンネル。",
+			"whatsappQrAlt": "WhatsApp ペアリング用 QR コード",
+			"whatsappIntro": "スマートフォンの WhatsApp で「設定 → リンク済みデバイス → デバイスをリンク」を開き、このコードをスキャンしてください。",
+			"newCode": "新しいコード",
+			"emailIntro": "アプリパスワードを使用してください（2 段階認証が有効な場合、Gmail、Outlook、iCloud では必須です）。",
+			"provider": "プロバイダー",
+			"otherProvider": "その他",
+			"emailAddress": "メールアドレス",
+			"appPassword": "アプリパスワード",
+			"imapServer": "IMAP サーバー",
+			"smtpServer": "SMTP サーバー",
+			"checking": "確認中…"
+		},
+		"mcp": {
+			"heading": "カスタム MCP サーバー",
+			"addServer": "MCP サーバーを追加",
+			"description": "これらのサーバーのツールは、タスクモードでモデルに提供されます。サーバーはデバイス上で動作します。",
+			"loading": "MCP サーバーを読み込み中",
+			"empty": "MCP サーバーはまだありません。",
+			"tools": "ツール",
+			"hideTools": "ツールを非表示",
+			"loadingTools": "ツールを読み込み中",
+			"added": "MCP サーバーを追加しました。",
+			"removed": "{{name}} を削除しました。",
+			"removeDialog": {
+				"title": "MCP サーバーを削除しますか？",
+				"text": "{{name}} をデバイスから削除しますか？モデルはそのツールを使用できなくなります。"
+			},
+			"addDialog": {
+				"title": "MCP サーバーを追加",
+				"description": "サーバーはデバイス上で動作するため、デバイスからアクセスできる必要があります。デスクトップ環境やブラウザが必要なサーバーはデバイス上では動作しません。",
+				"byUrl": "URL で指定",
+				"fromJson": "JSON で指定",
+				"name": "名前",
+				"url": "URL",
+				"urlHelp": "HTTP または SSE エンドポイント（例：{{example}}）",
+				"config": "MCP 設定",
+				"invalidJson": "有効な JSON ではありません",
+				"add": "追加",
+				"adding": "追加中…"
+			}
+		}
+	},
+	"settings": {
+		"page": {
+			"title": "設定",
+			"subtitle": "TiinyOS と同じ、デバイス本体の設定です。"
+		},
+		"actions": {
+			"cancel": "キャンセル",
+			"save": "保存",
+			"saving": "保存中…",
+			"retry": "再試行",
+			"copy": "コピー",
+			"copied": "コピーしました",
+			"delete": "削除",
+			"deleting": "削除中…"
+		},
+		"section": {
+			"staleValues": "最後に取得した値を表示しています。{{error}}"
+		},
+		"device": {
+			"title": "マイデバイス",
+			"subheader": "デバイスからの報告",
+			"loading": "デバイス情報を読み込み中",
+			"name": "名前",
+			"rename": "名前を変更",
+			"nameField": "デバイス名",
+			"serialNumber": "シリアル番号",
+			"copySerialNumber": "シリアル番号をコピー",
+			"model": "モデル",
+			"osService": "TiinyOS サービス"
+		},
+		"personalization": {
+			"title": "パーソナライズ",
+			"subheader": "タスクモードでデバイスがモデルに伝える、あなたに関する情報",
+			"loading": "パーソナライズを読み込み中",
+			"fields": {
+				"userName": {
+					"label": "呼び名",
+					"hint": "モデルがあなたを呼ぶときの名前。"
+				},
+				"occupation": {
+					"label": "職業",
+					"hint": "例：ソフトウェアエンジニア。"
+				},
+				"preferences": {
+					"label": "好み",
+					"hint": "希望する回答のスタイル。"
+				},
+				"recentFocus": {
+					"label": "最近の関心事",
+					"hint": "現在取り組んでいること。"
+				}
+			},
+			"fieldHelper": "{{hint}} {{length}}/{{limit}}",
+			"saved": "保存しました。次のタスクモードの会話からモデルに反映されます。",
+			"discardChanges": "変更を破棄"
+		},
+		"power": {
+			"title": "システム",
+			"subheader": "電源と TiinyOS のアップデート",
+			"autoPowerOn": {
+				"title": "自動電源オン",
+				"description": "電源に接続するとデバイスが自動的にオンになります。デバイスはこの設定の状態を報告しない（常にオフとして読み取られる）ため、変更の結果のみが表示されます。",
+				"turnOn": "オンにする",
+				"turnOff": "オフにする",
+				"deviceReply": "デバイス：{{message}}"
+			},
+			"update": {
+				"title": "システムアップデート",
+				"current": "TiinyOS {{version}}",
+				"available": "TiinyOS {{version}} · バージョン {{available}} が利用可能",
+				"upToDate": "TiinyOS {{version}} · 最新",
+				"loading": "アップデート状況を読み込み中",
+				"inProgress": "アップデート {{state}}…",
+				"progress": "アップデートの進行状況",
+				"check": "アップデートを確認",
+				"checking": "確認中…",
+				"download": "アップデートをダウンロード",
+				"install": "アップデートをインストール",
+				"confirmTitle": "アップデートをインストールしますか？",
+				"confirmText": "インストール中はモデルが停止し、デバイスが再起動します。復帰するまで電源を抜かないでください。",
+				"confirmLabel": "インストール",
+				"installing": "アップデートをインストールしています。デバイスは一度再起動します。電源を抜かないでください。"
+			},
+			"power": {
+				"title": "電源",
+				"restart": "再起動",
+				"shutDown": "シャットダウン",
+				"restarting": "再起動中… デバイスの復帰を待っています。",
+				"back": "デバイスが復帰しました。",
+				"notBack": "10 分経ってもデバイスが復帰しません",
+				"shuttingDown": "デバイスをシャットダウンしています。",
+				"restartTitle": "デバイスを再起動しますか？",
+				"restartText": "読み込み済みのモデル、チャット、エージェントが停止し、数分間デバイスにアクセスできなくなります。",
+				"shutDownTitle": "デバイスをシャットダウンしますか？",
+				"shutDownText": "読み込み済みのモデル、チャット、エージェントが停止します。デバイス本体で電源を入れるまで（または自動電源オンが有効な状態で電源に再接続するまで）オフのままになります。"
+			}
+		},
+		"apiAccess": {
+			"title": "API アクセス",
+			"subheader": "ネットワーク上の他のアプリからデバイスのモデルを使用",
+			"loading": "API アクセスを読み込み中",
+			"openaiCompatible": "OpenAI 互換",
+			"uses": {
+				"openai": "テキスト、埋め込み、リランク、画像、音声",
+				"anthropic": "テキスト生成",
+				"ollama": "テキスト生成、埋め込み"
+			},
+			"copyBaseUrl": "{{format}} のベース URL をコピー",
+			"apiKey": "API キー",
+			"copyApiKey": "API キーをコピー",
+			"reveal": "表示",
+			"hint": "モデルページのモデル ID を使用するか、直近に使用したモデルを指す <code>default</code> を指定してください。キーは秘密にしてください。キーを持つ人は誰でもデバイスの API を使用できます。"
+		},
+		"storage": {
+			"title": "ストレージ",
+			"subheader": "デバイスのディスク使用量",
+			"loading": "ストレージを読み込み中",
+			"used": "{{total}} 中 {{used}} 使用",
+			"usedBar": "ストレージ使用量",
+			"category": "{{name}}：{{size}}",
+			"modelFiles": "モデルファイル",
+			"agentFiles": "エージェントファイル",
+			"size": "サイズ",
+			"usedByVault": "Vault の使用量",
+			"deleted": "{{id}} を削除しました。",
+			"deleteModelTitle": "モデルを削除しますか？",
+			"deleteModelText": "{{id}} をデバイスから削除しますか？使用するには再度ダウンロードする必要があります。",
+			"deleteAgentTitle": "エージェントを削除しますか？",
+			"deleteAgentText": "{{id}} とそのデータをデバイスから削除しますか？この操作は元に戻せません。"
+		},
+		"backup": {
+			"title": "バックアップと復元",
+			"subheader": "チャット履歴と Vault をこのコンピューターに保存",
+			"backUp": {
+				"title": "バックアップ",
+				"loading": "バックアップを読み込み中",
+				"category": "{{name}} · 約 {{size}}",
+				"categoryNotReady": "{{name}} · 約 {{size}}（準備未完了）",
+				"download": "バックアップをダウンロード",
+				"inProgress": "バックアップ中…",
+				"saved": "{{name}}（{{size}}）を保存しました。",
+				"savedWithout": "{{name}}（{{size}}）を保存しました。含まれていないもの：{{failed}}。"
+			},
+			"restore": {
+				"title": "復元",
+				"chooseFile": "バックアップファイルを選択",
+				"fileField": "バックアップファイル",
+				"restore": "復元",
+				"inProgress": "復元中…",
+				"otherDevice": "このバックアップは別のデバイス（{{deviceId}}）で作成されたため、そのデバイスでのみ復元できます。",
+				"unknownDevice": "不明",
+				"result": "{{name}}：{{message}}",
+				"restored": "復元しました",
+				"failed": "デバイスでバックアップを復元できませんでした",
+				"confirmTitle": "バックアップを復元しますか？",
+				"confirmText": "デバイス上の {{categories}} をバックアップの内容で置き換えますか？バックアップ以降に追加されたものは失われます。",
+				"categoryJoiner": "と"
+			}
+		},
+		"network": {
+			"title": "ネットワーク",
+			"subheader": "デバイスの Wi-Fi 接続と有線接続",
+			"loading": "ネットワークを読み込み中",
+			"wifi": "Wi-Fi",
+			"wifiTurnedOn": "Wi-Fi をオンにしました。",
+			"wifiTurnedOff": "Wi-Fi をオフにしました。",
+			"connectedTo": "{{ssid}} に接続中（信号 {{signal}}%）",
+			"notConnected": "未接続",
+			"off": "オフ",
+			"wifiLink": "このアプリは Wi-Fi（{{interface}}）経由でデバイスに接続しているため、ここでは Wi-Fi のオフ、{{ssid}} の削除、別のネットワークへの接続はできません。これらの変更は TiinyOS から行うか、デバイスをケーブルで接続してから行ってください。",
+			"interfaces": {
+				"interface": "インターフェース",
+				"state": "状態",
+				"addresses": "アドレス",
+				"appLink": "このアプリの接続"
+			},
+			"networks": {
+				"scanning": "ネットワークをスキャン中…",
+				"network": "ネットワーク",
+				"autoJoin": "自動接続",
+				"connected": "接続済み",
+				"connecting": "接続中…",
+				"saved": "保存済み",
+				"open": "オープン",
+				"signal": "信号 {{signal}}%",
+				"autoJoinSwitch": "{{ssid}} に自動接続",
+				"autoJoinOn": "{{ssid}} の自動接続をオンにしました。",
+				"autoJoinOff": "{{ssid}} の自動接続をオフにしました。",
+				"join": "接続",
+				"joining": "{{ssid}} に接続しています。",
+				"forget": "削除",
+				"forgotten": "{{ssid}} を削除しました。"
+			},
+			"joinDialog": {
+				"title": "{{ssid}} に接続",
+				"password": "パスワード"
+			},
+			"forgetDialog": {
+				"title": "ネットワークを削除しますか？",
+				"text": "デバイスから {{ssid}} とそのパスワードが削除されます。"
+			}
+		}
+	},
+	"models": {
+		"heading": "モデル",
+		"percent": "{{value}}%",
+		"tabs": {
+			"models": "モデル",
+			"store": "ストア"
+		},
+		"pages": {
+			"models": "ダウンロード済みのモデルを NPU メモリに読み込むか、アンロードして空きを作ります。",
+			"store": "Tiiny ストアのモデルです。ダウンロード先はデバイスです。読み込みはモデルタブから行います。",
+			"huggingFace": "Hugging Face からカスタムモデルをインポートします。インポートできるかどうかはデバイスが判断します。通常はストアにあるモデルのファインチューンや LoRA アダプターで、一部は対応するストアモデルのダウンロード後にのみインポートできます。"
+		},
+		"columns": {
+			"model": "モデル",
+			"type": "種類",
+			"size": "サイズ",
+			"npuShare": "NPU 使用率",
+			"status": "状態",
+			"action": "操作"
+		},
+		"table": {
+			"loading": "モデルを読み込み中",
+			"title": "ダウンロード済みモデル",
+			"npuFree": "NPU の空き {{percent}}%",
+			"empty": "デバイスにダウンロード済みのモデルはありません。",
+			"status": {
+				"loaded": "読み込み済み",
+				"notLoaded": "未読み込み",
+				"tooBig": "NPU の空き不足",
+				"tooBigHint": "NPU の {{needed}}% が必要ですが、空きは {{free}}% です。モデルをアンロードして空きを作ってください。"
+			},
+			"pending": {
+				"load": "開始中…",
+				"unload": "アンロード中…",
+				"delete": "削除中…"
+			},
+			"progress": {
+				"load": "読み込みの進行状況",
+				"unload": "アンロードの進行状況",
+				"delete": "削除の進行状況"
+			},
+			"done": {
+				"load": "{{name}} を読み込みました。",
+				"unload": "{{name}} をアンロードしました。",
+				"delete": "{{name}} を削除しました。"
+			},
+			"failed": {
+				"load": "{{name}} を読み込めませんでした：{{reason}}",
+				"unload": "{{name}} をアンロードできませんでした：{{reason}}",
+				"delete": "{{name}} を削除できませんでした：{{reason}}",
+				"unloadAll": "すべてのモデルをアンロードできませんでした：{{reason}}",
+				"interrupt": "{{name}} を中断できませんでした：{{reason}}"
+			},
+			"allUnloaded": "すべてのモデルをアンロードしました。",
+			"interrupted": "{{name}} が処理中だった作業を停止しました。",
+			"interrupt": "中断",
+			"interruptHint": "このモデルが処理中のリクエストを、どのアプリからのものでも停止します",
+			"unload": "アンロード",
+			"unloading": "アンロード中…",
+			"unloadAll": "すべてアンロード",
+			"delete": "削除",
+			"load": "読み込む",
+			"cancel": "キャンセル",
+			"unloadAllDialog": {
+				"title": "すべてのモデルをアンロードしますか？",
+				"text": "読み込み済みのモデルがすべて NPU から解放されます。このアプリや他のクライアントからの処理中のリクエストは停止します。"
+			},
+			"deleteDialog": {
+				"title": "{{name}} を削除しますか？",
+				"text": "デバイスからこのモデルのファイルを削除します。ストアから再度ダウンロードできます。"
+			},
+			"unloadDialog": {
+				"title": "{{name}} をアンロードしますか？",
+				"text": "このモデルが使用している NPU が解放されます。このアプリや他のクライアントからこのモデルを使用中のリクエストはすべて停止します。"
+			}
+		},
+		"store": {
+			"loading": "ストアを読み込み中",
+			"search": "ストアを検索",
+			"searchPlaceholder": "モデルを検索",
+			"allTypes": "すべての種類",
+			"empty": "検索条件に一致するストアモデルはありません。",
+			"tableLabel": "ストアモデル",
+			"trending": "トレンド",
+			"stage": {
+				"starting": "開始中",
+				"downloading": "ダウンロード中",
+				"verifying": "検証中",
+				"installing": "インストール中"
+			},
+			"status": {
+				"loaded": "読み込み済み",
+				"downloaded": "ダウンロード済み",
+				"paused": "一時停止 {{percent}}%",
+				"downloading": "ダウンロード中 {{percent}}%",
+				"notDownloaded": "未ダウンロード"
+			},
+			"downloadProgress": "ダウンロードの進行状況",
+			"pause": "一時停止",
+			"cancel": "キャンセル",
+			"resume": "再開",
+			"download": "ダウンロード",
+			"deviceReported": "デバイスの応答 {{status}}",
+			"streamEnded": "モデルのダウンロードが完了する前にダウンロードストリームが終了しました",
+			"pausedDone": "{{name}} を一時停止しました。いつでも再開できます。",
+			"downloaded": "{{name}} をダウンロードしました。モデルページから読み込んでください。",
+			"cancelled": "{{name}} のダウンロードをキャンセルしました。",
+			"failed": {
+				"download": "{{name}} をダウンロードできませんでした：{{reason}}",
+				"pause": "{{name}} を一時停止できませんでした：{{reason}}",
+				"cancel": "{{name}} をキャンセルできませんでした：{{reason}}"
+			},
+			"details": {
+				"tableLabel": "モデルの詳細",
+				"close": "閉じる",
+				"modelId": "モデル ID",
+				"type": "種類",
+				"parameters": "パラメーター数",
+				"inputOutput": "入力 → 出力",
+				"npuShare": "NPU 使用率",
+				"contextWindow": "コンテキストウィンドウ",
+				"tokens_other": "{{tokens}} トークン",
+				"imageSize": "画像サイズ",
+				"defaultSteps": "デフォルトのステップ数",
+				"guidanceScale": "ガイダンススケール",
+				"reasoning": "推論",
+				"loadTime": "読み込み時間",
+				"loadSeconds": "約 {{seconds}} 秒",
+				"downloadsLikes": "ダウンロード数 · いいね数",
+				"thinking": {
+					"none": "なし",
+					"toggleable": "オフにできる",
+					"alwaysOn": "常にオン",
+					"levels": "レベル {{levels}}",
+					"defaultLevel": "デフォルト {{level}}"
+				}
+			}
+		},
+		"huggingFace": {
+			"verdict": {
+				"compatible": "互換",
+				"needsBaseModel": "ベースモデルが必要",
+				"incompatible": "非互換"
+			},
+			"kind": {
+				"adapter": "LoRA アダプター",
+				"fineTune": "ファインチューン"
+			},
+			"search": {
+				"title": "互換モデルを探す",
+				"subheader": "ストアモデルをベースにした Hugging Face 上の LoRA アダプターとファインチューンを、デバイスで確認します。",
+				"baseModel": "ベースモデル",
+				"onDevice": "{{modelId}}（デバイス上）",
+				"query": "検索（任意）",
+				"submit": "Hugging Face を検索",
+				"checkingBases": "インポートのベースにできるストアモデルをデバイスに問い合わせています…",
+				"autoCheck": "結果を自動で確認",
+				"compatibleOnly": "互換のみ",
+				"limit": "種類ごとの件数",
+				"searching": "Hugging Face を検索中",
+				"empty": "Hugging Face に {{base}} のアダプターやファインチューンは見つかりませんでした。",
+				"tableLabel": "Hugging Face リポジトリ",
+				"groups": {
+					"importable": "インポート可能なベース",
+					"checking": "デバイスで確認中…",
+					"notOnHf": "Hugging Face にない",
+					"unsupported": "インポート非対応"
+				},
+				"columns": {
+					"repo": "リポジトリ",
+					"kind": "種類",
+					"downloads": "ダウンロード数",
+					"compatibility": "互換性",
+					"action": "操作"
+				},
+				"details": "詳細",
+				"checking": "確認中…",
+				"notChecked": "未確認",
+				"checkFailed": "確認に失敗",
+				"downloadBase": "先にストアから {{name}} をダウンロードしてください",
+				"summary": {
+					"checked": "{{total}} 件中 {{finished}} 件を確認 · {{compatible}} 件が互換",
+					"needBase_other": "{{count}} 件はベースモデルが必要",
+					"hidden_other": "非互換の {{count}} 件を非表示"
+				},
+				"checkingCompatibility": "互換性を確認中"
+			},
+			"check": {
+				"title": "リポジトリを確認",
+				"subheader": "リポジトリをインポートできるかどうかはデバイスが判断します。",
+				"repo": "Hugging Face リポジトリ",
+				"placeholder": "org/name または https://huggingface.co/org/name",
+				"checking": "確認中…",
+				"check": "確認",
+				"checkingRepo": "リポジトリを確認中",
+				"store": "ストア",
+				"needsBase": "ストアから {{name}}（{{modelId}}）をデバイスにダウンロードすると、インポートできるようになります。",
+				"cannotImport": "デバイスはこのリポジトリをインポートできません。",
+				"size": "サイズ {{size}}",
+				"baseModel": "ベースモデル {{modelId}}",
+				"disk": "ディスク容量 {{required}} が必要、空き {{available}}",
+				"toolkit": "インポート時は、最初に {{toolkit}} ツールキット（{{size}}）をデバイスにダウンロードします。",
+				"noDisk": "デバイスのディスクの空き容量が不足しています。",
+				"bytes": "{{downloaded}}/{{total}}",
+				"importProgress": "インポートの進行状況",
+				"continues": "インポートはデバイス上で実行され、このページを離れても続行されます。",
+				"cancelImport": "インポートをキャンセル",
+				"import": "デバイスにインポート",
+				"starting": "開始中",
+				"importing": "インポート中",
+				"importFailed": "インポートに失敗しました",
+				"cancelled": "インポートをキャンセルしました。",
+				"imported": "{{repo}} をインポートしました。モデルページから読み込んでください。",
+				"streamStopped": "進行状況の更新が止まりました。デバイス上ではインポートが続行中の可能性があります。"
+			}
+		}
+	},
+	"vault": {
+		"layout": {
+			"title": "Vault",
+			"description": "デバイスのナレッジベースです。あなたのファイルと過去のチャットの要約をデバイス上でインデックス化し、モデルが検索できるようにします。",
+			"tabs": {
+				"files": "ファイル",
+				"chatHistory": "チャット履歴"
+			}
+		},
+		"files": {
+			"title": "ファイル",
+			"subheader": "PDF、Word、Excel、CSV、テキスト、Markdown、HTML（各 200 MB まで）。モデルはタスクモードでこれらを使用します。",
+			"upload": "ファイルをアップロード",
+			"uploadInput": "アップロードするファイル",
+			"loading": "Vault のファイルを読み込み中",
+			"empty": "ファイルはまだありません。モデルが使用するドキュメントをアップロードしてください。",
+			"fileCount_other": "{{count}} ファイル",
+			"columns": {
+				"file": "ファイル",
+				"size": "サイズ",
+				"added": "追加日",
+				"status": "状態"
+			},
+			"status": {
+				"indexed": "インデックス済み",
+				"indexFailed": "インデックス失敗",
+				"notIndexed": "未インデックス"
+			},
+			"actions": {
+				"index": "インデックス作成",
+				"download": "ダウンロード",
+				"rename": "名前を変更",
+				"delete": "削除"
+			},
+			"progress": {
+				"label": "Vault の進行状況",
+				"line": "{{label}}：{{message}}",
+				"uploading": "アップロード中…",
+				"indexing": "インデックス作成中…",
+				"loadingModel": "埋め込みモデルを読み込み中",
+				"stage": "インデックス作成中：{{stage}}",
+				"withChunks": "{{stage}}（{{processed}}/{{total}} チャンク）",
+				"retrying": "デバイスでのインデックス作成に失敗しました。再試行しています…"
+			},
+			"outcome": {
+				"added": "{{label}} を Vault に追加しました。",
+				"indexed": "{{name}} のインデックスを作成しました。",
+				"renamed": "{{name}} に名前を変更しました。",
+				"deleted": "{{name}} を削除しました。"
+			},
+			"errors": {
+				"device": "デバイスがエラーを報告しました",
+				"uploadUnconfirmed": "デバイスがアップロードを確認しませんでした"
+			},
+			"renameDialog": {
+				"title": "ファイル名を変更",
+				"name": "ファイル名",
+				"cancel": "キャンセル",
+				"confirm": "名前を変更"
+			},
+			"deleteDialog": {
+				"title": "ファイルを削除しますか？",
+				"text": "{{name}} とそのインデックスをデバイスから削除しますか？モデルはこのファイルを見つけられなくなります。",
+				"confirm": "削除"
+			}
+		},
+		"search": {
+			"title": "Vault を検索",
+			"subheader": "モデルが Vault を検索したときに見つかる内容",
+			"label": "検索",
+			"submit": "検索",
+			"searching": "検索中…",
+			"empty": "関連する内容は見つかりませんでした。"
+		},
+		"chatHistory": {
+			"title": "チャット履歴",
+			"subheader": "過去の会話の日次要約。Vault に保存されます。",
+			"loading": "チャット履歴を読み込み中",
+			"empty": "要約はまだありません。",
+			"read": "読む",
+			"hide": "非表示",
+			"delete": "削除",
+			"loadingSummary": "要約を読み込み中",
+			"deleted": "{{day}} の要約を削除しました。",
+			"deleteDialog": {
+				"title": "要約を削除しますか？",
+				"text": "{{day}} の要約を削除しますか？モデルはその日の会話を思い出せなくなります。",
+				"confirm": "削除"
+			}
+		},
+		"summarySettings": {
+			"loading": "日次要約を読み込み中",
+			"enabled": "日次要約",
+			"time": "時刻",
+			"deviceTime": "デバイス時刻 {{time}}（{{zone}}）",
+			"model": "モデル",
+			"save": "保存",
+			"saving": "保存中…",
+			"savedOn": "日次要約をオンにしました（{{time}}）。",
+			"savedOff": "日次要約をオフにしました。",
+			"description": "デバイスは毎日その日の会話を要約して Vault に保存し、モデルがタスクモードで思い出せるようにします。処理中はそのモデルを読み込むため、しばらくの間モデルがビジー状態になることがあります。"
+		}
+	},
+	"playground": {
+		"layout": {
+			"title": "プレイグラウンド",
+			"description": "デバイスの音声、画像認識、埋め込み、リランクモデルを試したり、テキストモデルのベンチマークを実行したりできます（tiiny CLI と同様）。モデルは初回実行時に読み込まれます。"
+		},
+		"tabs": {
+			"asr": {
+				"label": "音声認識",
+				"intro": "音声認識モデルで WAV 録音を文字起こしします。"
+			},
+			"tts": {
+				"label": "音声合成",
+				"intro": "音声モデルでテキストを音声に変換します。"
+			},
+			"ocr": {
+				"label": "OCR",
+				"intro": "画像内のテキストを読み取ります。"
+			},
+			"embed": {
+				"label": "埋め込み",
+				"intro": "テキストをベクトルに変換し、類似度を比較します。"
+			},
+			"rerank": {
+				"label": "リランク",
+				"intro": "クエリへの適合度でドキュメントを並べ替えます。"
+			},
+			"text": {
+				"label": "ベンチマーク",
+				"intro": "tiiny bench と同様に、テキストモデルの生成速度を測定します。"
+			}
+		},
+		"model": {
+			"label": "モデル",
+			"loadsWhenRun": "{{name}}（実行時に読み込み）"
+		},
+		"loading": "モデルを読み込み中",
+		"noModel": "この用途のモデルはダウンロードされていません。ストアから入手してください。",
+		"run": "実行",
+		"running": "実行中…",
+		"asr": {
+			"chooseFile": "WAV ファイルを選択",
+			"fileInput": "音声ファイル"
+		},
+		"tts": {
+			"text": "テキスト",
+			"voice": "ボイス（任意）",
+			"voiceHelp": "一部の音声モデル（Supertonic など）でのみ必要です。",
+			"download": "ダウンロード"
+		},
+		"ocr": {
+			"chooseImage": "画像を選択",
+			"imageInput": "画像ファイル",
+			"noText": "テキストは見つかりませんでした。",
+			"lines": "認識された行",
+			"score": "{{value}}%"
+		},
+		"embed": {
+			"texts": "テキスト",
+			"textsHelp": "1 行に 1 テキスト",
+			"summary_other": "{{count}} 次元。コサイン類似度："
+		},
+		"rerank": {
+			"query": "クエリ",
+			"documents": "ドキュメント",
+			"documentsHelp": "1 行に 1 ドキュメント",
+			"results": "順位付けされたドキュメント"
+		},
+		"bench": {
+			"tokensInput": "生成するトークン数",
+			"results": "ベンチマーク",
+			"speed": "生成速度",
+			"speedValue": "{{value}} トークン/秒",
+			"firstToken": "最初のトークンまでの時間",
+			"seconds": "{{value}} 秒",
+			"tokens": "トークン",
+			"tokensValue": "入力 {{prompt}} · 出力 {{completion}} · 合計 {{total}} 秒"
+		}
+	},
+	"overview": {
+		"title": "概要",
+		"npuReady": "NPU の準備ができました。",
+		"loading": "デバイスの状態を読み込み中",
+		"retry": "再試行",
+		"staleValues": "最後に取得した値を表示しています。{{error}}",
+		"percent": "{{value}}%",
+		"usedOfTotal": "{{used}}/{{total}}",
+		"stats": {
+			"npuUtilization": "NPU 使用率",
+			"npuReserved": "読み込み済みモデルが {{percent}} を確保",
+			"npuMemory": "NPU メモリ",
+			"systemMemory": "システムメモリ",
+			"systemMemoryCaption": "CPU {{cpu}} · RAM {{used}}/{{total}}",
+			"storage": "ストレージ",
+			"progress": "{{title}} {{percent}}"
+		},
+		"running": {
+			"title": "読み込み済みモデル",
+			"empty": "読み込まれているモデルはありません。モデルページから読み込んでください。",
+			"columns": {
+				"model": "モデル",
+				"type": "種類",
+				"status": "状態",
+				"npuShare": "NPU 使用率",
+				"activeRequests": "処理中のリクエスト"
+			}
+		},
+		"usage": {
+			"title": "トークン使用量",
+			"subheader": "{{requests}}で {{tokens}}（テキストモデル）",
+			"subheaderLoading": "テキストモデル",
+			"tokens_other": "{{value}} トークン",
+			"requests_other": "{{value}} リクエスト",
+			"previousWeek": "前の週",
+			"nextWeek": "次の週",
+			"weekRange": "{{start}} – {{end}}",
+			"dayBar": "{{day}}：{{tokens}}",
+			"segment": "{{day}} · {{model}}：{{tokens}}",
+			"other": "その他",
+			"showTable": "表で表示",
+			"showChart": "グラフで表示",
+			"loading": "トークン使用量を読み込み中",
+			"empty": "今週のトークン使用はありません。",
+			"table": {
+				"label": "日別トークン使用量",
+				"day": "日付",
+				"model": "モデル",
+				"requests": "リクエスト",
+				"prompt": "入力",
+				"completion": "出力",
+				"total": "合計"
+			}
+		},
+		"apps": {
+			"title": "アプリ別の使用量",
+			"subheader": "今週のトークン使用量（アプリ別）",
+			"label": "アプリ別の使用量",
+			"loading": "アプリ別の使用量を読み込み中",
+			"empty": "今週のトークン使用はありません。"
+		}
+	},
+	"server": {
+		"done": "完了",
+		"models": {
+			"allUnloaded": "すべてのモデルをアンロードしました"
+		},
+		"settings": {
+			"shuttingDown": "シャットダウン中",
+			"restarting": "再起動中",
+			"enabled": "有効",
+			"disabled": "無効",
+			"specs": {
+				"peakInt8": "ピーク INT8",
+				"storage": "ストレージ",
+				"network": "ネットワーク"
+			}
+		},
+		"connectors": {
+			"connected": "接続済み",
+			"notConnected": "未接続",
+			"unavailable": "利用不可",
+			"waitingForQr": "QR コードのスキャン待ち",
+			"scanQr": "WhatsApp で QR コードをスキャンしてください",
+			"signIn": "{{provider}} アカウントでサインイン",
+			"names": {
+				"email": "メール（IMAP/SMTP）",
+				"telegram": "Telegram ボット",
+				"discord": "Discord ボット"
+			}
+		},
+		"backup": {
+			"categories": {
+				"conversationService": "チャット履歴",
+				"knowledgeBase": "Vault とパーソナライズ",
+				"agentUsage": "エージェントの使用状況",
+				"connectorService": "コネクタ",
+				"scheduled": "スケジュールされたタスク",
+				"skills": "スキル"
+			}
+		},
+		"usage": {
+			"otherApps": "API とその他のアプリ"
+		},
+		"task": {
+			"searchedVault": "Vault を検索：{{query}}",
+			"readHost": "{{host}} を読み取り",
+			"readWebPage": "Web ページを読み取り",
+			"updatedOccupation": "職業を更新しました",
+			"updatedPreferences": "好みを更新しました",
+			"updatedRecentFocus": "最近の関心事を更新しました",
+			"updatedProfile": "プロフィールを更新しました",
+			"updatedField": "{{field}}を更新しました"
+		}
+	}
+}

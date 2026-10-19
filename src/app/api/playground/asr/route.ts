@@ -17,12 +17,12 @@ export const POST = apiRoute(async (request) => {
 	}
 	const model = modelIdOf(form?.get("model"));
 	const file = form?.get("file");
-	if (!(file instanceof File) || file.size === 0) throw new DeviceError("Choose or record some audio", 400);
-	if (file.size > MAX_AUDIO_BYTES) throw new DeviceError("Audio is larger than 100 MB", 400);
+	if (!(file instanceof File) || file.size === 0) throw new DeviceError("errors.playground.chooseAudio", 400);
+	if (file.size > MAX_AUDIO_BYTES) throw new DeviceError("errors.playground.audioTooLarge", 400, { megabytes: 100 });
 	// The device transcribes WAV; given MP3 it never answers (TiinyOS 0.1.35).
 	const header = Buffer.from(await file.slice(0, 12).arrayBuffer());
 	if (header.toString("latin1", 0, 4) !== "RIFF" || header.toString("latin1", 8, 12) !== "WAVE") {
-		throw new DeviceError("The device can only transcribe WAV audio. Convert the file to WAV first.", 400);
+		throw new DeviceError("errors.playground.wavOnly", 400);
 	}
 	const language = form?.get("language");
 	// A multipart body is sent once, so each attempt builds its own.

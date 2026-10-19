@@ -28,12 +28,13 @@ export const POST = apiRoute(async (request) => {
 		// A missing or malformed body is handled like an empty one.
 	}
 	const file = form?.get("file");
-	if (!(file instanceof File)) throw new DeviceError("Choose a file", 400);
+	if (!(file instanceof File)) throw new DeviceError("errors.chat.chooseFile", 400);
 	const body = new DeviceForm();
 	body.append("file", file, file.name);
 
 	if (file.type.startsWith("image/")) {
-		if (file.size > MAX_IMAGE_BYTES) throw new DeviceError(`${file.name} is larger than 50 MB`, 400);
+		if (file.size > MAX_IMAGE_BYTES)
+			throw new DeviceError("errors.file.tooLarge", 400, { name: file.name, megabytes: 50 });
 		const media = await deviceJson<Media>("/api/v1/media/upload", {
 			method: "POST",
 			service: "media",
@@ -52,14 +53,18 @@ export const POST = apiRoute(async (request) => {
 
 	const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
 	if (!DOCUMENT_EXTENSIONS.includes(extension)) {
-		throw new DeviceError(`${file.name}: attach images or ${DOCUMENT_EXTENSIONS.join(", ")} files`, 400);
+		throw new DeviceError("errors.chat.unsupportedFile", 400, {
+			name: file.name,
+			extensions: DOCUMENT_EXTENSIONS.join(", "),
+		});
 	}
-	if (file.size > MAX_DOCUMENT_BYTES) throw new DeviceError(`${file.name} is larger than 10 MB`, 400);
+	if (file.size > MAX_DOCUMENT_BYTES)
+		throw new DeviceError("errors.file.tooLarge", 400, { name: file.name, megabytes: 10 });
 	body.append("filename", file.name);
 	const parsed = await deviceJson<Parsed>("/api/v1/file/upload_file", { method: "POST", form: body, slow: true });
 	// Current firmware returns the text in base_response.msg; TiinyOS also reads data.content and content.
 	const text = parsed.data?.content ?? parsed.content ?? parsed.base_response?.msg ?? "";
-	if (!text.trim()) throw new DeviceError(`The device found no text in ${file.name}`, 422);
+	if (!text.trim()) throw new DeviceError("errors.chat.noText", 422, { name: file.name });
 	const attachment: Attachment = { kind: "document", name: file.name, text };
 	return NextResponse.json(attachment);
 });

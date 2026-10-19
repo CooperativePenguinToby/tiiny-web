@@ -1,3 +1,5 @@
+import { getI18n } from "react-i18next";
+
 export interface SseEvent {
 	event: string;
 	data: string;
@@ -28,7 +30,8 @@ export async function* readSse(response: Response): AsyncGenerator<SseEvent> {
 	}
 }
 
-// Error message from a non-OK API response (`{ error }` JSON) or a fallback.
+// Error message from a non-OK API response (`{ error }` JSON) or a fallback. Runs in the browser, where
+// getI18n() is the I18nProvider's instance (the routes' `{ error }` is already in the request's language).
 export async function responseError(response: Response): Promise<string> {
 	let body: { error?: string } = {};
 	try {
@@ -36,5 +39,5 @@ export async function responseError(response: Response): Promise<string> {
 	} catch {
 		// A missing or malformed body is handled like an empty one.
 	}
-	return body.error ?? `Request failed (${response.status})`;
+	return body.error ?? getI18n().t("core.errors.requestFailed", { status: response.status });
 }

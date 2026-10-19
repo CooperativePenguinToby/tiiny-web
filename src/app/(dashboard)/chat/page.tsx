@@ -4,11 +4,16 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { config } from "@/config";
+import { getT } from "@/i18n/server";
 import { ChatPanel } from "@/components/dashboard/chat/chat-panel";
 
-export const metadata = { title: `Chat | ${config.site.name}` } satisfies Metadata;
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getT();
+	return { title: t("titles.page", { page: t("titles.chat"), site: config.site.name }) };
+}
 
-export default function Page(): React.JSX.Element {
+export default async function Page(): Promise<React.JSX.Element> {
+	const t = await getT();
 	return (
 		<Stack spacing={3}>
 			<Typography
@@ -17,8 +22,7 @@ export default function Page(): React.JSX.Element {
 					color: "text.secondary",
 				}}
 			>
-				Talk to a loaded model. Chats are kept in the device&apos;s chat history, shared with TiinyOS. The device
-				answers one request per model at a time, so replies may queue.
+				{t("chat.intro")}
 			</Typography>
 			<React.Suspense>
 				<ChatPanel />

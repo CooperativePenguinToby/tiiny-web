@@ -3,10 +3,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { config } from "@/config";
+import { getT } from "@/i18n/server";
 import { Playground } from "@/components/dashboard/playground/playground";
 import { playgroundTabs } from "@/components/dashboard/playground/tabs";
 
-export const metadata = { title: `Playground | ${config.site.name}` } satisfies Metadata;
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getT();
+	return { title: t("titles.page", { page: t("titles.playground"), site: config.site.name }) };
+}
 
 export default async function Page({ params }: { params: Promise<{ tab: string }> }): Promise<React.JSX.Element> {
 	const { tab } = await params;

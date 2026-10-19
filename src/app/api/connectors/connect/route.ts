@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { authUrl, connect, connectorKeyFrom } from "@/server/connectors";
 import { apiRoute } from "@/server/route";
 
+import { getT } from "@/i18n/server";
+
 // POST { key, …credentials }. Account connectors answer { url } (the sign-in page to open); the others
 // connect once the device accepts the credentials (WhatsApp answers { qr } to scan).
 export const POST = apiRoute(async (request) => {
@@ -15,6 +17,6 @@ export const POST = apiRoute(async (request) => {
 	return NextResponse.json(
 		["gmail", "google-calendar", "outlook-mail", "outlook-calendar"].includes(key)
 			? { url: await authUrl(key) }
-			: await connect(key, body)
+			: await connect(key, body, await getT())
 	);
 });

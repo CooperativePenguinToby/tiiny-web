@@ -23,7 +23,9 @@ export const POST = apiRoute(async (request) => {
 		(!assistant.content.trim() && !assistant.attachments?.length) ||
 		typeof assistant.stopped !== "boolean"
 	) {
-		throw new DeviceError("Expected { modelId, user, assistant: { content, stopped } }", 400);
+		throw new DeviceError("errors.request.expected", 400, {
+			shape: "{ modelId, user, assistant: { content, stopped } }",
+		});
 	}
 	const conversationId = await saveTurn({
 		conversationId: body.conversationId ? conversationIdFrom(body.conversationId) : null,

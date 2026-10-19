@@ -16,8 +16,7 @@ export async function hfUrlFrom(request: Request): Promise<string> {
 		.replace(/^https?:\/\/(www\.)?huggingface\.co\//, "")
 		.replace(/\/(tree|blob)\/.*$/, "")
 		.replace(/\/$/, "");
-	if (!REPO_ID.test(repositoryId))
-		throw new DeviceError("Enter a Hugging Face repo as org/name or its huggingface.co URL", 400);
+	if (!REPO_ID.test(repositoryId)) throw new DeviceError("errors.hf.invalidRepo", 400);
 	return `https://huggingface.co/${repositoryId}`;
 }
 

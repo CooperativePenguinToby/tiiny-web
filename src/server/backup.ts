@@ -1,3 +1,5 @@
+import type { ParseKeys, TFunction } from "i18next";
+
 import type { BackupArchive, BackupCategory } from "@/types/device";
 
 import { DeviceError, deviceId, deviceJson, deviceResponse, deviceStream } from "./device";
@@ -6,14 +8,16 @@ import { readZip } from "./zip";
 // The device's backup service packages each category as tiiny-backup/<service>.zip inside one archive,
 // with show_names.json and metadata.json (the device serial); TiinyOS saves it as tiiny.<time>.zip.
 
-const NAMES: Record<string, string> = {
-	"conversation-service": "Chat history",
-	"knowledge-base": "Vault & personalization",
-	"agent-usage": "Agent usage",
-	"connector-service": "Connectors",
-	scheduled: "Scheduled tasks",
-	skills: "Skills",
+const NAMES: Record<string, ParseKeys> = {
+	"conversation-service": "server.backup.categories.conversationService",
+	"knowledge-base": "server.backup.categories.knowledgeBase",
+	"agent-usage": "server.backup.categories.agentUsage",
+	"connector-service": "server.backup.categories.connectorService",
+	scheduled: "server.backup.categories.scheduled",
+	skills: "server.backup.categories.skills",
 };
+
+const nameOf = (service: string, t: TFunction): string => (Object.hasOwn(NAMES, service) ? t(NAMES[service]) : service);
 
 interface Discovery {
 	ready: boolean;
@@ -21,11 +25,14 @@ interface Discovery {
 	warnings?: string[];
 }
 
-export async function backupCategories(): Promise<BackupCategory[]> {
-	const services = await deviceJson<Record<string, Discovery>>("/v1/backup", { service: "backup" });
+const discover = (): Promise<Record<string, Discovery>> =>
+	deviceJson<Record<string, Discovery>>("/v1/backup", { service: "backup" });
+
+export async function backupCategories(t: TFunction): Promise<BackupCategory[]> {
+	const services = await discover();
 	return Object.entries(services).map(([service, info]) => ({
 		service,
-		name: NAMES[service] ?? service,
+		name: nameOf(service, t),
 		ready: info.ready,
 		sizeBytes: info.estimated_size ?? 0,
 		warnings: info.warnings ?? [],
@@ -33,14 +40,13 @@ export async function backupCategories(): Promise<BackupCategory[]> {
 }
 
 export async function servicesFrom(value: unknown): Promise<string[]> {
-	const categories = await backupCategories();
-	const known = new Set(categories.map((category) => category.service));
+	const known = new Set(Object.keys(await discover()));
 	if (
 		!Array.isArray(value) ||
 		value.length === 0 ||
 		value.some((item) => !(typeof item === "string" && known.has(item)))
 	) {
-		throw new DeviceError("Choose at least one category the device offers", 400);
+		throw new DeviceError("errors.backup.chooseCategory", 400);
 	}
 	return value as string[];
 }
@@ -62,7 +68,9 @@ export async function exportBackup(
 	if (type.startsWith("application/zip")) return { archive: body, failures: {} };
 	const boundary = /boundary=(?:"([^"]+)"|([^;]+))/i.exec(type);
 	if (!boundary || !type.startsWith("multipart/mixed"))
-		throw new DeviceError(`Unexpected backup reply (${type || "no type"})`, 502);
+		throw type
+			? new DeviceError("errors.backup.unexpectedReply", 502, { type })
+			: new DeviceError("errors.backup.unexpectedReplyNoType", 502);
 	let archive: Buffer | null = null;
 	let failures: Record<string, unknown> = {};
 	for (const part of body.toString("latin1").split(`--${boundary[1] ?? boundary[2]}`)) {
@@ -74,22 +82,22 @@ export async function exportBackup(
 		else if (headers.includes("application/json"))
 			failures = JSON.parse(content.toString("utf8")) as Record<string, unknown>;
 	}
-	if (!archive) throw new DeviceError("The device's backup had no archive in it", 502);
+	if (!archive) throw new DeviceError("errors.backup.noArchive", 502);
 	return { archive, failures };
 }
 
-export async function inspectArchive(archive: Buffer): Promise<BackupArchive> {
+export async function inspectArchive(archive: Buffer, t: TFunction): Promise<BackupArchive> {
 	let entries;
 	try {
 		entries = readZip(archive);
 	} catch {
-		throw new DeviceError("That file is not a Tiiny backup", 400);
+		throw new DeviceError("errors.backup.notBackup", 400);
 	}
 	const services = entries.flatMap((entry) => {
 		const service = /^tiiny-backup\/([^/\\]+)\.zip$/.exec(entry.name)?.[1];
 		return service ? [service] : [];
 	});
-	if (services.length === 0) throw new DeviceError("That file is not a Tiiny backup", 400);
+	if (services.length === 0) throw new DeviceError("errors.backup.notBackup", 400);
 	const json = (name: string): Record<string, unknown> | null => {
 		const entry = entries.find((item) => item.name === name);
 		try {
@@ -102,7 +110,7 @@ export async function inspectArchive(archive: Buffer): Promise<BackupArchive> {
 	const meta = json("metadata.json");
 	const archiveDevice = typeof meta?.device_id === "string" ? meta.device_id : null;
 	return {
-		categories: services.map((service) => ({ service, name: names[service] ?? NAMES[service] ?? service })),
+		categories: services.map((service) => ({ service, name: names[service] ?? nameOf(service, t) })),
 		deviceId: archiveDevice,
 		sameDevice: archiveDevice === (await deviceId()),
 	};
@@ -112,13 +120,13 @@ export async function inspectArchive(archive: Buffer): Promise<BackupArchive> {
 export async function restoreBackup(
 	archive: Buffer,
 	services: string[],
+	t: TFunction,
 	signal: AbortSignal
 ): Promise<ReadableStream<Uint8Array>> {
-	const inspected = await inspectArchive(archive);
-	if (!inspected.sameDevice)
-		throw new DeviceError("This backup was made on another device; it can only be restored there", 400);
+	const inspected = await inspectArchive(archive, t);
+	if (!inspected.sameDevice) throw new DeviceError("errors.backup.otherDevice", 400);
 	const missing = services.filter((service) => inspected.categories.every((category) => category.service !== service));
-	if (missing.length > 0) throw new DeviceError(`The backup does not contain ${missing.join(", ")}`, 400);
+	if (missing.length > 0) throw new DeviceError("errors.backup.missing", 400, { services: missing.join(", ") });
 	const boundary = "tiiny-restore-boundary";
 	const body = Buffer.concat([
 		Buffer.from(

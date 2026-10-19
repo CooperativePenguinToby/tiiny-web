@@ -4,6 +4,7 @@ import { deviceWeekStart } from "@/server/device-clock";
 import { apiRoute } from "@/server/route";
 
 import type { WeekUsage } from "@/types/device";
+import { getT } from "@/i18n/server";
 
 type DeviceWeek = Record<
 	string,
@@ -16,7 +17,9 @@ type DeviceApps = Record<string, { total_tokens: number; models: Record<string, 
 export const GET = apiRoute(async (request) => {
 	const currentWeekStart = await deviceWeekStart();
 	const week = new URL(request.url).searchParams.get("week") ?? currentWeekStart;
-	if (!/^\d{4}-\d{2}-\d{2}$/.test(week)) throw new DeviceError("week must be a date like 2026-10-12", 400);
+	if (!/^\d{4}-\d{2}-\d{2}$/.test(week))
+		throw new DeviceError("errors.request.dateFormat", 400, { field: "week", example: "2026-10-12" });
+	const t = await getT();
 	const query = `start_date=${week}`;
 	const [days, apps] = await Promise.all([
 		deviceJson<DeviceWeek>(`/api/v1/statistics/week_usage?${query}`),
@@ -43,7 +46,7 @@ export const GET = apiRoute(async (request) => {
 			})),
 		apps: Object.entries(apps)
 			.map(([app, usage]) => ({
-				app: app === "default" ? "API and other apps" : app,
+				app: app === "default" ? t("server.usage.otherApps") : app,
 				totalTokens: usage.total_tokens,
 				models: usage.models,
 			}))

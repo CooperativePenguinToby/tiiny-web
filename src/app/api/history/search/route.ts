@@ -5,6 +5,6 @@ import { apiRoute } from "@/server/route";
 
 export const GET = apiRoute(async (request) => {
 	const query = new URL(request.url).searchParams.get("q")?.trim() ?? "";
-	if (!query) throw new DeviceError("Enter something to search for", 400);
+	if (!query) throw new DeviceError("errors.request.emptySearch", 400);
 	return NextResponse.json(await searchConversations(query));
 });

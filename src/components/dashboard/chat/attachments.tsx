@@ -6,9 +6,11 @@ import Chip from "@mui/material/Chip";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import { FileTextIcon } from "@phosphor-icons/react/dist/ssr/FileText";
+import { useTranslation } from "react-i18next";
 
 import type { Attachment } from "@/types/device";
 import { responseError } from "@/lib/sse";
+import { useFormat } from "@/i18n/client";
 
 export const DOCUMENT_ACCEPT = ".doc,.docx,.txt,.csv,.xlsx,.pdf,.html,.md";
 
@@ -81,6 +83,8 @@ export function AttachmentChips({
 	uploading: string[];
 	onRemove?: (index: number) => void;
 }): React.JSX.Element | null {
+	const { t } = useTranslation();
+	const format = useFormat();
 	if (attachments.length === 0 && uploading.length === 0) return null;
 	const keys = attachmentKeys(attachments);
 	return (
@@ -100,13 +104,16 @@ export function AttachmentChips({
 						key={keys[index]}
 						label={attachment.name}
 						onDelete={onRemove ? () => onRemove(index) : undefined}
-						title={`${attachment.text.length.toLocaleString()} characters read by the device`}
+						title={t("chat.attachments.charactersRead", {
+							count: attachment.text.length,
+							characters: format.number(attachment.text.length),
+						})}
 						variant="outlined"
 					/>
 				)
 			)}
 			{uploading.map((name) => (
-				<Chip key={`uploading-${name}`} label={`${name}…`} variant="outlined" />
+				<Chip key={`uploading-${name}`} label={t("chat.attachments.uploading", { name })} variant="outlined" />
 			))}
 		</Stack>
 	);
@@ -120,6 +127,7 @@ export function MessageAttachments({
 	attachments: Attachment[];
 	align: "start" | "end";
 }): React.JSX.Element {
+	const { t } = useTranslation();
 	const images = attachments.filter((item) => item.kind === "image");
 	const documents = attachments.filter((item) => item.kind === "document");
 	return (
@@ -130,7 +138,7 @@ export function MessageAttachments({
 						alt={image.name}
 						component="img"
 						onError={(event: React.SyntheticEvent<HTMLImageElement>) => {
-							event.currentTarget.alt = `${image.name} (no longer on the device)`;
+							event.currentTarget.alt = t("chat.attachments.missing", { name: image.name });
 						}}
 						src={thumbnail(image)}
 						sx={{
@@ -141,7 +149,7 @@ export function MessageAttachments({
 						}}
 					/>
 					<Link download={image.name} href={thumbnail(image)} variant="caption">
-						Download
+						{t("chat.attachments.download")}
 					</Link>
 				</Stack>
 			))}

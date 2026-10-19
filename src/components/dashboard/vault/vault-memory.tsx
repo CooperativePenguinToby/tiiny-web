@@ -10,17 +10,20 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 import type { DailySummary } from "@/types/device";
 import { postJson } from "@/lib/api";
 import { responseError } from "@/lib/sse";
+import { useFormat } from "@/i18n/client";
 import { usePolling } from "@/hooks/use-polling";
 import { ConfirmDialog } from "@/components/dashboard/settings/confirm-dialog";
 
 const errorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
 function SummaryItem({ summary, onDelete }: { summary: DailySummary; onDelete: () => void }): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const [text, setText] = React.useState<string | null>(null);
 	const [error, setError] = React.useState<string | null>(null);
 	const [open, setOpen] = React.useState(false);
@@ -45,13 +48,13 @@ function SummaryItem({ summary, onDelete }: { summary: DailySummary; onDelete: (
 	return (
 		<Stack data-testid={`summary-${summary.day}`} spacing={1}>
 			<Stack direction="row" spacing={1} sx={{ alignItems: "center", justifyContent: "space-between" }}>
-				<Typography variant="subtitle2">{dayjs(summary.day).format("dddd D MMMM YYYY")}</Typography>
+				<Typography variant="subtitle2">{format.date(summary.day).format("dddd D MMMM YYYY")}</Typography>
 				<Stack direction="row">
 					<Button onClick={() => void toggle()} size="small">
-						{open ? "Hide" : "Read"}
+						{t(open ? "vault.chatHistory.hide" : "vault.chatHistory.read")}
 					</Button>
 					<Button color="error" onClick={onDelete} size="small">
-						Delete
+						{t("vault.chatHistory.delete")}
 					</Button>
 				</Stack>
 			</Stack>
@@ -59,7 +62,7 @@ function SummaryItem({ summary, onDelete }: { summary: DailySummary; onDelete: (
 				error ? (
 					<Alert severity="error">{error}</Alert>
 				) : text === null ? (
-					<CircularProgress aria-label="Loading summary" size={20} />
+					<CircularProgress aria-label={t("vault.chatHistory.loadingSummary")} size={20} />
 				) : (
 					<Typography data-testid="summary-text" sx={{ whiteSpace: "pre-wrap" }} variant="body2">
 						{text}
@@ -84,6 +87,7 @@ function SummaryItem({ summary, onDelete }: { summary: DailySummary; onDelete: (
 }
 
 export function VaultMemory(): React.JSX.Element {
+	const { t } = useTranslation();
 	const polled = usePolling<DailySummary[]>("/api/vault/memory", 60_000);
 	const [deleting, setDeleting] = React.useState<DailySummary | null>(null);
 	const [outcome, setOutcome] = React.useState<{ severity: "success" | "error"; message: string } | null>(null);
@@ -91,7 +95,7 @@ export function VaultMemory(): React.JSX.Element {
 	return (
 		<Stack spacing={3}>
 			<Card data-testid="vault-summaries">
-				<CardHeader subheader="Daily summaries of past conversations, kept in Vault." title="Chat history" />
+				<CardHeader subheader={t("vault.chatHistory.subheader")} title={t("vault.chatHistory.title")} />
 				<Divider />
 				<CardContent>
 					<Stack spacing={2}>
@@ -103,7 +107,7 @@ export function VaultMemory(): React.JSX.Element {
 						{polled.error ? <Alert severity={polled.data ? "warning" : "error"}>{polled.error}</Alert> : null}
 						{polled.data === null ? (
 							polled.isLoading ? (
-								<CircularProgress aria-label="Loading chat history" />
+								<CircularProgress aria-label={t("vault.chatHistory.loading")} />
 							) : null
 						) : polled.data.length === 0 ? (
 							<Typography
@@ -112,7 +116,7 @@ export function VaultMemory(): React.JSX.Element {
 									color: "text.secondary",
 								}}
 							>
-								No summaries yet.
+								{t("vault.chatHistory.empty")}
 							</Typography>
 						) : (
 							<Stack divider={<Divider />} spacing={2}>
@@ -125,19 +129,21 @@ export function VaultMemory(): React.JSX.Element {
 				</CardContent>
 			</Card>
 			<ConfirmDialog
-				confirmLabel="Delete"
+				confirmLabel={t("vault.chatHistory.deleteDialog.confirm")}
 				onCancel={() => setDeleting(null)}
 				onConfirm={() => {
 					const summary = deleting!;
 					setDeleting(null);
 					void postJson("/api/vault/delete", { sourceId: summary.sourceId })
-						.then(() => setOutcome({ severity: "success", message: `Summary of ${summary.day} deleted.` }))
+						.then(() =>
+							setOutcome({ severity: "success", message: t("vault.chatHistory.deleted", { day: summary.day }) })
+						)
 						.catch((error: unknown) => setOutcome({ severity: "error", message: errorMessage(error) }))
 						.finally(() => void polled.refresh());
 				}}
 				open={deleting !== null}
-				text={`Delete the summary of ${deleting?.day ?? ""}? Models will no longer recall that day's conversations.`}
-				title="Delete summary?"
+				text={t("vault.chatHistory.deleteDialog.text", { day: deleting?.day ?? "" })}
+				title={t("vault.chatHistory.deleteDialog.title")}
 			/>
 		</Stack>
 	);

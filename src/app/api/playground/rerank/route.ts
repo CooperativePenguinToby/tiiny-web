@@ -13,11 +13,13 @@ export const POST = apiRoute(async (request) => {
 		// A missing or malformed body is handled like an empty one.
 	}
 	const model = modelIdOf(body.model);
-	const query = textOf(body.query, "Query", 4000);
+	const query = textOf(body.query, { kind: "query" }, 4000);
 	if (!Array.isArray(body.documents) || body.documents.length < 2 || body.documents.length > 50) {
-		throw new DeviceError("Give 2 to 50 documents", 400);
+		throw new DeviceError("errors.playground.documentCount", 400, { min: 2, max: 50 });
 	}
-	const documents = body.documents.map((document_, index) => textOf(document_, `Document ${index + 1}`, 8000));
+	const documents = body.documents.map((document_, index) =>
+		textOf(document_, { kind: "document", number: index + 1 }, 8000)
+	);
 	const reply = await withModel(model, () =>
 		deviceJson<{ results: { index: number; relevance_score?: number; score?: number }[] }>("/v1/rerank", {
 			method: "POST",

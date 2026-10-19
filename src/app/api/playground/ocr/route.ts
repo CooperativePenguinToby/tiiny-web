@@ -18,8 +18,9 @@ export const POST = apiRoute(async (request) => {
 	}
 	const model = modelIdOf(form?.get("model"));
 	const file = form?.get("file");
-	if (!(file instanceof File) || !file.type.startsWith("image/")) throw new DeviceError("Choose an image", 400);
-	if (file.size > 20 * 1024 * 1024) throw new DeviceError("Image is larger than 20 MB", 400);
+	if (!(file instanceof File) || !file.type.startsWith("image/"))
+		throw new DeviceError("errors.playground.chooseImage", 400);
+	if (file.size > 20 * 1024 * 1024) throw new DeviceError("errors.playground.imageTooLarge", 400, { megabytes: 20 });
 	const input = `data:${file.type};base64,${Buffer.from(await file.arrayBuffer()).toString("base64")}`;
 	const reply = await withModel(model, () =>
 		deviceJson<OcrReply>(`/v1/ocr?model=${encodeURIComponent(model)}`, {

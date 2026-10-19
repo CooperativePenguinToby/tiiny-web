@@ -9,10 +9,12 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { CheckCircleIcon } from "@phosphor-icons/react/dist/ssr/CheckCircle";
 import { WarningCircleIcon } from "@phosphor-icons/react/dist/ssr/WarningCircle";
+import { useTranslation } from "react-i18next";
 
 import type { TaskStep } from "@/types/device";
 
 function Step({ step }: { step: TaskStep }): React.JSX.Element {
+	const { t } = useTranslation();
 	const [open, setOpen] = React.useState(false);
 	const isDone = step.ok !== undefined;
 	return (
@@ -25,12 +27,12 @@ function Step({ step }: { step: TaskStep }): React.JSX.Element {
 						<WarningCircleIcon color="var(--mui-palette-error-main)" fontSize="var(--icon-fontSize-md)" />
 					)
 				) : (
-					<CircularProgress aria-label={`${step.label} running`} size={14} />
+					<CircularProgress aria-label={t("chat.task.running", { label: step.label })} size={14} />
 				)}
 				<Typography variant="body2">{step.label}</Typography>
 				{isDone && step.result ? (
 					<Link component="button" onClick={() => setOpen(!open)} type="button" variant="caption">
-						{open ? "Hide" : "Show"} result
+						{t(open ? "chat.task.hideResult" : "chat.task.showResult")}
 					</Link>
 				) : null}
 			</Stack>

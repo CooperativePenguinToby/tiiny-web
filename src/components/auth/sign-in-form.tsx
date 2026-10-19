@@ -15,19 +15,24 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { EyeIcon } from "@phosphor-icons/react/dist/ssr/Eye";
 import { EyeSlashIcon } from "@phosphor-icons/react/dist/ssr/EyeSlash";
+import type { TFunction } from "i18next";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z as zod } from "zod";
 
 import { paths } from "@/paths";
 
-const schema = zod.object({ password: zod.string().min(1, { error: "Password is required" }) });
+const createSchema = (t: TFunction) =>
+	zod.object({ password: zod.string().min(1, { error: t("auth.signIn.passwordRequired") }) });
 
-type Values = zod.infer<typeof schema>;
+type Values = zod.infer<ReturnType<typeof createSchema>>;
 
 export function SignInForm(): React.JSX.Element {
+	const { t } = useTranslation();
 	const router = useRouter();
 	const [showPassword, setShowPassword] = React.useState<boolean>(false);
 	const [isPending, setIsPending] = React.useState<boolean>(false);
+	const schema = React.useMemo(() => createSchema(t), [t]);
 
 	const {
 		control,
@@ -53,30 +58,30 @@ export function SignInForm(): React.JSX.Element {
 						// A missing or malformed body is handled like an empty one.
 					}
 					const { error } = failure;
-					setError("root", { type: "server", message: error ?? `Sign in failed (${response.status})` });
+					setError("root", { type: "server", message: error ?? t("auth.signIn.failed", { status: response.status }) });
 					setIsPending(false);
 					return;
 				}
 				router.replace(paths.dashboard.overview);
 			} catch {
-				setError("root", { type: "server", message: "Could not reach the server" });
+				setError("root", { type: "server", message: t("auth.signIn.unreachable") });
 				setIsPending(false);
 			}
 		},
-		[router, setError]
+		[router, setError, t]
 	);
 
 	return (
 		<Stack spacing={4}>
 			<Stack spacing={1}>
-				<Typography variant="h4">Sign in</Typography>
+				<Typography variant="h4">{t("auth.signIn.title")}</Typography>
 				<Typography
 					variant="body2"
 					sx={{
 						color: "text.secondary",
 					}}
 				>
-					Enter the admin password configured for this server.
+					{t("auth.signIn.description")}
 				</Typography>
 			</Stack>
 			<form onSubmit={handleSubmit(onSubmit)}>
@@ -86,7 +91,7 @@ export function SignInForm(): React.JSX.Element {
 						name="password"
 						render={({ field }) => (
 							<FormControl error={Boolean(errors.password)}>
-								<InputLabel htmlFor="password">Password</InputLabel>
+								<InputLabel htmlFor="password">{t("auth.signIn.password")}</InputLabel>
 								<OutlinedInput
 									{...field}
 									autoComplete="current-password"
@@ -94,7 +99,7 @@ export function SignInForm(): React.JSX.Element {
 									endAdornment={
 										<InputAdornment position="end">
 											<IconButton
-												aria-label={showPassword ? "Hide password" : "Show password"}
+												aria-label={t(showPassword ? "auth.signIn.hidePassword" : "auth.signIn.showPassword")}
 												edge="end"
 												onClick={(): void => {
 													setShowPassword((value) => !value);
@@ -109,7 +114,7 @@ export function SignInForm(): React.JSX.Element {
 										</InputAdornment>
 									}
 									id="password"
-									label="Password"
+									label={t("auth.signIn.password")}
 									type={showPassword ? "text" : "password"}
 								/>
 								{errors.password ? <FormHelperText>{errors.password.message}</FormHelperText> : null}
@@ -118,7 +123,7 @@ export function SignInForm(): React.JSX.Element {
 					/>
 					{errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
 					<Button disabled={isPending} type="submit" variant="contained">
-						{isPending ? "Signing in…" : "Sign in"}
+						{t(isPending ? "auth.signIn.submitting" : "auth.signIn.submit")}
 					</Button>
 				</Stack>
 			</form>

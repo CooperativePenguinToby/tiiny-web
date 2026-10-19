@@ -13,11 +13,12 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { useTranslation } from "react-i18next";
 
 import type { HfInspection, ImportEvent } from "@/types/device";
 import { paths } from "@/paths";
-import { formatBytes } from "@/lib/format";
 import { readSse, responseError } from "@/lib/sse";
+import { useFormat } from "@/i18n/client";
 
 interface ImportState {
 	importId: string | null;
@@ -29,8 +30,8 @@ interface ImportState {
 const DONE_STATUSES = new Set(["completed", "complete", "success", "succeeded", "done", "imported"]);
 const FAILED_STATUSES = new Set(["failed", "error", "cancelled", "canceled", "cancel_requested"]);
 
-const errorText = (event: ImportEvent): string =>
-	typeof event.error === "string" ? event.error : (event.error?.message ?? event.message ?? "Import failed");
+const errorText = (event: ImportEvent, fallback: string): string =>
+	typeof event.error === "string" ? event.error : (event.error?.message ?? event.message ?? fallback);
 
 export interface RepositoryCheckHandle {
 	check: (repository: string) => void;
@@ -41,6 +42,8 @@ export interface RepositoryCheckProperties {
 }
 
 export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const [repository, setRepository] = React.useState<string>("");
 	const [checking, setChecking] = React.useState<boolean>(false);
 	const [verdict, setVerdict] = React.useState<HfInspection | null>(null);
@@ -74,8 +77,9 @@ export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.E
 	React.useImperativeHandle(ref, () => ({ check: (value) => void check(value) }), [check]);
 
 	const startImport = async (target: HfInspection): Promise<void> => {
+		const cancelled = t("models.huggingFace.check.cancelled");
 		setOutcome(null);
-		setImporting({ importId: null, stage: "Starting", percent: 0, bytes: "" });
+		setImporting({ importId: null, stage: t("models.huggingFace.check.starting"), percent: 0, bytes: "" });
 		try {
 			const response = await fetch("/api/hf/import", {
 				method: "POST",
@@ -87,29 +91,34 @@ export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.E
 				const update = JSON.parse(data) as ImportEvent;
 				const status = update.import_status ?? "";
 				if (event === "error" || update.error || FAILED_STATUSES.has(status)) {
-					throw new Error(status.startsWith("cancel") ? "Import cancelled." : errorText(update));
+					throw new Error(
+						status.startsWith("cancel") ? cancelled : errorText(update, t("models.huggingFace.check.importFailed"))
+					);
 				}
 				if (event === "done" || DONE_STATUSES.has(status)) {
-					setOutcome({ severity: "success", message: `${target.repoId} imported. Load it from the Models page.` });
+					setOutcome({ severity: "success", message: t("models.huggingFace.check.imported", { repo: target.repoId }) });
 					return;
 				}
 				setImporting({
 					importId: update.import_id ?? null,
-					stage: update.message || update.stage_name || update.stage || "Importing",
+					stage: update.message || update.stage_name || update.stage || t("models.huggingFace.check.importing"),
 					percent: update.global_progress ?? 0,
 					bytes:
 						update.total_bytes && update.total_bytes > 0
-							? `${formatBytes(update.downloaded_bytes ?? 0)} of ${formatBytes(update.total_bytes)}`
+							? t("models.huggingFace.check.bytes", {
+									downloaded: format.bytes(update.downloaded_bytes ?? 0),
+									total: format.bytes(update.total_bytes),
+								})
 							: "",
 				});
 			}
 			setOutcome({
 				severity: "info",
-				message: "Progress updates stopped. The import may still be running on the device.",
+				message: t("models.huggingFace.check.streamStopped"),
 			});
 		} catch (error_) {
 			const message = error_ instanceof Error ? error_.message : String(error_);
-			setOutcome({ severity: message === "Import cancelled." ? "info" : "error", message });
+			setOutcome({ severity: message === cancelled ? "info" : "error", message });
 		} finally {
 			setImporting(null);
 		}
@@ -127,7 +136,7 @@ export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.E
 
 	return (
 		<Card>
-			<CardHeader subheader="The device decides whether it can import a repo." title="Check a repo" />
+			<CardHeader subheader={t("models.huggingFace.check.subheader")} title={t("models.huggingFace.check.title")} />
 			<Divider />
 			<CardContent>
 				<Stack spacing={2}>
@@ -143,9 +152,9 @@ export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.E
 						<TextField
 							disabled={checking || importing !== null}
 							fullWidth
-							label="Hugging Face repo"
+							label={t("models.huggingFace.check.repo")}
 							onChange={(event) => setRepository(event.target.value)}
-							placeholder="org/name or https://huggingface.co/org/name"
+							placeholder={t("models.huggingFace.check.placeholder")}
 							value={repository}
 						/>
 						<Button
@@ -154,10 +163,10 @@ export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.E
 							type="submit"
 							variant="contained"
 						>
-							{checking ? "Checking…" : "Check"}
+							{t(checking ? "models.huggingFace.check.checking" : "models.huggingFace.check.check")}
 						</Button>
 					</Stack>
-					{checking ? <LinearProgress aria-label="Checking repo" /> : null}
+					{checking ? <LinearProgress aria-label={t("models.huggingFace.check.checkingRepo")} /> : null}
 					{error ? <Alert severity="error">{error}</Alert> : null}
 					{verdict ? (
 						<Stack data-testid="hf-verdict" spacing={1.5}>
@@ -170,27 +179,29 @@ export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.E
 									}
 									label={
 										{
-											compatible: "compatible",
-											"needs-base-model": "needs base model",
-											incompatible: "not compatible",
+											compatible: t("models.huggingFace.verdict.compatible"),
+											"needs-base-model": t("models.huggingFace.verdict.needsBaseModel"),
+											incompatible: t("models.huggingFace.verdict.incompatible"),
 										}[verdict.verdict]
 									}
 									size="small"
 								/>
-								{verdict.isLora ? <Chip label="LoRA adapter" size="small" /> : null}
+								{verdict.isLora ? <Chip label={t("models.huggingFace.kind.adapter")} size="small" /> : null}
 								{verdict.task ? <Chip label={verdict.task} size="small" variant="outlined" /> : null}
 							</Stack>
 							{verdict.verdict === "needs-base-model" && verdict.requiredBaseModel ? (
 								<Alert
 									action={
 										<Button color="inherit" component={RouterLink} href={paths.dashboard.store} size="small">
-											Store
+											{t("models.huggingFace.check.store")}
 										</Button>
 									}
 									severity="warning"
 								>
-									Importable once {verdict.requiredBaseModel.name} ({verdict.requiredBaseModel.modelId}) is downloaded
-									to the device from the Store.
+									{t("models.huggingFace.check.needsBase", {
+										name: verdict.requiredBaseModel.name,
+										modelId: verdict.requiredBaseModel.modelId,
+									})}
 								</Alert>
 							) : null}
 							{verdict.verdict === "incompatible" ? (
@@ -200,7 +211,7 @@ export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.E
 										color: "text.secondary",
 									}}
 								>
-									{verdict.reason ?? "The device cannot import this repo."}
+									{verdict.reason ?? t("models.huggingFace.check.cannotImport")}
 									{verdict.reasonCode ? ` (${verdict.reasonCode})` : ""}
 								</Typography>
 							) : null}
@@ -210,20 +221,27 @@ export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.E
 									color: "text.secondary",
 								}}
 							>
-								Size {formatBytes(verdict.sizeBytes)}
-								{verdict.baseModelId ? ` · base model ${verdict.baseModelId}` : ""}
+								{t("models.huggingFace.check.size", { size: format.bytes(verdict.sizeBytes) })}
+								{verdict.baseModelId
+									? ` · ${t("models.huggingFace.check.baseModel", { modelId: verdict.baseModelId })}`
+									: ""}
 								{verdict.disk
-									? ` · needs ${formatBytes(verdict.disk.requiredBytes)} of disk, ${formatBytes(verdict.disk.availableBytes)} free`
+									? ` · ${t("models.huggingFace.check.disk", {
+											required: format.bytes(verdict.disk.requiredBytes),
+											available: format.bytes(verdict.disk.availableBytes),
+										})}`
 									: ""}
 							</Typography>
 							{verdict.supported && verdict.toolkit?.requiresDownload ? (
 								<Alert severity="warning">
-									Importing first downloads the {verdict.toolkit.id} toolkit to the device (
-									{formatBytes(verdict.toolkit.sizeBytes)}).
+									{t("models.huggingFace.check.toolkit", {
+										toolkit: verdict.toolkit.id,
+										size: format.bytes(verdict.toolkit.sizeBytes),
+									})}
 								</Alert>
 							) : null}
 							{verdict.supported && verdict.disk && !verdict.disk.sufficient ? (
-								<Alert severity="error">Not enough free disk space on the device.</Alert>
+								<Alert severity="error">{t("models.huggingFace.check.noDisk")}</Alert>
 							) : null}
 							{importing ? (
 								<Stack spacing={1}>
@@ -234,16 +252,24 @@ export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.E
 											color: "text.secondary",
 										}}
 									>
-										{importing.stage} · {importing.percent.toFixed(1)}%{importing.bytes ? ` · ${importing.bytes}` : ""}
+										{importing.stage} ·{" "}
+										{t("models.percent", {
+											value: format.number(importing.percent, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+										})}
+										{importing.bytes ? ` · ${importing.bytes}` : ""}
 									</Typography>
-									<LinearProgress aria-label="import progress" value={importing.percent} variant="determinate" />
+									<LinearProgress
+										aria-label={t("models.huggingFace.check.importProgress")}
+										value={importing.percent}
+										variant="determinate"
+									/>
 									<Typography
 										variant="caption"
 										sx={{
 											color: "text.secondary",
 										}}
 									>
-										The import runs on the device and continues if you leave this page.
+										{t("models.huggingFace.check.continues")}
 									</Typography>
 									<div>
 										<Button
@@ -252,7 +278,7 @@ export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.E
 											onClick={() => void cancelImport()}
 											variant="outlined"
 										>
-											Cancel import
+											{t("models.huggingFace.check.cancelImport")}
 										</Button>
 									</div>
 								</Stack>
@@ -263,7 +289,7 @@ export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.E
 										onClick={() => void startImport(verdict)}
 										variant="contained"
 									>
-										Import to device
+										{t("models.huggingFace.check.import")}
 									</Button>
 								</div>
 							) : null}

@@ -207,7 +207,8 @@ export interface DeviceInfo {
 	model: string;
 	modelDate: string;
 	os: string;
-	specs: { label: string; value: string }[];
+	// id is the English label, the same in every language.
+	specs: { id: string; label: string; value: string }[];
 }
 
 export interface StorageOverview {
@@ -461,7 +462,8 @@ export type TaskEvent =
 	| { type: "step"; step: TaskStep }
 	| { type: "step-result"; id: string; ok: boolean; result: string }
 	| { type: "usage"; usage: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number } }
-	| { type: "error"; message: string }
+	// `interrupted`: the user stopped the reply (the message is translated, so it is not a marker).
+	| { type: "error"; message: string; interrupted?: true }
 	| { type: "done" };
 
 export type PlaygroundKind = "asr" | "tts" | "ocr" | "embed" | "rerank" | "text";

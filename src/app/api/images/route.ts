@@ -15,13 +15,13 @@ export const POST = apiRoute(async (request) => {
 	}
 	const { modelId, prompt, size, steps, seed } = input;
 	if (typeof modelId !== "string" || typeof prompt !== "string" || !prompt.trim()) {
-		throw new DeviceError("Expected { modelId, prompt }", 400);
+		throw new DeviceError("errors.request.expected", 400, { shape: "{ modelId, prompt }" });
 	}
 	if (typeof size !== "string" || !(IMAGE_SIZES as readonly string[]).includes(size)) {
-		throw new DeviceError(`size must be one of ${IMAGE_SIZES.join(", ")}`, 400);
+		throw new DeviceError("errors.request.oneOf", 400, { field: "size", options: IMAGE_SIZES.join(", ") });
 	}
 	if (!Number.isSafeInteger(steps) || (steps as number) < 1 || (steps as number) > 50) {
-		throw new DeviceError("steps must be 1-50", 400);
+		throw new DeviceError("errors.request.range", 400, { field: "steps", min: 1, max: 50 });
 	}
 	const [width, height] = size.split("x").map(Number);
 	const body = {

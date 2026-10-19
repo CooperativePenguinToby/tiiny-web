@@ -1,0 +1,1187 @@
+{
+	"nav": {
+		"overview": "概览",
+		"models": "模型",
+		"agents": "智能体",
+		"chat": "聊天",
+		"playground": "试验场",
+		"vault": "Vault",
+		"connectors": "连接器",
+		"settings": "设置",
+		"openNavigation": "打开导航",
+		"signOut": "退出登录",
+		"language": "语言",
+		"languageCurrent": "语言：{{language}}"
+	},
+	"titles": {
+		"page": "{{page}} | {{site}}",
+		"notFound": "未找到",
+		"settings": "设置",
+		"overview": "概览",
+		"agents": "智能体",
+		"history": "历史记录",
+		"signIn": "登录",
+		"playground": "试验场",
+		"connectors": "连接器",
+		"models": "模型",
+		"store": "商店",
+		"chat": "聊天",
+		"vault": "Vault",
+		"huggingFace": "Hugging Face"
+	},
+	"errors": {
+		"notSignedIn": "未登录",
+		"internal": "内部错误",
+		"unknownLanguage": "未知语言",
+		"incorrectPassword": "密码错误",
+		"passthrough": "{{message}}",
+		"request": {
+			"expected": "应为 {{shape}}",
+			"required": "{{field}} 为必填项",
+			"mustBeText": "{{field}} 必须是文本",
+			"tooLong_other": "{{field}} 超过 {{count}} 个字符",
+			"modelIdFormat": "{{field}} 的格式应为 Org/Name",
+			"modelIdLike": "{{field}} 必须是类似 Org/Name 的模型 ID",
+			"range": "{{field}} 必须在 {{min}}-{{max}} 之间",
+			"oneOf": "{{field}} 必须是以下之一：{{options}}",
+			"dateFormat": "{{field}} 必须是类似 {{example}} 的日期",
+			"jsonList": "{{field}} 必须是 JSON 列表",
+			"emptySearch": "请输入搜索内容"
+		},
+		"device": {
+			"notConfigured": "设备未配置：请设置 TIINY_DEVICE_URL 和 TIINY_AUTH_KEY，或先用 tiiny CLI 登录",
+			"notConfiguredShort": "设备未配置",
+			"responded": "设备返回 {{status}}：{{message}}",
+			"respondedUnavailable": "设备返回 {{status}}：服务不可用",
+			"unreachable": "无法连接 {{url}} 上的设备：{{reason}}",
+			"emptyStream": "设备返回了空的数据流",
+			"refusedChange": "设备拒绝了此更改",
+			"reportedError": "设备报告了一个错误"
+		},
+		"file": {
+			"tooLarge": "{{name}} 大于 {{megabytes}} MB"
+		},
+		"hf": {
+			"invalidRepo": "请以 org/name 或 huggingface.co 链接的形式输入 Hugging Face 仓库",
+			"unreachable": "无法连接 Hugging Face：{{reason}}",
+			"responded": "Hugging Face 返回 {{status}}"
+		},
+		"models": {
+			"didNotLoad": "模型未能加载",
+			"didNotLoadStatus": "模型未能加载（{{status}}）",
+			"didNotLoadNoStatus": "模型未能加载（无状态）"
+		},
+		"connectors": {
+			"unknown": "未知连接器",
+			"noAccountSignIn": "此连接器不使用账号登录",
+			"accountSignIn": "此连接器使用账号登录",
+			"tokenRejected": "设备拒绝了该令牌",
+			"xLoginRejected": "X 拒绝了登录",
+			"mailLoginRefused": "邮件服务器拒绝了登录",
+			"whatsappFailed": "设备无法启动 WhatsApp",
+			"invalidMcpId": "无效的 MCP 服务器 ID",
+			"mcpConfig": "应为类似 {{example}} 的 JSON 对象"
+		},
+		"chat": {
+			"invalidAttachment": "无效的附件",
+			"tooManyAttachments_other": "最多 {{count}} 个附件",
+			"chooseFile": "请选择文件",
+			"unsupportedFile": "{{name}}：请附加图片或 {{extensions}} 文件",
+			"noText": "设备在 {{name}} 中未找到文本",
+			"invalidMediaId": "无效的媒体 ID"
+		},
+		"task": {
+			"interrupted": "已中断。",
+			"tooManySteps_other": "执行 {{count}} 步后仍无最终答案，已停止。"
+		},
+		"history": {
+			"invalidConversationId": "无效的对话 ID"
+		},
+		"vault": {
+			"invalidSourceId": "无效的来源 ID",
+			"chooseFiles": "请至少选择一个文件",
+			"tooManyFiles_other": "一次最多上传 {{count}} 个文件",
+			"unsupportedFile": "{{name}}：Vault 支持 {{extensions}} 文件",
+			"invalidName": "请输入不含斜杠的文件名"
+		},
+		"memory": {
+			"chooseTextModel": "请选择一个已下载的文本模型"
+		},
+		"settings": {
+			"deviceNameLength_other": "设备名称必须为 1-{{count}} 个字符"
+		},
+		"agents": {
+			"noDomain": "未配置智能体子域名（AGENT_DOMAIN）"
+		},
+		"playground": {
+			"textRequired": "文本为必填项",
+			"textTooLong_other": "文本超过 {{count}} 个字符",
+			"queryRequired": "查询为必填项",
+			"queryTooLong_other": "查询超过 {{count}} 个字符",
+			"numberedTextRequired": "文本 {{number}} 为必填项",
+			"numberedTextTooLong_other": "文本 {{number}} 超过 {{count}} 个字符",
+			"documentRequired": "文档 {{number}} 为必填项",
+			"documentTooLong_other": "文档 {{number}} 超过 {{count}} 个字符",
+			"textCount": "请提供 {{min}} 到 {{max}} 段文本",
+			"documentCount": "请提供 {{min}} 到 {{max}} 个文档",
+			"chooseAudio": "请选择或录制音频",
+			"audioTooLarge": "音频大于 {{megabytes}} MB",
+			"wavOnly": "设备只能转写 WAV 音频。请先将文件转换为 WAV。",
+			"chooseImage": "请选择图片",
+			"imageTooLarge": "图片大于 {{megabytes}} MB"
+		},
+		"backup": {
+			"chooseFile": "请选择备份文件",
+			"chooseCategory": "请至少选择一个设备提供的类别",
+			"unexpectedReply": "意外的备份响应（{{type}}）",
+			"unexpectedReplyNoType": "意外的备份响应（无类型）",
+			"noArchive": "设备的备份中没有归档文件",
+			"notBackup": "该文件不是 Tiiny 备份",
+			"otherDevice": "此备份来自另一台设备，只能在那台设备上恢复",
+			"missing": "备份中不包含 {{services}}"
+		},
+		"wifi": {
+			"unknownAction": "未知的 Wi-Fi 操作",
+			"wouldDropLink": "本应用通过 Wi-Fi 连接设备，此更改会使连接中断。请在 TiinyOS 中操作，或用网线连接设备后再操作。"
+		},
+		"update": {
+			"upToDate": "TiinyOS 已是最新版本",
+			"notReady": "没有已下载、可安装的更新",
+			"unknownAction": "未知的更新操作"
+		},
+		"agentProxy": {
+			"noAnswer": "智能体没有响应（{{reason}}），它可能已停止。",
+			"linkExpired": "此链接已过期。请从 tiiny-web 的智能体页面重新打开该智能体。",
+			"signIn": "请登录 tiiny-web，并从智能体页面打开此智能体。"
+		}
+	},
+	"chat": {
+		"title": "聊天",
+		"tabs": {
+			"chat": "聊天",
+			"history": "历史记录"
+		},
+		"intro": "与已加载的模型对话。聊天记录保存在设备的聊天历史中，并与 TiinyOS 共享。设备对每个模型一次只处理一个请求，因此回复可能需要排队。",
+		"message": {
+			"you": "你",
+			"assistant": "助手",
+			"thinking": "思考"
+		},
+		"notes": {
+			"stopped": "已停止。",
+			"noReply": "回复不完整。",
+			"interrupted": "已中断。",
+			"drawing": "正在绘制… 第 {{step}} 步，共 {{total}} 步",
+			"picture_other": "{{size}}，{{count}} 步"
+		},
+		"errors": {
+			"openConversation": "无法打开对话：{{message}}",
+			"load": "无法加载 {{name}}：{{message}}",
+			"device": "设备报告了一个错误",
+			"gaveUp": "设备等待超时：模型正忙于处理其他请求。请重试。（{{message}}）",
+			"drawFailed": "设备无法绘制图片",
+			"noPicture": "设备已完成，但未生成图片",
+			"notSaved": "未保存到历史记录：{{message}}"
+		},
+		"models": {
+			"loading": "正在加载聊天模型",
+			"none": "尚未下载任何聊天或图像模型。请从商店获取一个，然后加载。",
+			"modelsButton": "模型",
+			"label": "模型",
+			"choose": "选择模型",
+			"notLoadedOption": "{{name}}（未加载）"
+		},
+		"loading": {
+			"starting": "正在启动",
+			"unloading": "正在卸载 {{name}}",
+			"status": "正在加载 {{name}}：{{message}}",
+			"statusProgress": "正在加载 {{name}}：{{message}} {{progress}}%",
+			"progressLabel": "模型加载",
+			"notLoaded": "{{name}} 未加载。",
+			"load": "加载"
+		},
+		"makeRoom": {
+			"title": "为 {{name}} 腾出空间？",
+			"text": "设备的可用 NPU 内存不足。是否先卸载 {{models}}？使用这些模型的应用将停止。",
+			"otherModels": "其他模型",
+			"cancel": "取消",
+			"confirm": "卸载并加载"
+		},
+		"mode": {
+			"label": "模式",
+			"chat": "聊天",
+			"chatTitle": "模型直接回答",
+			"task": "任务",
+			"taskTitle": "模型借助 Vault、网页和 MCP 工具分步完成任务"
+		},
+		"tools": {
+			"vault": "Vault",
+			"vaultTitle": "允许模型搜索你的 Vault 文件和聊天摘要",
+			"web": "网页",
+			"webTitle": "允许模型读取网页"
+		},
+		"image": {
+			"size": "尺寸",
+			"steps": "步数"
+		},
+		"thinking": {
+			"label": "思考",
+			"off": "关闭"
+		},
+		"newChat": "新聊天",
+		"conversation": {
+			"opening": "正在打开对话",
+			"empty": "发送一条消息，开始与 {{name}} 聊天。",
+			"theModel": "模型",
+			"waiting": "正在等待设备 · {{seconds}} 秒",
+			"waitingQueued_other": "正在等待设备 · {{seconds}} 秒 · 模型正在处理其他 {{count}} 个请求，你的请求已排队"
+		},
+		"composer": {
+			"files": "要附加的文件",
+			"attachImagesOrDocuments": "附加图片或文档",
+			"attachDocuments": "附加文档",
+			"message": "消息",
+			"placeholder": "Enter 发送，Shift+Enter 换行",
+			"stop": "停止",
+			"send": "发送"
+		},
+		"attachments": {
+			"charactersRead_other": "设备读取了 {{characters}} 个字符",
+			"uploading": "{{name}}…",
+			"missing": "{{name}}（已不在设备上）",
+			"download": "下载"
+		},
+		"task": {
+			"running": "{{label}} 运行中",
+			"showResult": "显示结果",
+			"hideResult": "隐藏结果"
+		},
+		"history": {
+			"intro": "保存在设备上的对话，来自本应用和 TiinyOS。",
+			"search": "搜索对话",
+			"searchButton": "搜索",
+			"searching": "正在搜索…",
+			"loading": "正在加载对话",
+			"noMatches": "没有提到“{{query}}”的对话。",
+			"empty": "还没有对话。你的聊天会保存在这里。",
+			"untitled": "无标题",
+			"delete": "删除",
+			"confirmTitle": "删除对话？",
+			"confirmText": "要从设备中删除“{{title}}”吗？它也会从 TiinyOS 中删除。"
+		}
+	},
+	"auth": {
+		"layout": {
+			"welcome": "欢迎使用 <brand>Tiiny</brand>",
+			"tagline": "在你网络中的任意浏览器上监控设备、管理已加载的模型并进行聊天。"
+		},
+		"signIn": {
+			"title": "登录",
+			"description": "请输入为此服务器配置的管理员密码。",
+			"password": "密码",
+			"passwordRequired": "密码为必填项",
+			"showPassword": "显示密码",
+			"hidePassword": "隐藏密码",
+			"submit": "登录",
+			"submitting": "正在登录…",
+			"failed": "登录失败（{{status}}）",
+			"unreachable": "无法连接服务器"
+		}
+	},
+	"core": {
+		"backHome": "返回首页",
+		"notFound": {
+			"heading": "404：你要找的页面不存在",
+			"hint": "请使用导航返回仪表板。"
+		},
+		"errors": {
+			"requestFailed": "请求失败（{{status}}）",
+			"deviceReported": "设备返回 {{status}}"
+		}
+	},
+	"agents": {
+		"page": {
+			"title": "智能体",
+			"description": "设备上安装的智能体通过 HTTPS 在此打开，受本应用的登录保护。"
+		},
+		"loading": "正在加载智能体",
+		"recommendedModels_other": "推荐模型：{{models}}",
+		"stream": {
+			"failed": "失败",
+			"working": "处理中"
+		},
+		"progress": {
+			"percent": "{{message}} {{percent}}%",
+			"ariaLabel": "{{name}} 进度",
+			"startingInstall": "正在开始安装…",
+			"resumingInstall": "正在继续安装…",
+			"updating": "正在更新…",
+			"stopping": "正在停止…",
+			"starting": "正在启动…",
+			"deleting": "正在删除…"
+		},
+		"install": {
+			"paused": "安装已暂停于 {{percent}}%",
+			"running": "正在安装 {{percent}}%",
+			"ariaLabel": "{{name}} 安装"
+		},
+		"outcome": {
+			"installed": "{{name}} 已安装。",
+			"installPaused": "{{name}} 安装已暂停。",
+			"updated": "{{name}} 已更新到 {{version}}。",
+			"stopped": "{{name}} 已停止。",
+			"started": "{{name}} 已启动。",
+			"deleted": "{{name}} 已删除。",
+			"error": "{{name}}：{{message}}"
+		},
+		"actions": {
+			"resume": "继续",
+			"pause": "暂停",
+			"cancelInstall": "取消安装",
+			"update": "更新",
+			"open": "打开",
+			"stop": "停止",
+			"start": "启动",
+			"delete": "删除",
+			"installOnDevice": "安装到设备",
+			"cancel": "取消"
+		},
+		"installed": {
+			"heading": "本设备上",
+			"empty": "设备上未安装任何智能体。请从下方的商店安装。",
+			"version": "版本 {{version}}",
+			"versionWithUpdate": "版本 {{version}} · {{latest}} 可用",
+			"unknownVersion": "未知",
+			"usage": "CPU {{cpu}}% · 内存 {{memory}}",
+			"containersStopped": "设备报告此智能体的容器意外停止。请重新启动，或点击“停止”将其重置。",
+			"proxyError": "端口 {{port}} 上的代理：{{error}}"
+		},
+		"store": {
+			"heading": "智能体商店：在设备上运行",
+			"allInstalled": "商店中的所有 Web 智能体均已安装。",
+			"version": "版本 {{version}}"
+		},
+		"desktop": {
+			"heading": "智能体商店：在你的电脑上运行",
+			"description": "这些智能体在电脑上运行，并使用设备的 OpenAI 兼容 API。将它们指向设备（例如 <code>http://&lt;device address&gt;/v1</code>），并使用 <code>tiiny auth key</code> 提供的密钥。",
+			"noDownloads": "暂无可下载内容。"
+		},
+		"deleteDialog": {
+			"title": "删除 {{name}}？",
+			"text": "这会从设备中移除该智能体。你可以从智能体商店重新安装。"
+		},
+		"status": {
+			"created": "已创建",
+			"running": "运行中",
+			"starting": "启动中",
+			"stopped": "已停止",
+			"exited": "已退出",
+			"paused": "已暂停",
+			"error": "错误"
+		}
+	},
+	"connectors": {
+		"page": {
+			"title": "连接器",
+			"description": "模型可在任务模式下使用的邮件、日历、消息和 MCP 工具。"
+		},
+		"category": {
+			"email": "邮件",
+			"calendar": "日历",
+			"messaging": "消息"
+		},
+		"state": {
+			"connected": "已连接",
+			"notConnected": "未连接",
+			"notReachable": "无法访问"
+		},
+		"actions": {
+			"connect": "连接",
+			"disconnect": "断开连接",
+			"cancel": "取消",
+			"close": "关闭",
+			"remove": "移除"
+		},
+		"services": {
+			"heading": "服务",
+			"description": "模型在任务模式下可在你授权的范围内使用已连接的服务。连接保存在设备上，并与 TiinyOS 共享。",
+			"loading": "正在加载连接器",
+			"waitingForSignIn": "正在等待你完成登录… <link>打开登录页面</link>"
+		},
+		"outcome": {
+			"connected": "{{name}} 已连接：{{detail}}。",
+			"whatsappConnected": "WhatsApp 已连接。",
+			"disconnected": "{{name}} 已断开连接。",
+			"error": "{{name}}：{{message}}"
+		},
+		"disconnectDialog": {
+			"title": "断开连接？",
+			"text": "要断开 {{name}} 吗？设备将清除已保存的登录信息，模型将无法再使用它。"
+		},
+		"connect": {
+			"title": "连接 {{name}}",
+			"telegramIntro": "在 Telegram 中通过 @BotFather 创建机器人（/newbot），然后粘贴它提供的令牌。",
+			"discordIntro": "在 Discord Developer Portal 中创建机器人，开启 Message Content Intent，将其邀请到你的服务器，然后粘贴它的令牌。",
+			"xIntro": "在浏览器中登录 x.com，然后复制 auth_token 和 ct0 Cookie。",
+			"botToken": "机器人令牌",
+			"channelId": "频道 ID",
+			"channelIdHelp": "机器人可以读取和发帖的频道。",
+			"whatsappQrAlt": "WhatsApp 配对二维码",
+			"whatsappIntro": "在手机上的 WhatsApp 中打开“设置 → 已关联的设备 → 关联新设备”，然后扫描此二维码。",
+			"newCode": "新二维码",
+			"emailIntro": "请使用应用专用密码（开启两步验证时，Gmail、Outlook 和 iCloud 都要求使用）。",
+			"provider": "服务商",
+			"otherProvider": "其他",
+			"emailAddress": "邮箱地址",
+			"appPassword": "应用专用密码",
+			"imapServer": "IMAP 服务器",
+			"smtpServer": "SMTP 服务器",
+			"checking": "正在检查…"
+		},
+		"mcp": {
+			"heading": "自定义 MCP 服务器",
+			"addServer": "添加 MCP 服务器",
+			"description": "这些服务器的工具会在任务模式下提供给模型。它们在设备上运行。",
+			"loading": "正在加载 MCP 服务器",
+			"empty": "还没有 MCP 服务器。",
+			"tools": "工具",
+			"hideTools": "隐藏工具",
+			"loadingTools": "正在加载工具",
+			"added": "MCP 服务器已添加。",
+			"removed": "{{name}} 已移除。",
+			"removeDialog": {
+				"title": "移除 MCP 服务器？",
+				"text": "要从设备中移除 {{name}} 吗？模型将无法再使用它的工具。"
+			},
+			"addDialog": {
+				"title": "添加 MCP 服务器",
+				"description": "服务器在设备上运行，因此必须能从设备访问。需要桌面环境或浏览器的服务器无法在设备上运行。",
+				"byUrl": "通过 URL",
+				"fromJson": "通过 JSON",
+				"name": "名称",
+				"url": "URL",
+				"urlHelp": "HTTP 或 SSE 端点，例如 {{example}}",
+				"config": "MCP 配置",
+				"invalidJson": "不是有效的 JSON",
+				"add": "添加",
+				"adding": "正在添加…"
+			}
+		}
+	},
+	"settings": {
+		"page": {
+			"title": "设置",
+			"subtitle": "设备自身的设置，与 TiinyOS 中的相同。"
+		},
+		"actions": {
+			"cancel": "取消",
+			"save": "保存",
+			"saving": "正在保存…",
+			"retry": "重试",
+			"copy": "复制",
+			"copied": "已复制",
+			"delete": "删除",
+			"deleting": "正在删除…"
+		},
+		"section": {
+			"staleValues": "显示的是最近一次获取的值。{{error}}"
+		},
+		"device": {
+			"title": "我的设备",
+			"subheader": "由设备报告",
+			"loading": "正在加载设备信息",
+			"name": "名称",
+			"rename": "重命名",
+			"nameField": "设备名称",
+			"serialNumber": "序列号",
+			"copySerialNumber": "复制序列号",
+			"model": "型号",
+			"osService": "TiinyOS 服务"
+		},
+		"personalization": {
+			"title": "个性化",
+			"subheader": "设备在任务模式下向模型提供的关于你的背景信息",
+			"loading": "正在加载个性化设置",
+			"fields": {
+				"userName": {
+					"label": "称呼",
+					"hint": "模型如何称呼你。"
+				},
+				"occupation": {
+					"label": "职业",
+					"hint": "例如：软件工程师。"
+				},
+				"preferences": {
+					"label": "偏好",
+					"hint": "你喜欢什么样的回答。"
+				},
+				"recentFocus": {
+					"label": "近期关注",
+					"hint": "你正在做的事情。"
+				}
+			},
+			"fieldHelper": "{{hint}} {{length}}/{{limit}}",
+			"saved": "已保存。模型将从下一次任务模式对话开始看到这些信息。",
+			"discardChanges": "放弃更改"
+		},
+		"power": {
+			"title": "系统",
+			"subheader": "电源和 TiinyOS 更新",
+			"autoPowerOn": {
+				"title": "通电自动开机",
+				"description": "设备接通电源后会自动开机。设备不会报告此功能是否开启（读取结果始终为关闭），因此只显示更改的结果。",
+				"turnOn": "开启",
+				"turnOff": "关闭",
+				"deviceReply": "设备：{{message}}"
+			},
+			"update": {
+				"title": "系统更新",
+				"current": "TiinyOS {{version}}",
+				"available": "TiinyOS {{version}} · 有新版本 {{available}} 可用",
+				"upToDate": "TiinyOS {{version}} · 已是最新版本",
+				"loading": "正在加载更新状态",
+				"inProgress": "更新{{state}}…",
+				"progress": "更新进度",
+				"check": "检查更新",
+				"checking": "正在检查…",
+				"download": "下载更新",
+				"install": "安装更新",
+				"confirmTitle": "安装更新？",
+				"confirmText": "安装期间模型将停止，设备将重新启动。在设备恢复之前请勿断开电源。",
+				"confirmLabel": "安装",
+				"installing": "正在安装更新。设备将重启一次，请勿断开电源。"
+			},
+			"power": {
+				"title": "电源",
+				"restart": "重新启动",
+				"shutDown": "关机",
+				"restarting": "正在重新启动… 等待设备恢复。",
+				"back": "设备已恢复。",
+				"notBack": "10 分钟后设备仍未恢复",
+				"shuttingDown": "设备正在关机。",
+				"restartTitle": "重新启动设备？",
+				"restartText": "已加载的模型、聊天和智能体将停止，设备将在几分钟内无法访问。",
+				"shutDownTitle": "关闭设备？",
+				"shutDownText": "已加载的模型、聊天和智能体将停止。设备将保持关机状态，直到在设备上开机（或在开启通电自动开机时重新接通电源）。"
+			}
+		},
+		"apiAccess": {
+			"title": "API 访问",
+			"subheader": "在你网络中的其他应用里使用设备的模型",
+			"loading": "正在加载 API 访问信息",
+			"openaiCompatible": "OpenAI 兼容",
+			"uses": {
+				"openai": "文本、嵌入、重排序、图像、语音",
+				"anthropic": "文本生成",
+				"ollama": "文本生成、嵌入"
+			},
+			"copyBaseUrl": "复制 {{format}} 基础 URL",
+			"apiKey": "API 密钥",
+			"copyApiKey": "复制 API 密钥",
+			"reveal": "显示",
+			"hint": "使用“模型”页面中的模型 ID，或使用 <code>default</code> 表示最近使用的模型。请妥善保管密钥：任何持有它的人都可以使用设备的 API。"
+		},
+		"storage": {
+			"title": "存储",
+			"subheader": "设备上的磁盘使用情况",
+			"loading": "正在加载存储信息",
+			"used": "已使用 {{used}}，共 {{total}}",
+			"usedBar": "已用存储",
+			"category": "{{name}}：{{size}}",
+			"modelFiles": "模型文件",
+			"agentFiles": "智能体文件",
+			"size": "大小",
+			"usedByVault": "Vault 占用",
+			"deleted": "{{id}} 已删除。",
+			"deleteModelTitle": "删除模型？",
+			"deleteModelText": "要从设备中删除 {{id}} 吗？如需使用，必须重新下载。",
+			"deleteAgentTitle": "删除智能体？",
+			"deleteAgentText": "要从设备中删除 {{id}} 及其数据吗？此操作无法撤销。"
+		},
+		"backup": {
+			"title": "备份与恢复",
+			"subheader": "聊天历史和 Vault，保存到这台电脑",
+			"backUp": {
+				"title": "备份",
+				"loading": "正在加载备份信息",
+				"category": "{{name}} · 约 {{size}}",
+				"categoryNotReady": "{{name}} · 约 {{size}}（未就绪）",
+				"download": "下载备份",
+				"inProgress": "正在备份…",
+				"saved": "已保存 {{name}}（{{size}}）。",
+				"savedWithout": "已保存 {{name}}（{{size}}），未包含：{{failed}}。"
+			},
+			"restore": {
+				"title": "恢复",
+				"chooseFile": "选择备份文件",
+				"fileField": "备份文件",
+				"restore": "恢复",
+				"inProgress": "正在恢复…",
+				"otherDevice": "此备份来自另一台设备（{{deviceId}}），只能在那台设备上恢复。",
+				"unknownDevice": "未知",
+				"result": "{{name}}：{{message}}",
+				"restored": "已恢复",
+				"failed": "设备无法恢复此备份",
+				"confirmTitle": "恢复备份？",
+				"confirmText": "要用备份内容替换设备上的 {{categories}} 吗？备份之后新增的内容将会丢失。",
+				"categoryJoiner": "和"
+			}
+		},
+		"network": {
+			"title": "网络",
+			"subheader": "设备的 Wi-Fi 和有线连接",
+			"loading": "正在加载网络信息",
+			"wifi": "Wi-Fi",
+			"wifiTurnedOn": "Wi-Fi 已开启。",
+			"wifiTurnedOff": "Wi-Fi 已关闭。",
+			"connectedTo": "已连接到 {{ssid}}（信号 {{signal}}%）",
+			"notConnected": "未连接",
+			"off": "关闭",
+			"wifiLink": "本应用通过 Wi-Fi（{{interface}}）连接设备，因此此处无法关闭 Wi-Fi、忘记 {{ssid}} 或加入其他网络。请使用 TiinyOS 或用网线连接设备后再进行这些更改。",
+			"interfaces": {
+				"interface": "接口",
+				"state": "状态",
+				"addresses": "地址",
+				"appLink": "本应用的连接"
+			},
+			"networks": {
+				"scanning": "正在扫描网络…",
+				"network": "网络",
+				"autoJoin": "自动加入",
+				"connected": "已连接",
+				"connecting": "正在连接…",
+				"saved": "已保存",
+				"open": "开放",
+				"signal": "信号 {{signal}}%",
+				"autoJoinSwitch": "自动加入 {{ssid}}",
+				"autoJoinOn": "已为 {{ssid}} 开启自动加入。",
+				"autoJoinOff": "已为 {{ssid}} 关闭自动加入。",
+				"join": "加入",
+				"joining": "正在加入 {{ssid}}。",
+				"forget": "忘记",
+				"forgotten": "已忘记 {{ssid}}。"
+			},
+			"joinDialog": {
+				"title": "加入 {{ssid}}",
+				"password": "密码"
+			},
+			"forgetDialog": {
+				"title": "忘记网络？",
+				"text": "设备将忘记 {{ssid}} 及其密码。"
+			}
+		}
+	},
+	"models": {
+		"heading": "模型",
+		"percent": "{{value}}%",
+		"tabs": {
+			"models": "模型",
+			"store": "商店"
+		},
+		"pages": {
+			"models": "将已下载的模型加载到 NPU 内存中，或将其卸载以释放空间。",
+			"store": "来自 Tiiny 商店的模型。下载内容保存到设备上；请在“模型”标签页中加载。",
+			"huggingFace": "从 Hugging Face 导入自定义模型。能否导入由设备决定：通常是商店中模型的微调版本和 LoRA 适配器，其中一些需要先下载对应的商店模型。"
+		},
+		"columns": {
+			"model": "模型",
+			"type": "类型",
+			"size": "大小",
+			"npuShare": "NPU 占比",
+			"status": "状态",
+			"action": "操作"
+		},
+		"table": {
+			"loading": "正在加载模型",
+			"title": "已下载的模型",
+			"npuFree": "NPU 空闲 {{percent}}%",
+			"empty": "设备上没有已下载的模型。",
+			"status": {
+				"loaded": "已加载",
+				"notLoaded": "未加载",
+				"tooBig": "NPU 空间不足",
+				"tooBigHint": "需要 {{needed}}% 的 NPU，当前空闲 {{free}}%。请卸载一个模型以腾出空间。"
+			},
+			"pending": {
+				"load": "正在启动…",
+				"unload": "正在卸载…",
+				"delete": "正在删除…"
+			},
+			"progress": {
+				"load": "加载进度",
+				"unload": "卸载进度",
+				"delete": "删除进度"
+			},
+			"done": {
+				"load": "{{name}} 已加载。",
+				"unload": "{{name}} 已卸载。",
+				"delete": "{{name}} 已删除。"
+			},
+			"failed": {
+				"load": "无法加载 {{name}}：{{reason}}",
+				"unload": "无法卸载 {{name}}：{{reason}}",
+				"delete": "无法删除 {{name}}：{{reason}}",
+				"unloadAll": "无法卸载所有模型：{{reason}}",
+				"interrupt": "无法中断 {{name}}：{{reason}}"
+			},
+			"allUnloaded": "所有模型已卸载。",
+			"interrupted": "已停止 {{name}} 正在处理的任务。",
+			"interrupt": "中断",
+			"interruptHint": "停止此模型正在处理的请求（来自任何应用）",
+			"unload": "卸载",
+			"unloading": "正在卸载…",
+			"unloadAll": "全部卸载",
+			"delete": "删除",
+			"load": "加载",
+			"cancel": "取消",
+			"unloadAllDialog": {
+				"title": "卸载所有模型？",
+				"text": "所有已加载的模型都将从 NPU 中释放。来自本应用或其他客户端的进行中请求将停止。"
+			},
+			"deleteDialog": {
+				"title": "删除 {{name}}？",
+				"text": "这会从设备中删除该模型的文件。你可以从商店重新下载。"
+			},
+			"unloadDialog": {
+				"title": "卸载 {{name}}？",
+				"text": "这会释放其 NPU 占用。当前使用该模型的任何请求（来自本应用或其他客户端）都将停止。"
+			}
+		},
+		"store": {
+			"loading": "正在加载商店",
+			"search": "搜索商店",
+			"searchPlaceholder": "搜索模型",
+			"allTypes": "所有类型",
+			"empty": "没有符合搜索条件的商店模型。",
+			"tableLabel": "商店模型",
+			"trending": "热门",
+			"stage": {
+				"starting": "正在启动",
+				"downloading": "正在下载",
+				"verifying": "正在校验",
+				"installing": "正在安装"
+			},
+			"status": {
+				"loaded": "已加载",
+				"downloaded": "已下载",
+				"paused": "已暂停 {{percent}}%",
+				"downloading": "下载中 {{percent}}%",
+				"notDownloaded": "未下载"
+			},
+			"downloadProgress": "下载进度",
+			"pause": "暂停",
+			"cancel": "取消",
+			"resume": "继续",
+			"download": "下载",
+			"deviceReported": "设备返回 {{status}}",
+			"streamEnded": "模型下载完成前下载流已结束",
+			"pausedDone": "{{name}} 已暂停，可随时继续。",
+			"downloaded": "{{name}} 已下载。请在“模型”页面中加载。",
+			"cancelled": "已取消下载 {{name}}。",
+			"failed": {
+				"download": "无法下载 {{name}}：{{reason}}",
+				"pause": "无法暂停 {{name}}：{{reason}}",
+				"cancel": "无法取消 {{name}}：{{reason}}"
+			},
+			"details": {
+				"tableLabel": "模型详情",
+				"close": "关闭",
+				"modelId": "模型 ID",
+				"type": "类型",
+				"parameters": "参数量",
+				"inputOutput": "输入 → 输出",
+				"npuShare": "NPU 占比",
+				"contextWindow": "上下文窗口",
+				"tokens_other": "{{tokens}} 个 token",
+				"imageSize": "图像尺寸",
+				"defaultSteps": "默认步数",
+				"guidanceScale": "引导系数",
+				"reasoning": "推理",
+				"loadTime": "加载时间",
+				"loadSeconds": "约 {{seconds}} 秒",
+				"downloadsLikes": "下载量 · 点赞数",
+				"thinking": {
+					"none": "无",
+					"toggleable": "可关闭",
+					"alwaysOn": "始终开启",
+					"levels": "级别 {{levels}}",
+					"defaultLevel": "默认 {{level}}"
+				}
+			}
+		},
+		"huggingFace": {
+			"verdict": {
+				"compatible": "兼容",
+				"needsBaseModel": "需要基础模型",
+				"incompatible": "不兼容"
+			},
+			"kind": {
+				"adapter": "LoRA 适配器",
+				"fineTune": "微调"
+			},
+			"search": {
+				"title": "查找兼容模型",
+				"subheader": "Hugging Face 上基于商店模型构建的 LoRA 适配器和微调模型，已通过设备检查。",
+				"baseModel": "基础模型",
+				"onDevice": "{{modelId}}（设备上）",
+				"query": "搜索（可选）",
+				"submit": "搜索 Hugging Face",
+				"checkingBases": "正在询问设备哪些商店模型可作为导入的基础…",
+				"autoCheck": "自动检查结果",
+				"compatibleOnly": "仅显示兼容项",
+				"limit": "每类结果数",
+				"searching": "正在搜索 Hugging Face",
+				"empty": "在 Hugging Face 上未找到 {{base}} 的适配器或微调模型。",
+				"tableLabel": "Hugging Face 仓库",
+				"groups": {
+					"importable": "可导入的基础模型",
+					"checking": "正在通过设备检查…",
+					"notOnHf": "不在 Hugging Face 上",
+					"unsupported": "不支持导入"
+				},
+				"columns": {
+					"repo": "仓库",
+					"kind": "种类",
+					"downloads": "下载量",
+					"compatibility": "兼容性",
+					"action": "操作"
+				},
+				"details": "详情",
+				"checking": "检查中…",
+				"notChecked": "未检查",
+				"checkFailed": "检查失败",
+				"downloadBase": "请先从商店下载 {{name}}",
+				"summary": {
+					"checked": "已检查 {{finished}}/{{total}} · {{compatible}} 个兼容",
+					"needBase_other": "{{count}} 个需要基础模型",
+					"hidden_other": "已隐藏 {{count}} 个不兼容项"
+				},
+				"checkingCompatibility": "正在检查兼容性"
+			},
+			"check": {
+				"title": "检查仓库",
+				"subheader": "由设备决定能否导入某个仓库。",
+				"repo": "Hugging Face 仓库",
+				"placeholder": "org/name 或 https://huggingface.co/org/name",
+				"checking": "正在检查…",
+				"check": "检查",
+				"checkingRepo": "正在检查仓库",
+				"store": "商店",
+				"needsBase": "从商店将 {{name}}（{{modelId}}）下载到设备后即可导入。",
+				"cannotImport": "设备无法导入此仓库。",
+				"size": "大小 {{size}}",
+				"baseModel": "基础模型 {{modelId}}",
+				"disk": "需要 {{required}} 磁盘空间，可用 {{available}}",
+				"toolkit": "导入前会先将 {{toolkit}} 工具包下载到设备（{{size}}）。",
+				"noDisk": "设备上的可用磁盘空间不足。",
+				"bytes": "{{downloaded}}/{{total}}",
+				"importProgress": "导入进度",
+				"continues": "导入在设备上进行，离开此页面后仍会继续。",
+				"cancelImport": "取消导入",
+				"import": "导入到设备",
+				"starting": "正在启动",
+				"importing": "正在导入",
+				"importFailed": "导入失败",
+				"cancelled": "已取消导入。",
+				"imported": "{{repo}} 已导入。请在“模型”页面中加载。",
+				"streamStopped": "进度更新已停止。导入可能仍在设备上进行。"
+			}
+		}
+	},
+	"vault": {
+		"layout": {
+			"title": "Vault",
+			"description": "设备的知识库：你的文件和过往聊天的摘要，在设备上建立索引，供模型搜索。",
+			"tabs": {
+				"files": "文件",
+				"chatHistory": "聊天历史"
+			}
+		},
+		"files": {
+			"title": "文件",
+			"subheader": "PDF、Word、Excel、CSV、文本、Markdown 或 HTML，每个最大 200 MB。模型在任务模式下使用这些文件。",
+			"upload": "上传文件",
+			"uploadInput": "要上传的文件",
+			"loading": "正在加载 Vault 文件",
+			"empty": "还没有文件。上传文档供模型使用。",
+			"fileCount_other": "{{count}} 个文件",
+			"columns": {
+				"file": "文件",
+				"size": "大小",
+				"added": "添加时间",
+				"status": "状态"
+			},
+			"status": {
+				"indexed": "已索引",
+				"indexFailed": "索引失败",
+				"notIndexed": "未索引"
+			},
+			"actions": {
+				"index": "索引",
+				"download": "下载",
+				"rename": "重命名",
+				"delete": "删除"
+			},
+			"progress": {
+				"label": "Vault 进度",
+				"line": "{{label}}：{{message}}",
+				"uploading": "正在上传…",
+				"indexing": "正在索引…",
+				"loadingModel": "正在加载嵌入模型",
+				"stage": "正在索引：{{stage}}",
+				"withChunks": "{{stage}}（{{processed}}/{{total}} 个分块）",
+				"retrying": "设备上索引失败，正在重试…"
+			},
+			"outcome": {
+				"added": "{{label}} 已添加到 Vault。",
+				"indexed": "{{name}} 已索引。",
+				"renamed": "已重命名为 {{name}}。",
+				"deleted": "{{name}} 已删除。"
+			},
+			"errors": {
+				"device": "设备报告了一个错误",
+				"uploadUnconfirmed": "设备未确认上传"
+			},
+			"renameDialog": {
+				"title": "重命名文件",
+				"name": "文件名",
+				"cancel": "取消",
+				"confirm": "重命名"
+			},
+			"deleteDialog": {
+				"title": "删除文件？",
+				"text": "要从设备中删除 {{name}} 及其索引吗？模型将无法再找到它。",
+				"confirm": "删除"
+			}
+		},
+		"search": {
+			"title": "搜索 Vault",
+			"subheader": "模型搜索 Vault 时会找到的内容",
+			"label": "搜索",
+			"submit": "搜索",
+			"searching": "正在搜索…",
+			"empty": "未找到相关内容。"
+		},
+		"chatHistory": {
+			"title": "聊天历史",
+			"subheader": "过往对话的每日摘要，保存在 Vault 中。",
+			"loading": "正在加载聊天历史",
+			"empty": "还没有摘要。",
+			"read": "阅读",
+			"hide": "隐藏",
+			"delete": "删除",
+			"loadingSummary": "正在加载摘要",
+			"deleted": "{{day}} 的摘要已删除。",
+			"deleteDialog": {
+				"title": "删除摘要？",
+				"text": "要删除 {{day}} 的摘要吗？模型将无法再回忆起那天的对话。",
+				"confirm": "删除"
+			}
+		},
+		"summarySettings": {
+			"loading": "正在加载每日摘要设置",
+			"enabled": "每日摘要",
+			"time": "时间",
+			"deviceTime": "设备时间 {{time}}（{{zone}}）",
+			"model": "模型",
+			"save": "保存",
+			"saving": "正在保存…",
+			"savedOn": "每日摘要已开启，时间为 {{time}}。",
+			"savedOff": "每日摘要已关闭。",
+			"description": "设备每天会将当天的对话总结到 Vault 中，以便模型在任务模式下回忆。生成摘要时会加载该模型，因此该模型可能会忙碌一段时间。"
+		}
+	},
+	"playground": {
+		"layout": {
+			"title": "试验场",
+			"description": "试用设备的语音、视觉、嵌入和重排序模型，并对文本模型进行基准测试（与 tiiny CLI 相同）。模型会在首次运行时加载。"
+		},
+		"tabs": {
+			"asr": {
+				"label": "语音转文字",
+				"intro": "使用语音识别模型转写 WAV 录音。"
+			},
+			"tts": {
+				"label": "文字转语音",
+				"intro": "使用语音模型将文本转换为语音。"
+			},
+			"ocr": {
+				"label": "OCR",
+				"intro": "识别图片中的文字。"
+			},
+			"embed": {
+				"label": "嵌入",
+				"intro": "将文本转换为向量，并比较它们的相似度。"
+			},
+			"rerank": {
+				"label": "重排序",
+				"intro": "按文档回答查询的程度对其排序。"
+			},
+			"text": {
+				"label": "基准测试",
+				"intro": "测量文本模型的生成速度，与 tiiny bench 相同。"
+			}
+		},
+		"model": {
+			"label": "模型",
+			"loadsWhenRun": "{{name}}（运行时加载）"
+		},
+		"loading": "正在加载模型",
+		"noModel": "尚未下载适用于此功能的模型。请从商店获取。",
+		"run": "运行",
+		"running": "正在运行…",
+		"asr": {
+			"chooseFile": "选择 WAV 文件",
+			"fileInput": "音频文件"
+		},
+		"tts": {
+			"text": "文本",
+			"voice": "音色（可选）",
+			"voiceHelp": "只有部分语音模型需要，例如 Supertonic。",
+			"download": "下载"
+		},
+		"ocr": {
+			"chooseImage": "选择图片",
+			"imageInput": "图片文件",
+			"noText": "未找到文字。",
+			"lines": "识别出的行",
+			"score": "{{value}}%"
+		},
+		"embed": {
+			"texts": "文本",
+			"textsHelp": "每行一段文本",
+			"summary_other": "{{count}} 维。余弦相似度："
+		},
+		"rerank": {
+			"query": "查询",
+			"documents": "文档",
+			"documentsHelp": "每行一个文档",
+			"results": "排序后的文档"
+		},
+		"bench": {
+			"tokensInput": "要生成的 token 数",
+			"results": "基准测试",
+			"speed": "生成速度",
+			"speedValue": "{{value}} token/秒",
+			"firstToken": "首个 token 用时",
+			"seconds": "{{value}} 秒",
+			"tokens": "Token",
+			"tokensValue": "输入 {{prompt}} · 输出 {{completion}} · 共 {{total}} 秒"
+		}
+	},
+	"overview": {
+		"title": "概览",
+		"npuReady": "NPU 已就绪。",
+		"loading": "正在加载设备状态",
+		"retry": "重试",
+		"staleValues": "显示的是最近一次获取的值。{{error}}",
+		"percent": "{{value}}%",
+		"usedOfTotal": "{{used}}/{{total}}",
+		"stats": {
+			"npuUtilization": "NPU 利用率",
+			"npuReserved": "已加载模型占用 {{percent}}",
+			"npuMemory": "NPU 内存",
+			"systemMemory": "系统内存",
+			"systemMemoryCaption": "CPU {{cpu}} · RAM {{used}}/{{total}}",
+			"storage": "存储",
+			"progress": "{{title}} {{percent}}"
+		},
+		"running": {
+			"title": "已加载的模型",
+			"empty": "没有已加载的模型。请在“模型”页面中加载一个。",
+			"columns": {
+				"model": "模型",
+				"type": "类型",
+				"status": "状态",
+				"npuShare": "NPU 占比",
+				"activeRequests": "活动请求"
+			}
+		},
+		"usage": {
+			"title": "Token 用量",
+			"subheader": "{{requests}}中共 {{tokens}}（文本模型）",
+			"subheaderLoading": "文本模型",
+			"tokens_other": "{{value}} 个 token",
+			"requests_other": "{{value}} 个请求",
+			"previousWeek": "上一周",
+			"nextWeek": "下一周",
+			"weekRange": "{{start}} – {{end}}",
+			"dayBar": "{{day}}：{{tokens}}",
+			"segment": "{{day}} · {{model}}：{{tokens}}",
+			"other": "其他",
+			"showTable": "以表格显示",
+			"showChart": "显示图表",
+			"loading": "正在加载 token 用量",
+			"empty": "本周没有 token 用量。",
+			"table": {
+				"label": "每日 token 用量",
+				"day": "日期",
+				"model": "模型",
+				"requests": "请求数",
+				"prompt": "输入",
+				"completion": "输出",
+				"total": "总计"
+			}
+		},
+		"apps": {
+			"title": "按应用统计用量",
+			"subheader": "本周 token 用量，按应用统计",
+			"label": "按应用统计用量",
+			"loading": "正在加载应用用量",
+			"empty": "本周没有 token 用量。"
+		}
+	},
+	"server": {
+		"done": "完成",
+		"models": {
+			"allUnloaded": "所有模型已卸载"
+		},
+		"settings": {
+			"shuttingDown": "正在关机",
+			"restarting": "正在重新启动",
+			"enabled": "已启用",
+			"disabled": "已禁用",
+			"specs": {
+				"peakInt8": "INT8 峰值",
+				"storage": "存储",
+				"network": "网络"
+			}
+		},
+		"connectors": {
+			"connected": "已连接",
+			"notConnected": "未连接",
+			"unavailable": "不可用",
+			"waitingForQr": "正在等待扫描二维码",
+			"scanQr": "用 WhatsApp 扫描二维码",
+			"signIn": "使用你的 {{provider}} 账号登录",
+			"names": {
+				"email": "邮件（IMAP/SMTP）",
+				"telegram": "Telegram 机器人",
+				"discord": "Discord 机器人"
+			}
+		},
+		"backup": {
+			"categories": {
+				"conversationService": "聊天历史",
+				"knowledgeBase": "Vault 与个性化",
+				"agentUsage": "智能体用量",
+				"connectorService": "连接器",
+				"scheduled": "定时任务",
+				"skills": "技能"
+			}
+		},
+		"usage": {
+			"otherApps": "API 及其他应用"
+		},
+		"task": {
+			"searchedVault": "已搜索 Vault：{{query}}",
+			"readHost": "已读取 {{host}}",
+			"readWebPage": "已读取网页",
+			"updatedOccupation": "已更新你的职业",
+			"updatedPreferences": "已更新你的偏好",
+			"updatedRecentFocus": "已更新你的近期关注",
+			"updatedProfile": "已更新你的个人资料",
+			"updatedField": "已更新你的{{field}}"
+		}
+	}
+}

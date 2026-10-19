@@ -22,7 +22,7 @@ export const POST = apiRoute(async (request) => {
 	}
 	const { modelId, messages, thinking } = input;
 	if (typeof modelId !== "string" || !Array.isArray(messages) || messages.length === 0) {
-		throw new DeviceError("Expected { modelId, messages: [{ role, content }] }", 400);
+		throw new DeviceError("errors.request.expected", 400, { shape: "{ modelId, messages: [{ role, content }] }" });
 	}
 	const setting = typeof thinking === "string" ? (thinking as ThinkingSetting) : "off";
 	const body = {

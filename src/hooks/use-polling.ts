@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 import { paths } from "@/paths";
 
@@ -16,6 +17,7 @@ export function usePolling<T>(url: string, intervalMs: number): Polled<T> {
 	const [error, setError] = React.useState<string | null>(null);
 	const [isLoading, setIsLoading] = React.useState<boolean>(true);
 	const router = useRouter();
+	const { t } = useTranslation();
 
 	const refresh = React.useCallback(async (): Promise<void> => {
 		try {
@@ -25,7 +27,7 @@ export function usePolling<T>(url: string, intervalMs: number): Polled<T> {
 				return;
 			}
 			const body = (await response.json()) as T & { error?: string };
-			if (!response.ok) throw new Error(body.error ?? `Request failed (${response.status})`);
+			if (!response.ok) throw new Error(body.error ?? t("core.errors.requestFailed", { status: response.status }));
 			setData(body);
 			setError(null);
 		} catch (error_) {
@@ -33,7 +35,7 @@ export function usePolling<T>(url: string, intervalMs: number): Polled<T> {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [url, router]);
+	}, [url, router, t]);
 
 	React.useEffect(() => {
 		const poll = (): void => void refresh();

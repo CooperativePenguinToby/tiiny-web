@@ -3,31 +3,32 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { paths } from "@/paths";
+import { getT } from "@/i18n/server";
 import { RouteTabs } from "@/components/dashboard/layout/route-tabs";
 
 interface LayoutProperties {
 	children: React.ReactNode;
 }
 
-export default function Layout({ children }: LayoutProperties): React.JSX.Element {
+export default async function Layout({ children }: LayoutProperties): Promise<React.JSX.Element> {
+	const t = await getT();
 	return (
 		<Stack spacing={3}>
 			<div>
-				<Typography variant="h4">Vault</Typography>
+				<Typography variant="h4">{t("vault.layout.title")}</Typography>
 				<Typography
 					variant="body2"
 					sx={{
 						color: "text.secondary",
 					}}
 				>
-					The device&apos;s knowledge base: your files and summaries of past chats, indexed on the device for models to
-					search.
+					{t("vault.layout.description")}
 				</Typography>
 			</div>
 			<RouteTabs
 				tabs={[
-					{ label: "Files", href: paths.dashboard.vault },
-					{ label: "Chat history", href: paths.dashboard.vaultChatHistory },
+					{ label: t("vault.layout.tabs.files"), href: paths.dashboard.vault },
+					{ label: t("vault.layout.tabs.chatHistory"), href: paths.dashboard.vaultChatHistory },
 				]}
 			/>
 			{children}

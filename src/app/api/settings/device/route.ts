@@ -3,6 +3,7 @@ import { deviceJson } from "@/server/device";
 import { apiRoute } from "@/server/route";
 
 import type { DeviceInfo } from "@/types/device";
+import { getT } from "@/i18n/server";
 
 interface SysDeviceInfo {
 	device_model_name: string;
@@ -26,6 +27,7 @@ export const GET = apiRoute(async () => {
 		deviceJson<SysDeviceInfo>("/api/v1/sys/device_info"),
 		deviceJson<Connect>("/api/v1/connect", { method: "POST", service: "auth", body: {} }),
 	]);
+	const t = await getT();
 	const body: DeviceInfo = {
 		name: connect.user_info?.device_name ?? "",
 		serial: connect.device_id,
@@ -33,13 +35,13 @@ export const GET = apiRoute(async () => {
 		modelDate: info.device_model_date,
 		os: info.tiiny_os,
 		specs: [
-			{ label: "CPU", value: info.cpu },
-			{ label: "GPU", value: info.gpu },
-			{ label: "dNPU", value: info.dnpu },
-			{ label: "Peak INT8", value: info.peak_int8 },
-			{ label: "RAM", value: info.ram },
-			{ label: "Storage", value: info.storage },
-			{ label: "Network", value: info.network },
+			{ id: "CPU", label: "CPU", value: info.cpu },
+			{ id: "GPU", label: "GPU", value: info.gpu },
+			{ id: "dNPU", label: "dNPU", value: info.dnpu },
+			{ id: "Peak INT8", label: t("server.settings.specs.peakInt8"), value: info.peak_int8 },
+			{ id: "RAM", label: "RAM", value: info.ram },
+			{ id: "Storage", label: t("server.settings.specs.storage"), value: info.storage },
+			{ id: "Network", label: t("server.settings.specs.network"), value: info.network },
 		],
 	};
 	return NextResponse.json(body);

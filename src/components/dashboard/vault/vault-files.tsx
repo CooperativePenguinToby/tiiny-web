@@ -24,12 +24,12 @@ import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { UploadSimpleIcon } from "@phosphor-icons/react/dist/ssr/UploadSimple";
-import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 import type { VaultEvent, VaultFile, VaultSearchResult } from "@/types/device";
 import { postJson } from "@/lib/api";
-import { formatBytes } from "@/lib/format";
 import { readSse, responseError } from "@/lib/sse";
+import { useFormat } from "@/i18n/client";
 import { usePolling } from "@/hooks/use-polling";
 import { ConfirmDialog } from "@/components/dashboard/settings/confirm-dialog";
 
@@ -51,15 +51,20 @@ const hitText = (content: string): string =>
 
 const errorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
-// Reads a device upload/index stream, reporting progress, until it ends; throws on an error event.
-async function follow(response: Response, onEvent: (event: VaultEvent) => void): Promise<VaultEvent | null> {
+// Reads a device upload/index stream, reporting progress, until it ends; throws on an error event
+// (with fallbackError when the device gives no message).
+async function follow(
+	response: Response,
+	fallbackError: string,
+	onEvent: (event: VaultEvent) => void
+): Promise<VaultEvent | null> {
 	if (!response.ok) throw new Error(await responseError(response));
 	let last: VaultEvent | null = null;
 	for await (const { event, data } of readSse(response)) {
 		if (event === "heartbeat") continue;
 		const update = JSON.parse(data) as VaultEvent;
 		if (event === "error" || update.error_type || update.success === false) {
-			throw new Error(update.message || update.error || "The device reported an error");
+			throw new Error(update.message || update.error || fallbackError);
 		}
 		last = update;
 		onEvent(update);
@@ -76,28 +81,29 @@ function RenameDialog({
 	onCancel: () => void;
 	onRename: (name: string) => void;
 }): React.JSX.Element {
+	const { t } = useTranslation();
 	const [name, setName] = React.useState(file?.filename ?? "");
 	return (
 		<Dialog fullWidth maxWidth="xs" onClose={onCancel} open={file !== null}>
-			<DialogTitle>Rename file</DialogTitle>
+			<DialogTitle>{t("vault.files.renameDialog.title")}</DialogTitle>
 			<DialogContent>
 				<TextField
 					autoFocus
 					fullWidth
-					label="File name"
+					label={t("vault.files.renameDialog.name")}
 					margin="dense"
 					onChange={(event) => setName(event.target.value)}
 					value={name}
 				/>
 			</DialogContent>
 			<DialogActions>
-				<Button onClick={onCancel}>Cancel</Button>
+				<Button onClick={onCancel}>{t("vault.files.renameDialog.cancel")}</Button>
 				<Button
 					disabled={!name.trim() || name === file?.filename}
 					onClick={() => onRename(name.trim())}
 					variant="contained"
 				>
-					Rename
+					{t("vault.files.renameDialog.confirm")}
 				</Button>
 			</DialogActions>
 		</Dialog>
@@ -105,6 +111,7 @@ function RenameDialog({
 }
 
 function VaultSearch(): React.JSX.Element {
+	const { t } = useTranslation();
 	const [query, setQuery] = React.useState("");
 	const [results, setResults] = React.useState<VaultSearchResult[] | null>(null);
 	const [searching, setSearching] = React.useState(false);
@@ -124,7 +131,7 @@ function VaultSearch(): React.JSX.Element {
 
 	return (
 		<Card>
-			<CardHeader subheader="What models find when they search Vault" title="Search Vault" />
+			<CardHeader subheader={t("vault.search.subheader")} title={t("vault.search.title")} />
 			<Divider />
 			<CardContent>
 				<Stack spacing={2}>
@@ -139,13 +146,13 @@ function VaultSearch(): React.JSX.Element {
 					>
 						<TextField
 							fullWidth
-							label="Search"
+							label={t("vault.search.label")}
 							onChange={(event) => setQuery(event.target.value)}
 							size="small"
 							value={query}
 						/>
 						<Button disabled={!query.trim() || searching} type="submit" variant="contained">
-							{searching ? "Searching…" : "Search"}
+							{t(searching ? "vault.search.searching" : "vault.search.submit")}
 						</Button>
 					</Stack>
 					{error ? <Alert severity="error">{error}</Alert> : null}
@@ -156,7 +163,7 @@ function VaultSearch(): React.JSX.Element {
 								color: "text.secondary",
 							}}
 						>
-							Nothing relevant found.
+							{t("vault.search.empty")}
 						</Typography>
 					) : (
 						<Stack divider={<Divider />} spacing={1.5} data-testid="vault-results">
@@ -185,6 +192,8 @@ function VaultSearch(): React.JSX.Element {
 }
 
 export function VaultFiles(): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const polled = usePolling<VaultFile[]>("/api/vault", 15_000);
 	const inputRef = React.useRef<HTMLInputElement>(null);
 	const [progress, setProgress] = React.useState<Progress | null>(null);
@@ -194,44 +203,60 @@ export function VaultFiles(): React.JSX.Element {
 	const isBusy = progress !== null;
 
 	const index = async (sourceId: string, label: string, isRetry = false): Promise<void> => {
-		setProgress({ label, message: "Indexing…", percent: null });
+		setProgress({ label, message: t("vault.files.progress.indexing"), percent: null });
 		const response = await fetch("/api/vault/index", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ sourceId }),
 		});
 		try {
-			await follow(response, (update) => {
-				const chunks = update.total_chunks ? ` (${update.processed_chunks ?? 0}/${update.total_chunks} chunks)` : "";
+			await follow(response, t("vault.files.errors.device"), (update) => {
 				const stage =
-					update.stage === "loading_model" ? "Loading the embedding model" : `Indexing: ${update.stage ?? ""}`;
-				setProgress({ label, message: `${stage}${chunks}`, percent: update.progress_percent ?? null });
+					update.stage === "loading_model"
+						? t("vault.files.progress.loadingModel")
+						: t("vault.files.progress.stage", { stage: update.stage ?? "" });
+				const message = update.total_chunks
+					? t("vault.files.progress.withChunks", {
+							stage,
+							processed: update.processed_chunks ?? 0,
+							total: update.total_chunks,
+						})
+					: stage;
+				setProgress({ label, message, percent: update.progress_percent ?? null });
 			});
 		} catch (error) {
 			// The device's embedding server now and then fails a request outright; a second try succeeds.
 			if (isRetry || !/upstream model server failed/i.test(errorMessage(error))) throw error;
-			setProgress({ label, message: "Indexing failed on the device, trying again…", percent: null });
+			setProgress({ label, message: t("vault.files.progress.retrying"), percent: null });
 			await new Promise((resolve) => setTimeout(resolve, 5000));
 			await index(sourceId, label, true);
 		}
 	};
 
 	const upload = async (files: File[]): Promise<void> => {
-		const label = files.length === 1 ? files[0].name : `${files.length} files`;
+		const label = files.length === 1 ? files[0].name : t("vault.files.fileCount", { count: files.length });
 		setOutcome(null);
-		setProgress({ label, message: "Uploading…", percent: 0 });
+		setProgress({ label, message: t("vault.files.progress.uploading"), percent: 0 });
 		try {
 			const form = new FormData();
 			for (const file of files) form.append("files", file);
 			let sourceId: string | null = null;
-			await follow(await fetch("/api/vault/upload", { method: "POST", body: form }), (update) => {
-				sourceId = update.source_id ?? sourceId;
-				setProgress({ label, message: update.message ?? "Uploading…", percent: update.progress_percent ?? null });
-			});
-			if (!sourceId) throw new Error("The device did not confirm the upload");
+			await follow(
+				await fetch("/api/vault/upload", { method: "POST", body: form }),
+				t("vault.files.errors.device"),
+				(update) => {
+					sourceId = update.source_id ?? sourceId;
+					setProgress({
+						label,
+						message: update.message ?? t("vault.files.progress.uploading"),
+						percent: update.progress_percent ?? null,
+					});
+				}
+			);
+			if (!sourceId) throw new Error(t("vault.files.errors.uploadUnconfirmed"));
 			await polled.refresh();
 			await index(sourceId, label);
-			setOutcome({ severity: "success", message: `${label} added to Vault.` });
+			setOutcome({ severity: "success", message: t("vault.files.outcome.added", { label }) });
 		} catch (error) {
 			setOutcome({ severity: "error", message: errorMessage(error) });
 		} finally {
@@ -263,15 +288,15 @@ export function VaultFiles(): React.JSX.Element {
 							startIcon={<UploadSimpleIcon />}
 							variant="contained"
 						>
-							Upload files
+							{t("vault.files.upload")}
 						</Button>
 					}
-					subheader="PDF, Word, Excel, CSV, text, Markdown or HTML, up to 200 MB each. Models use them in Task mode."
-					title="Files"
+					subheader={t("vault.files.subheader")}
+					title={t("vault.files.title")}
 				/>
 				<input
 					accept={ACCEPT}
-					aria-label="Files to upload"
+					aria-label={t("vault.files.uploadInput")}
 					hidden
 					multiple
 					onChange={(event) => {
@@ -288,10 +313,10 @@ export function VaultFiles(): React.JSX.Element {
 						{progress ? (
 							<Stack spacing={0.5} data-testid="vault-progress">
 								<Typography variant="body2">
-									{progress.label}: {progress.message}
+									{t("vault.files.progress.line", { label: progress.label, message: progress.message })}
 								</Typography>
 								<LinearProgress
-									aria-label="Vault progress"
+									aria-label={t("vault.files.progress.label")}
 									value={progress.percent ?? 0}
 									variant={progress.percent === null ? "indeterminate" : "determinate"}
 								/>
@@ -306,7 +331,7 @@ export function VaultFiles(): React.JSX.Element {
 						{polled.data === null ? (
 							polled.isLoading ? (
 								<Stack sx={{ alignItems: "center", py: 4 }}>
-									<CircularProgress aria-label="Loading Vault files" />
+									<CircularProgress aria-label={t("vault.files.loading")} />
 								</Stack>
 							) : null
 						) : polled.data.length === 0 ? (
@@ -316,17 +341,17 @@ export function VaultFiles(): React.JSX.Element {
 									color: "text.secondary",
 								}}
 							>
-								No files yet. Upload documents for models to use.
+								{t("vault.files.empty")}
 							</Typography>
 						) : (
 							<Box sx={{ overflowX: "auto" }}>
 								<Table size="small">
 									<TableHead>
 										<TableRow>
-											<TableCell>File</TableCell>
-											<TableCell align="right">Size</TableCell>
-											<TableCell>Added</TableCell>
-											<TableCell>Status</TableCell>
+											<TableCell>{t("vault.files.columns.file")}</TableCell>
+											<TableCell align="right">{t("vault.files.columns.size")}</TableCell>
+											<TableCell>{t("vault.files.columns.added")}</TableCell>
+											<TableCell>{t("vault.files.columns.status")}</TableCell>
 											<TableCell align="right" />
 										</TableRow>
 									</TableHead>
@@ -335,18 +360,20 @@ export function VaultFiles(): React.JSX.Element {
 											<TableRow data-testid={`vault-file-${file.filename}`} key={file.sourceId}>
 												<TableCell sx={{ wordBreak: "break-all" }}>{file.filename}</TableCell>
 												<TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
-													{formatBytes(file.sizeBytes)}
+													{format.bytes(file.sizeBytes)}
 												</TableCell>
 												<TableCell sx={{ whiteSpace: "nowrap" }}>
-													{dayjs(file.addedAt).format("D MMM YYYY HH:mm")}
+													{format.date(file.addedAt).format("D MMM YYYY HH:mm")}
 												</TableCell>
 												<TableCell>
 													{file.indexed ? (
-														<Chip color="success" label="Indexed" size="small" />
+														<Chip color="success" label={t("vault.files.status.indexed")} size="small" />
 													) : (
 														<Chip
 															color={file.indexError ? "error" : "default"}
-															label={file.indexError ? "Indexing failed" : "Not indexed"}
+															label={t(
+																file.indexError ? "vault.files.status.indexFailed" : "vault.files.status.notIndexed"
+															)}
 															size="small"
 															title={file.indexError ?? undefined}
 														/>
@@ -359,12 +386,12 @@ export function VaultFiles(): React.JSX.Element {
 															onClick={() =>
 																void act(
 																	() => index(file.sourceId, file.filename),
-																	`${file.filename} indexed.`
+																	t("vault.files.outcome.indexed", { name: file.filename })
 																).finally(() => setProgress(null))
 															}
 															size="small"
 														>
-															Index
+															{t("vault.files.actions.index")}
 														</Button>
 													)}
 													<Button
@@ -373,13 +400,13 @@ export function VaultFiles(): React.JSX.Element {
 														href={`/api/vault/download?id=${encodeURIComponent(file.sourceId)}`}
 														size="small"
 													>
-														Download
+														{t("vault.files.actions.download")}
 													</Button>
 													<Button disabled={isBusy} onClick={() => setRenaming(file)} size="small">
-														Rename
+														{t("vault.files.actions.rename")}
 													</Button>
 													<Button color="error" disabled={isBusy} onClick={() => setDeleting(file)} size="small">
-														Delete
+														{t("vault.files.actions.delete")}
 													</Button>
 												</TableCell>
 											</TableRow>
@@ -401,21 +428,24 @@ export function VaultFiles(): React.JSX.Element {
 					setRenaming(null);
 					void act(
 						() => postJson("/api/vault/rename", { sourceId: file.sourceId, filename }),
-						`Renamed to ${filename}.`
+						t("vault.files.outcome.renamed", { name: filename })
 					);
 				}}
 			/>
 			<ConfirmDialog
-				confirmLabel="Delete"
+				confirmLabel={t("vault.files.deleteDialog.confirm")}
 				onCancel={() => setDeleting(null)}
 				onConfirm={() => {
 					const file = deleting!;
 					setDeleting(null);
-					void act(() => postJson("/api/vault/delete", { sourceId: file.sourceId }), `${file.filename} deleted.`);
+					void act(
+						() => postJson("/api/vault/delete", { sourceId: file.sourceId }),
+						t("vault.files.outcome.deleted", { name: file.filename })
+					);
 				}}
 				open={deleting !== null}
-				text={`Delete ${deleting?.filename ?? ""} and its index from the device? Models will no longer find it.`}
-				title="Delete file?"
+				text={t("vault.files.deleteDialog.text", { name: deleting?.filename ?? "" })}
+				title={t("vault.files.deleteDialog.title")}
 			/>
 		</Stack>
 	);

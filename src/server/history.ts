@@ -80,7 +80,8 @@ export async function listConversations(): Promise<ConversationSummary[]> {
 }
 
 export function conversationIdFrom(value: unknown): string {
-	if (typeof value !== "string" || !/^[\w-]{1,100}$/.test(value)) throw new DeviceError("Invalid conversation id", 400);
+	if (typeof value !== "string" || !/^[\w-]{1,100}$/.test(value))
+		throw new DeviceError("errors.history.invalidConversationId", 400);
 	return value;
 }
 

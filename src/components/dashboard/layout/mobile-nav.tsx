@@ -8,6 +8,7 @@ import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useTranslation } from "react-i18next";
 
 import type { NavItemConfig } from "@/types/nav";
 import { paths } from "@/paths";
@@ -90,6 +91,7 @@ interface NavItemProperties extends Omit<NavItemConfig, "items"> {
 }
 
 function NavItem({ disabled, external, href, icon, matcher, pathname, title }: NavItemProperties): React.JSX.Element {
+	const { t } = useTranslation();
 	const active = isNavItemActive({ disabled, external, href, matcher, pathname });
 	const Icon = icon ? navIcons[icon] : null;
 
@@ -138,7 +140,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
 						component="span"
 						sx={{ color: "inherit", fontSize: "0.875rem", fontWeight: 500, lineHeight: "28px" }}
 					>
-						{title}
+						{title ? t(title) : null}
 					</Typography>
 				</Box>
 			</Box>

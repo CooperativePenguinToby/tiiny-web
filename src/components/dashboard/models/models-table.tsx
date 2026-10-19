@@ -22,12 +22,13 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
+import { useTranslation } from "react-i18next";
 
 import type { DownloadedModel, ModelList } from "@/types/device";
 import { postJson } from "@/lib/api";
-import { formatBytes } from "@/lib/format";
 import { loadModel } from "@/lib/models";
 import { responseError } from "@/lib/sse";
+import { useFormat } from "@/i18n/client";
 import { usePolling } from "@/hooks/use-polling";
 import { ConfirmDialog } from "@/components/dashboard/settings/confirm-dialog";
 
@@ -53,6 +54,8 @@ async function postModel(action: "unload" | "delete", modelId: string): Promise<
 }
 
 export function ModelsTable(): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const { data, error, isLoading, refresh } = usePolling<ModelList>("/api/models", 5000);
 	const [operation, setOperation] = React.useState<Operation | null>(null);
 	const [outcome, setOutcome] = React.useState<Outcome | null>(null);
@@ -64,7 +67,7 @@ export function ModelsTable(): React.JSX.Element {
 			setOperation({
 				modelId: model.modelId,
 				kind,
-				message: { load: "Starting…", unload: "Unloading…", delete: "Deleting…" }[kind],
+				message: t(`models.table.pending.${kind}`),
 				progress: null,
 			});
 			try {
@@ -75,17 +78,17 @@ export function ModelsTable(): React.JSX.Element {
 					: postModel(kind, model.modelId));
 				setOutcome({
 					severity: "success",
-					message: `${model.name} ${{ load: "loaded", unload: "unloaded", delete: "deleted" }[kind]}.`,
+					message: t(`models.table.done.${kind}`, { name: model.name }),
 				});
 			} catch (error_) {
 				const reason = error_ instanceof Error ? error_.message : String(error_);
-				setOutcome({ severity: "error", message: `Could not ${kind} ${model.name}: ${reason}` });
+				setOutcome({ severity: "error", message: t(`models.table.failed.${kind}`, { name: model.name, reason }) });
 			} finally {
 				setOperation(null);
 				await refresh();
 			}
 		},
-		[refresh]
+		[refresh, t]
 	);
 
 	const [confirmUnloadAll, setConfirmUnloadAll] = React.useState(false);
@@ -94,7 +97,7 @@ export function ModelsTable(): React.JSX.Element {
 	if (isLoading) {
 		return (
 			<Stack sx={{ alignItems: "center", py: 8 }}>
-				<CircularProgress aria-label="Loading models" />
+				<CircularProgress aria-label={t("models.table.loading")} />
 			</Stack>
 		);
 	}
@@ -105,11 +108,13 @@ export function ModelsTable(): React.JSX.Element {
 		setOutcome(null);
 		try {
 			await postJson("/api/models/unload-all");
-			setOutcome({ severity: "success", message: "All models unloaded." });
+			setOutcome({ severity: "success", message: t("models.table.allUnloaded") });
 		} catch (error_) {
 			setOutcome({
 				severity: "error",
-				message: `Could not unload all models: ${error_ instanceof Error ? error_.message : String(error_)}`,
+				message: t("models.table.failed.unloadAll", {
+					reason: error_ instanceof Error ? error_.message : String(error_),
+				}),
 			});
 		} finally {
 			setBulk(false);
@@ -121,11 +126,14 @@ export function ModelsTable(): React.JSX.Element {
 		setOutcome(null);
 		try {
 			await postJson("/api/models/interrupt", { modelId: model.modelId });
-			setOutcome({ severity: "success", message: `Stopped what ${model.name} was working on.` });
+			setOutcome({ severity: "success", message: t("models.table.interrupted", { name: model.name }) });
 		} catch (error_) {
 			setOutcome({
 				severity: "error",
-				message: `Could not interrupt ${model.name}: ${error_ instanceof Error ? error_.message : String(error_)}`,
+				message: t("models.table.failed.interrupt", {
+					name: model.name,
+					reason: error_ instanceof Error ? error_.message : String(error_),
+				}),
 			});
 		}
 	};
@@ -147,11 +155,11 @@ export function ModelsTable(): React.JSX.Element {
 								disabled={operation !== null || bulk || data.models.every((model) => model.status !== "running")}
 								onClick={() => setConfirmUnloadAll(true)}
 							>
-								{bulk ? "Unloading…" : "Unload all"}
+								{t(bulk ? "models.table.unloading" : "models.table.unloadAll")}
 							</Button>
 						}
-						subheader={`${data.npuAvailablePercent}% of the NPU is free`}
-						title="Downloaded models"
+						subheader={t("models.table.npuFree", { percent: format.number(data.npuAvailablePercent) })}
+						title={t("models.table.title")}
 					/>
 					<Divider />
 					{data.models.length === 0 ? (
@@ -162,20 +170,20 @@ export function ModelsTable(): React.JSX.Element {
 								p: 3,
 							}}
 						>
-							No models are downloaded on the device.
+							{t("models.table.empty")}
 						</Typography>
 					) : (
 						<Box sx={{ overflowX: "auto" }}>
-							<Table aria-label="Downloaded models" sx={{ minWidth: 800 }}>
+							<Table aria-label={t("models.table.title")} sx={{ minWidth: 800 }}>
 								<TableHead>
 									<TableRow>
-										<TableCell>Model</TableCell>
-										<TableCell>Type</TableCell>
-										<TableCell align="right">Size</TableCell>
-										<TableCell align="right">NPU share</TableCell>
-										<TableCell>Status</TableCell>
+										<TableCell>{t("models.columns.model")}</TableCell>
+										<TableCell>{t("models.columns.type")}</TableCell>
+										<TableCell align="right">{t("models.columns.size")}</TableCell>
+										<TableCell align="right">{t("models.columns.npuShare")}</TableCell>
+										<TableCell>{t("models.columns.status")}</TableCell>
 										<TableCell align="right" sx={{ width: 240 }}>
-											Action
+											{t("models.columns.action")}
 										</TableCell>
 									</TableRow>
 								</TableHead>
@@ -199,16 +207,27 @@ export function ModelsTable(): React.JSX.Element {
 													</Typography>
 												</TableCell>
 												<TableCell>{model.type}</TableCell>
-												<TableCell align="right">{formatBytes(model.sizeBytes)}</TableCell>
-												<TableCell align="right">{model.npuUsage}%</TableCell>
+												<TableCell align="right">{format.bytes(model.sizeBytes)}</TableCell>
+												<TableCell align="right">
+													{t("models.percent", { value: format.number(model.npuUsage) })}
+												</TableCell>
 												<TableCell>
 													<Chip
 														color={isRunning ? "success" : isTooBigForNpu ? "warning" : "default"}
-														label={isRunning ? "loaded" : isTooBigForNpu ? "not enough free NPU" : "not loaded"}
+														label={t(
+															isRunning
+																? "models.table.status.loaded"
+																: isTooBigForNpu
+																	? "models.table.status.tooBig"
+																	: "models.table.status.notLoaded"
+														)}
 														size="small"
 														title={
 															isTooBigForNpu
-																? `Needs ${model.npuUsage}% of the NPU; ${data.npuAvailablePercent}% is free. Unload a model to make room.`
+																? t("models.table.status.tooBigHint", {
+																		needed: format.number(model.npuUsage),
+																		free: format.number(data.npuAvailablePercent),
+																	})
 																: undefined
 														}
 													/>
@@ -226,7 +245,7 @@ export function ModelsTable(): React.JSX.Element {
 																{active.message}
 															</Typography>
 															<LinearProgress
-																aria-label={`${active.kind} progress`}
+																aria-label={t(`models.table.progress.${active.kind}`)}
 																value={active.progress ?? 0}
 																variant={active.progress === null ? "indeterminate" : "determinate"}
 															/>
@@ -236,9 +255,9 @@ export function ModelsTable(): React.JSX.Element {
 															<Button
 																disabled={operation !== null || bulk}
 																onClick={() => void interrupt(model)}
-																title="Stop the requests this model is working on, from any app"
+																title={t("models.table.interruptHint")}
 															>
-																Interrupt
+																{t("models.table.interrupt")}
 															</Button>
 															<Button
 																color="error"
@@ -246,7 +265,7 @@ export function ModelsTable(): React.JSX.Element {
 																onClick={() => setConfirm({ model, kind: "unload" })}
 																variant="outlined"
 															>
-																Unload
+																{t("models.table.unload")}
 															</Button>
 														</Stack>
 													) : (
@@ -256,14 +275,14 @@ export function ModelsTable(): React.JSX.Element {
 																disabled={operation !== null}
 																onClick={() => setConfirm({ model, kind: "delete" })}
 															>
-																Delete
+																{t("models.table.delete")}
 															</Button>
 															<Button
 																disabled={operation !== null || isTooBigForNpu}
 																onClick={() => void run(model, "load")}
 																variant="contained"
 															>
-																Load
+																{t("models.table.load")}
 															</Button>
 														</Stack>
 													)}
@@ -278,26 +297,28 @@ export function ModelsTable(): React.JSX.Element {
 				</Card>
 			) : null}
 			<ConfirmDialog
-				confirmLabel="Unload all"
+				confirmLabel={t("models.table.unloadAll")}
 				onCancel={() => setConfirmUnloadAll(false)}
 				onConfirm={() => void unloadAll()}
 				open={confirmUnloadAll}
-				text="Every loaded model is released from the NPU. Requests in progress, from this app or other clients, stop."
-				title="Unload all models?"
+				text={t("models.table.unloadAllDialog.text")}
+				title={t("models.table.unloadAllDialog.title")}
 			/>
 			<Dialog onClose={() => setConfirm(null)} open={confirm !== null}>
 				<DialogTitle>
-					{confirm?.kind === "delete" ? "Delete" : "Unload"} {confirm?.model.name}?
+					{confirm
+						? t(confirm.kind === "delete" ? "models.table.deleteDialog.title" : "models.table.unloadDialog.title", {
+								name: confirm.model.name,
+							})
+						: null}
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
-						{confirm?.kind === "delete"
-							? "This removes the model's files from the device. You can download it again from the store."
-							: "This frees its NPU share. Any request currently using the model, from this app or other clients, will be stopped."}
+						{t(confirm?.kind === "delete" ? "models.table.deleteDialog.text" : "models.table.unloadDialog.text")}
 					</DialogContentText>
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={() => setConfirm(null)}>Cancel</Button>
+					<Button onClick={() => setConfirm(null)}>{t("models.table.cancel")}</Button>
 					<Button
 						color="error"
 						onClick={() => {
@@ -307,7 +328,7 @@ export function ModelsTable(): React.JSX.Element {
 						}}
 						variant="contained"
 					>
-						{confirm?.kind === "delete" ? "Delete" : "Unload"}
+						{t(confirm?.kind === "delete" ? "models.table.delete" : "models.table.unload")}
 					</Button>
 				</DialogActions>
 			</Dialog>

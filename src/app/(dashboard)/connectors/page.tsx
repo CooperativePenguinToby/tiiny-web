@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 
 import { config } from "@/config";
+import { getT } from "@/i18n/server";
 
-export const metadata = { title: `Connectors | ${config.site.name}` } satisfies Metadata;
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getT();
+	return { title: t("titles.page", { page: t("titles.connectors"), site: config.site.name }) };
+}
 
 // The Connectors layout renders the page; this route only selects what it shows.
 export default function Page(): null {

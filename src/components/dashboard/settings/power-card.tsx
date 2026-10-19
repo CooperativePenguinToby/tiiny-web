@@ -11,6 +11,7 @@ import Divider from "@mui/material/Divider";
 import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useTranslation } from "react-i18next";
 
 import type { SystemUpdate } from "@/types/device";
 import { postJson } from "@/lib/api";
@@ -24,8 +25,8 @@ const errorMessage = (error: unknown): string => (error instanceof Error ? error
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Waits until the device has gone away and answered again (or, if it never seemed to go away, until
-// it answers after a grace period).
-async function waitForRestart(): Promise<void> {
+// it answers after a grace period). Throws `timeoutMessage` if it does not come back.
+async function waitForRestart(timeoutMessage: string): Promise<void> {
 	const started = Date.now();
 	let isWentDown = false;
 	while (Date.now() - started < 10 * 60_000) {
@@ -42,10 +43,11 @@ async function waitForRestart(): Promise<void> {
 		}
 		if (isWentDown || Date.now() - started > 60_000) return;
 	}
-	throw new Error("The device has not come back after 10 minutes");
+	throw new Error(timeoutMessage);
 }
 
 function AutoPowerOn(): React.JSX.Element {
+	const { t } = useTranslation();
 	const [saving, setSaving] = React.useState(false);
 	const [outcome, setOutcome] = React.useState<Outcome | null>(null);
 	const set = async (isEnabled: boolean): Promise<void> => {
@@ -53,7 +55,7 @@ function AutoPowerOn(): React.JSX.Element {
 		setOutcome(null);
 		try {
 			const { message } = await postJson<{ message: string }>("/api/settings/power", { autoPowerOn: isEnabled });
-			setOutcome({ severity: "success", message: `Device: ${message}` });
+			setOutcome({ severity: "success", message: t("settings.power.autoPowerOn.deviceReply", { message }) });
 		} catch (error) {
 			setOutcome({ severity: "error", message: errorMessage(error) });
 		} finally {
@@ -62,22 +64,21 @@ function AutoPowerOn(): React.JSX.Element {
 	};
 	return (
 		<Stack spacing={1}>
-			<Typography variant="subtitle2">Auto power-on</Typography>
+			<Typography variant="subtitle2">{t("settings.power.autoPowerOn.title")}</Typography>
 			<Typography
 				variant="body2"
 				sx={{
 					color: "text.secondary",
 				}}
 			>
-				The device turns on by itself when connected to power. The device does not report whether this is on (it always
-				reads as off), so only the result of a change is shown.
+				{t("settings.power.autoPowerOn.description")}
 			</Typography>
 			<Stack direction="row" spacing={1}>
 				<Button disabled={saving} onClick={() => void set(true)} size="small" variant="outlined">
-					Turn on
+					{t("settings.power.autoPowerOn.turnOn")}
 				</Button>
 				<Button disabled={saving} onClick={() => void set(false)} size="small" variant="outlined">
-					Turn off
+					{t("settings.power.autoPowerOn.turnOff")}
 				</Button>
 			</Stack>
 			{outcome ? (
@@ -90,6 +91,7 @@ function AutoPowerOn(): React.JSX.Element {
 }
 
 function UpdateSection({ onRestarting }: { onRestarting: (message: string) => Promise<void> }): React.JSX.Element {
+	const { t } = useTranslation();
 	const status = usePolling<SystemUpdate>("/api/settings/update", 5000);
 	const [checked, setChecked] = React.useState<SystemUpdate | null>(null);
 	const [busy, setBusy] = React.useState<string | null>(null);
@@ -114,20 +116,22 @@ function UpdateSection({ onRestarting }: { onRestarting: (message: string) => Pr
 
 	return (
 		<Stack spacing={1.5}>
-			<Typography variant="subtitle2">System update</Typography>
+			<Typography variant="subtitle2">{t("settings.power.update.title")}</Typography>
 			{update ? (
 				<Typography data-testid="update-status" variant="body2">
-					TiinyOS {update.currentVersion}
 					{checked
 						? checked.updateAvailable
-							? ` · version ${checked.availableVersion} is available`
-							: " · up to date"
-						: ""}
+							? t("settings.power.update.available", {
+									version: update.currentVersion,
+									available: checked.availableVersion,
+								})
+							: t("settings.power.update.upToDate", { version: update.currentVersion })
+						: t("settings.power.update.current", { version: update.currentVersion })}
 				</Typography>
 			) : status.error ? (
 				<Alert severity="error">{status.error}</Alert>
 			) : (
-				<CircularProgress aria-label="Loading update status" size={20} />
+				<CircularProgress aria-label={t("settings.power.update.loading")} size={20} />
 			)}
 			{checked?.updateAvailable ? (
 				<Typography
@@ -142,8 +146,12 @@ function UpdateSection({ onRestarting }: { onRestarting: (message: string) => Pr
 			) : null}
 			{isWorking ? (
 				<Stack spacing={0.5}>
-					<Typography variant="body2">Update {state}…</Typography>
-					<LinearProgress aria-label="Update progress" value={status.data?.progress ?? 0} variant="determinate" />
+					<Typography variant="body2">{t("settings.power.update.inProgress", { state })}</Typography>
+					<LinearProgress
+						aria-label={t("settings.power.update.progress")}
+						value={status.data?.progress ?? 0}
+						variant="determinate"
+					/>
 				</Stack>
 			) : null}
 			{status.data?.error ? <Alert severity="warning">{status.data.error}</Alert> : null}
@@ -158,7 +166,7 @@ function UpdateSection({ onRestarting }: { onRestarting: (message: string) => Pr
 					}
 					variant="outlined"
 				>
-					{busy === "check" ? "Checking…" : "Check for updates"}
+					{t(busy === "check" ? "settings.power.update.checking" : "settings.power.update.check")}
 				</Button>
 				{state !== "prepared" && checked?.updateAvailable ? (
 					<Button
@@ -171,34 +179,35 @@ function UpdateSection({ onRestarting }: { onRestarting: (message: string) => Pr
 						}
 						variant="contained"
 					>
-						Download update
+						{t("settings.power.update.download")}
 					</Button>
 				) : null}
 				{state === "prepared" ? (
 					<Button disabled={busy !== null} onClick={() => setConfirmInstall(true)} variant="contained">
-						Install update
+						{t("settings.power.update.install")}
 					</Button>
 				) : null}
 			</Stack>
 			<ConfirmDialog
-				confirmLabel="Install"
+				confirmLabel={t("settings.power.update.confirmLabel")}
 				onCancel={() => setConfirmInstall(false)}
 				onConfirm={() => {
 					setConfirmInstall(false);
 					void run("install", async () => {
 						await postJson("/api/settings/update", { action: "install" });
-						await onRestarting("Installing the update. The device restarts once; don't unplug it.");
+						await onRestarting(t("settings.power.update.installing"));
 					});
 				}}
 				open={confirmInstall}
-				text="Models stop and the device restarts during the installation. Don't unplug it until it is back."
-				title="Install update?"
+				text={t("settings.power.update.confirmText")}
+				title={t("settings.power.update.confirmTitle")}
 			/>
 		</Stack>
 	);
 }
 
 export function PowerCard(): React.JSX.Element {
+	const { t } = useTranslation();
 	const [confirm, setConfirm] = React.useState<"restart" | "shutdown" | null>(null);
 	const [outcome, setOutcome] = React.useState<Outcome | null>(null);
 	const [restarting, setRestarting] = React.useState(false);
@@ -207,8 +216,8 @@ export function PowerCard(): React.JSX.Element {
 		setRestarting(true);
 		setOutcome({ severity: "info", message });
 		try {
-			await waitForRestart();
-			setOutcome({ severity: "success", message: "The device is back." });
+			await waitForRestart(t("settings.power.power.notBack"));
+			setOutcome({ severity: "success", message: t("settings.power.power.back") });
 		} catch (error) {
 			setOutcome({ severity: "error", message: errorMessage(error) });
 		} finally {
@@ -224,14 +233,14 @@ export function PowerCard(): React.JSX.Element {
 			setOutcome({ severity: "error", message: errorMessage(error) });
 			return;
 		}
-		await followRestart("Restarting… waiting for the device to come back.");
+		await followRestart(t("settings.power.power.restarting"));
 	};
 
 	const shutdown = async (): Promise<void> => {
 		setConfirm(null);
 		try {
 			await postJson("/api/settings/shutdown");
-			setOutcome({ severity: "info", message: "The device is shutting down." });
+			setOutcome({ severity: "info", message: t("settings.power.power.shuttingDown") });
 		} catch (error) {
 			setOutcome({ severity: "error", message: errorMessage(error) });
 		}
@@ -239,14 +248,14 @@ export function PowerCard(): React.JSX.Element {
 
 	return (
 		<Card data-testid="settings-power">
-			<CardHeader subheader="Power and TiinyOS updates" title="System" />
+			<CardHeader subheader={t("settings.power.subheader")} title={t("settings.power.title")} />
 			<Divider />
 			<CardContent>
 				<Stack spacing={3}>
 					<AutoPowerOn />
 					<UpdateSection onRestarting={followRestart} />
 					<Stack spacing={1.5}>
-						<Typography variant="subtitle2">Power</Typography>
+						<Typography variant="subtitle2">{t("settings.power.power.title")}</Typography>
 						{outcome ? (
 							<Alert
 								icon={restarting ? <CircularProgress size={18} /> : undefined}
@@ -258,26 +267,22 @@ export function PowerCard(): React.JSX.Element {
 						) : null}
 						<Stack direction="row" spacing={1}>
 							<Button disabled={restarting} onClick={() => setConfirm("restart")} variant="outlined">
-								Restart
+								{t("settings.power.power.restart")}
 							</Button>
 							<Button color="error" disabled={restarting} onClick={() => setConfirm("shutdown")} variant="outlined">
-								Shut down
+								{t("settings.power.power.shutDown")}
 							</Button>
 						</Stack>
 					</Stack>
 				</Stack>
 			</CardContent>
 			<ConfirmDialog
-				confirmLabel={confirm === "shutdown" ? "Shut down" : "Restart"}
+				confirmLabel={t(confirm === "shutdown" ? "settings.power.power.shutDown" : "settings.power.power.restart")}
 				onCancel={() => setConfirm(null)}
 				onConfirm={() => void (confirm === "shutdown" ? shutdown() : restart())}
 				open={confirm !== null}
-				text={
-					confirm === "shutdown"
-						? "Loaded models, chats and agents stop. The device stays off until it is turned on at the device (or reconnected to power with Auto power-on)."
-						: "Loaded models, chats and agents stop, and the device is unreachable for a few minutes."
-				}
-				title={confirm === "shutdown" ? "Shut down the device?" : "Restart the device?"}
+				text={t(confirm === "shutdown" ? "settings.power.power.shutDownText" : "settings.power.power.restartText")}
+				title={t(confirm === "shutdown" ? "settings.power.power.shutDownTitle" : "settings.power.power.restartTitle")}
 			/>
 		</Card>
 	);

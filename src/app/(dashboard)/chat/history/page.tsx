@@ -4,11 +4,16 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { config } from "@/config";
+import { getT } from "@/i18n/server";
 import { HistoryList } from "@/components/dashboard/history/history-list";
 
-export const metadata = { title: `History | ${config.site.name}` } satisfies Metadata;
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getT();
+	return { title: t("titles.page", { page: t("titles.history"), site: config.site.name }) };
+}
 
-export default function Page(): React.JSX.Element {
+export default async function Page(): Promise<React.JSX.Element> {
+	const t = await getT();
 	return (
 		<Stack spacing={3}>
 			<Typography
@@ -17,7 +22,7 @@ export default function Page(): React.JSX.Element {
 					color: "text.secondary",
 				}}
 			>
-				Conversations kept on the device, from this app and from TiinyOS.
+				{t("chat.history.intro")}
 			</Typography>
 			<HistoryList />
 		</Stack>

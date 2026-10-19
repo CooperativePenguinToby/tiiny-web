@@ -16,10 +16,12 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { useTranslation } from "react-i18next";
 
 import type { BenchResult, PlaygroundKind, PlaygroundModel } from "@/types/device";
 import { postJson } from "@/lib/api";
 import { responseError } from "@/lib/sse";
+import { useFormat } from "@/i18n/client";
 import { usePolling } from "@/hooks/use-polling";
 
 import { playgroundTabs } from "./tabs";
@@ -35,9 +37,10 @@ function ModelPicker({
 	value: string;
 	onChange: (modelId: string) => void;
 }): React.JSX.Element {
+	const { t } = useTranslation();
 	return (
 		<TextField
-			label="Model"
+			label={t("playground.model.label")}
 			onChange={(event) => onChange(event.target.value)}
 			select
 			size="small"
@@ -46,8 +49,7 @@ function ModelPicker({
 		>
 			{models.map((model) => (
 				<MenuItem key={model.modelId} value={model.modelId}>
-					{model.name}
-					{model.loaded ? "" : " (loads when run)"}
+					{model.loaded ? model.name : t("playground.model.loadsWhenRun", { name: model.name })}
 				</MenuItem>
 			))}
 		</TextField>
@@ -87,6 +89,7 @@ function RunButton({
 	disabled: boolean;
 	onClick: () => void;
 }): React.JSX.Element {
+	const { t } = useTranslation();
 	return (
 		<Box>
 			<Button
@@ -95,23 +98,24 @@ function RunButton({
 				startIcon={busy ? <CircularProgress size={16} /> : undefined}
 				variant="contained"
 			>
-				{busy ? "Running…" : "Run"}
+				{t(busy ? "playground.running" : "playground.run")}
 			</Button>
 		</Box>
 	);
 }
 
 function SpeechToText({ model }: { model: string }): React.JSX.Element {
+	const { t } = useTranslation();
 	const [file, setFile] = React.useState<File | null>(null);
 	const [text, setText] = React.useState<string | null>(null);
 	const { busy, error, run } = useRun();
 	return (
 		<Stack spacing={2}>
 			<Button component="label" sx={{ alignSelf: "flex-start" }} variant="outlined">
-				{file ? file.name : "Choose a WAV file"}
+				{file ? file.name : t("playground.asr.chooseFile")}
 				<input
 					accept=".wav,audio/wav,audio/x-wav"
-					aria-label="Audio file"
+					aria-label={t("playground.asr.fileInput")}
 					hidden
 					onChange={(event) => setFile(event.target.files?.[0] ?? null)}
 					type="file"
@@ -141,6 +145,7 @@ function SpeechToText({ model }: { model: string }): React.JSX.Element {
 }
 
 function TextToSpeech({ model }: { model: string }): React.JSX.Element {
+	const { t } = useTranslation();
 	const [text, setText] = React.useState("");
 	const [voice, setVoice] = React.useState("");
 	const [audio, setAudio] = React.useState<string | null>(null);
@@ -153,10 +158,16 @@ function TextToSpeech({ model }: { model: string }): React.JSX.Element {
 	);
 	return (
 		<Stack spacing={2}>
-			<TextField label="Text" minRows={3} multiline onChange={(event) => setText(event.target.value)} value={text} />
 			<TextField
-				helperText="Only some voice models need one, e.g. Supertonic."
-				label="Voice (optional)"
+				label={t("playground.tts.text")}
+				minRows={3}
+				multiline
+				onChange={(event) => setText(event.target.value)}
+				value={text}
+			/>
+			<TextField
+				helperText={t("playground.tts.voiceHelp")}
+				label={t("playground.tts.voice")}
 				onChange={(event) => setVoice(event.target.value)}
 				size="small"
 				sx={{ maxWidth: 300 }}
@@ -182,7 +193,7 @@ function TextToSpeech({ model }: { model: string }): React.JSX.Element {
 				<Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
 					<audio controls data-testid="playground-audio" src={audio} />
 					<Link download="speech.wav" href={audio}>
-						Download
+						{t("playground.tts.download")}
 					</Link>
 				</Stack>
 			) : null}
@@ -191,6 +202,8 @@ function TextToSpeech({ model }: { model: string }): React.JSX.Element {
 }
 
 function Ocr({ model }: { model: string }): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const [file, setFile] = React.useState<File | null>(null);
 	// Each recognized line keeps its position in the reply as its id: a result is never reordered.
 	const [result, setResult] = React.useState<{
@@ -201,10 +214,10 @@ function Ocr({ model }: { model: string }): React.JSX.Element {
 	return (
 		<Stack spacing={2}>
 			<Button component="label" sx={{ alignSelf: "flex-start" }} variant="outlined">
-				{file ? file.name : "Choose image"}
+				{file ? file.name : t("playground.ocr.chooseImage")}
 				<input
 					accept="image/*"
-					aria-label="Image file"
+					aria-label={t("playground.ocr.imageInput")}
 					hidden
 					onChange={(event) => setFile(event.target.files?.[0] ?? null)}
 					type="file"
@@ -234,16 +247,18 @@ function Ocr({ model }: { model: string }): React.JSX.Element {
 							color: "text.secondary",
 						}}
 					>
-						No text found.
+						{t("playground.ocr.noText")}
 					</Typography>
 				) : (
-					<Table aria-label="Recognized lines" data-testid="playground-result" size="small">
+					<Table aria-label={t("playground.ocr.lines")} data-testid="playground-result" size="small">
 						<TableBody>
 							{result.lines.map((line) => (
 								<TableRow key={line.id}>
 									<TableCell>{line.text}</TableCell>
 									<TableCell align="right" sx={{ color: "text.secondary", width: 100 }}>
-										{(line.score * 100).toFixed(0)}%
+										{t("playground.ocr.score", {
+											value: format.number(line.score * 100, { maximumFractionDigits: 0 }),
+										})}
 									</TableCell>
 								</TableRow>
 							))}
@@ -256,6 +271,8 @@ function Ocr({ model }: { model: string }): React.JSX.Element {
 }
 
 function Embeddings({ model }: { model: string }): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const [texts, setTexts] = React.useState("");
 	// The similarity matrix, with each row and cell keeping its position as its id: a result is never reordered.
 	const [result, setResult] = React.useState<{
@@ -271,8 +288,8 @@ function Embeddings({ model }: { model: string }): React.JSX.Element {
 	return (
 		<Stack spacing={2}>
 			<TextField
-				helperText="One text per line"
-				label="Texts"
+				helperText={t("playground.embed.textsHelp")}
+				label={t("playground.embed.texts")}
 				minRows={4}
 				multiline
 				onChange={(event) => setTexts(event.target.value)}
@@ -300,7 +317,7 @@ function Embeddings({ model }: { model: string }): React.JSX.Element {
 			{error ? <Alert severity="error">{error}</Alert> : null}
 			{result ? (
 				<Stack data-testid="playground-result" spacing={1}>
-					<Typography variant="body2">{result.dimensions} dimensions. Cosine similarity:</Typography>
+					<Typography variant="body2">{t("playground.embed.summary", { count: result.dimensions })}</Typography>
 					<Box sx={{ overflowX: "auto" }}>
 						<Table size="small">
 							<TableHead>
@@ -323,7 +340,7 @@ function Embeddings({ model }: { model: string }): React.JSX.Element {
 										</TableCell>
 										{cells.map(({ column, value }) => (
 											<TableCell align="right" data-testid={`similarity-${row}-${column}`} key={column}>
-												{value.toFixed(3)}
+												{format.number(value, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}
 											</TableCell>
 										))}
 									</TableRow>
@@ -338,6 +355,8 @@ function Embeddings({ model }: { model: string }): React.JSX.Element {
 }
 
 function Rerank({ model }: { model: string }): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const [query, setQuery] = React.useState("");
 	const [documents, setDocuments] = React.useState("");
 	const [results, setResults] = React.useState<{ index: number; document: string; score: number }[] | null>(null);
@@ -348,10 +367,15 @@ function Rerank({ model }: { model: string }): React.JSX.Element {
 		.filter(Boolean);
 	return (
 		<Stack spacing={2}>
-			<TextField label="Query" onChange={(event) => setQuery(event.target.value)} size="small" value={query} />
 			<TextField
-				helperText="One document per line"
-				label="Documents"
+				label={t("playground.rerank.query")}
+				onChange={(event) => setQuery(event.target.value)}
+				size="small"
+				value={query}
+			/>
+			<TextField
+				helperText={t("playground.rerank.documentsHelp")}
+				label={t("playground.rerank.documents")}
 				minRows={4}
 				multiline
 				onChange={(event) => setDocuments(event.target.value)}
@@ -376,14 +400,14 @@ function Rerank({ model }: { model: string }): React.JSX.Element {
 			/>
 			{error ? <Alert severity="error">{error}</Alert> : null}
 			{results ? (
-				<Table aria-label="Ranked documents" data-testid="playground-result" size="small">
+				<Table aria-label={t("playground.rerank.results")} data-testid="playground-result" size="small">
 					<TableBody>
 						{results.map((result, rank) => (
 							<TableRow key={result.index}>
 								<TableCell sx={{ width: 40 }}>{rank + 1}</TableCell>
 								<TableCell>{result.document}</TableCell>
 								<TableCell align="right" sx={{ color: "text.secondary", width: 100 }}>
-									{result.score.toFixed(3)}
+									{format.number(result.score, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}
 								</TableCell>
 							</TableRow>
 						))}
@@ -395,13 +419,17 @@ function Rerank({ model }: { model: string }): React.JSX.Element {
 }
 
 function Benchmark({ model }: { model: string }): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
+	const fixed = (value: number, digits: number): string =>
+		format.number(value, { minimumFractionDigits: digits, maximumFractionDigits: digits });
 	const [tokens, setTokens] = React.useState(256);
 	const [result, setResult] = React.useState<BenchResult | null>(null);
 	const { busy, error, run } = useRun();
 	return (
 		<Stack spacing={2}>
 			<TextField
-				label="Tokens to generate"
+				label={t("playground.bench.tokensInput")}
 				onChange={(event) => setTokens(Number(event.target.value))}
 				size="small"
 				slotProps={{ htmlInput: { min: 32, max: 2048, step: 32 } }}
@@ -416,20 +444,26 @@ function Benchmark({ model }: { model: string }): React.JSX.Element {
 			/>
 			{error ? <Alert severity="error">{error}</Alert> : null}
 			{result ? (
-				<Table aria-label="Benchmark" data-testid="playground-result" size="small">
+				<Table aria-label={t("playground.bench.results")} data-testid="playground-result" size="small">
 					<TableBody>
 						<TableRow>
-							<TableCell component="th">Generation speed</TableCell>
-							<TableCell data-testid="bench-speed">{result.tokensPerSecond.toFixed(1)} tokens/s</TableCell>
+							<TableCell component="th">{t("playground.bench.speed")}</TableCell>
+							<TableCell data-testid="bench-speed">
+								{t("playground.bench.speedValue", { value: fixed(result.tokensPerSecond, 1) })}
+							</TableCell>
 						</TableRow>
 						<TableRow>
-							<TableCell component="th">Time to first token</TableCell>
-							<TableCell>{(result.firstTokenMs / 1000).toFixed(2)} s</TableCell>
+							<TableCell component="th">{t("playground.bench.firstToken")}</TableCell>
+							<TableCell>{t("playground.bench.seconds", { value: fixed(result.firstTokenMs / 1000, 2) })}</TableCell>
 						</TableRow>
 						<TableRow>
-							<TableCell component="th">Tokens</TableCell>
+							<TableCell component="th">{t("playground.bench.tokens")}</TableCell>
 							<TableCell>
-								{result.promptTokens} in · {result.completionTokens} out · {(result.totalMs / 1000).toFixed(1)} s total
+								{t("playground.bench.tokensValue", {
+									prompt: result.promptTokens,
+									completion: result.completionTokens,
+									total: fixed(result.totalMs / 1000, 1),
+								})}
 							</TableCell>
 						</TableRow>
 					</TableBody>
@@ -440,6 +474,7 @@ function Benchmark({ model }: { model: string }): React.JSX.Element {
 }
 
 export function Playground({ kind }: { kind: PlaygroundKind }): React.JSX.Element {
+	const { t } = useTranslation();
 	const models = usePolling<PlaygroundModel[]>("/api/playground/models", 15_000);
 	const [chosenModel, setChosenModel] = React.useState<string>();
 	const tab = playgroundTabs.find((entry) => entry.kind === kind)!;
@@ -458,13 +493,13 @@ export function Playground({ kind }: { kind: PlaygroundKind }): React.JSX.Elemen
 						color: "text.secondary",
 					}}
 				>
-					{tab.intro}
+					{t(tab.intro)}
 				</Typography>
 				{models.error ? <Alert severity="error">{models.error}</Alert> : null}
 				{models.data === null ? (
-					<CircularProgress aria-label="Loading models" />
+					<CircularProgress aria-label={t("playground.loading")} />
 				) : available.length === 0 ? (
-					<Alert severity="info">No model for this is downloaded. Get one from the Store.</Alert>
+					<Alert severity="info">{t("playground.noModel")}</Alert>
 				) : (
 					<>
 						<ModelPicker models={available} onChange={setChosenModel} value={model} />

@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { config } from "@/config";
+import { getT } from "@/i18n/server";
 import { ApiAccessCard } from "@/components/dashboard/settings/api-access-card";
 import { BackupCard } from "@/components/dashboard/settings/backup-card";
 import { DeviceCard } from "@/components/dashboard/settings/device-card";
@@ -13,20 +14,24 @@ import { PersonalizationCard } from "@/components/dashboard/settings/personaliza
 import { PowerCard } from "@/components/dashboard/settings/power-card";
 import { StorageCard } from "@/components/dashboard/settings/storage-card";
 
-export const metadata = { title: `Settings | ${config.site.name}` } satisfies Metadata;
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getT();
+	return { title: t("titles.page", { page: t("titles.settings"), site: config.site.name }) };
+}
 
-export default function Page(): React.JSX.Element {
+export default async function Page(): Promise<React.JSX.Element> {
+	const t = await getT();
 	return (
 		<Stack spacing={3}>
 			<div>
-				<Typography variant="h4">Settings</Typography>
+				<Typography variant="h4">{t("settings.page.title")}</Typography>
 				<Typography
 					variant="body2"
 					sx={{
 						color: "text.secondary",
 					}}
 				>
-					The device&apos;s own settings, as in TiinyOS.
+					{t("settings.page.subtitle")}
 				</Typography>
 			</div>
 			<Grid container spacing={3}>

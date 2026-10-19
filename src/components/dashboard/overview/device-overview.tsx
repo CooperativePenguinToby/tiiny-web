@@ -11,9 +11,11 @@ import { CpuIcon } from "@phosphor-icons/react/dist/ssr/Cpu";
 import { GaugeIcon } from "@phosphor-icons/react/dist/ssr/Gauge";
 import { HardDrivesIcon } from "@phosphor-icons/react/dist/ssr/HardDrives";
 import { MemoryIcon } from "@phosphor-icons/react/dist/ssr/Memory";
+import { useTranslation } from "react-i18next";
 
 import type { DeviceStatus } from "@/types/device";
-import { formatBytes, percent } from "@/lib/format";
+import { percent } from "@/lib/format";
+import { useFormat } from "@/i18n/client";
 import { usePolling } from "@/hooks/use-polling";
 
 import { RunningModels } from "./running-models";
@@ -21,12 +23,14 @@ import { StatCard } from "./stat-card";
 import { TokenUsage } from "./token-usage";
 
 export function DeviceOverview(): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const { data, error, isLoading, refresh } = usePolling<DeviceStatus>("/api/device", 5000);
 
 	if (isLoading) {
 		return (
 			<Stack sx={{ alignItems: "center", py: 8 }}>
-				<CircularProgress aria-label="Loading device status" />
+				<CircularProgress aria-label={t("overview.loading")} />
 			</Stack>
 		);
 	}
@@ -35,72 +39,88 @@ export function DeviceOverview(): React.JSX.Element {
 		<Alert
 			action={
 				<Button color="inherit" onClick={() => void refresh()} size="small">
-					Retry
+					{t("overview.retry")}
 				</Button>
 			}
 			severity={data ? "warning" : "error"}
 		>
-			{data ? `Showing last known values. ${error}` : error}
+			{data ? t("overview.staleValues", { error }) : error}
 		</Alert>
 	) : null;
 
 	if (!data) return <Stack spacing={3}>{errorAlert}</Stack>;
 
 	const { npu, memory, disk } = data;
+	const percentText = (value: number): string =>
+		t("overview.percent", { value: format.number(value, { maximumFractionDigits: 0 }) });
+	const usedOfTotal = (used: number, total: number): string =>
+		t("overview.usedOfTotal", { used: format.bytes(used), total: format.bytes(total) });
 
 	return (
 		<Stack spacing={3}>
 			<div>
-				<Typography variant="h4">Overview</Typography>
+				<Typography variant="h4">{t("overview.title")}</Typography>
 				<Typography
 					variant="body2"
 					sx={{
 						color: "text.secondary",
 					}}
 				>
-					{data.device.model} · TiinyOS {data.device.os} · {npu.statusMessage}
+					{data.device.model} · TiinyOS {data.device.os} ·{" "}
+					{/* The device's own sentence is English; translate the states we know. */}
+					{npu.status === "ready" ? t("overview.npuReady") : npu.statusMessage}
 				</Typography>
 			</div>
 			{errorAlert}
 			<Grid container spacing={3}>
 				<Grid size={{ lg: 3, sm: 6, xs: 12 }}>
 					<StatCard
-						caption={`${npu.allocatedPercent}% reserved by loaded models`}
+						id="NPU utilization"
+						caption={t("overview.stats.npuReserved", {
+							percent: t("overview.percent", { value: format.number(npu.allocatedPercent) }),
+						})}
 						color="var(--mui-palette-primary-main)"
 						icon={GaugeIcon}
 						percent={npu.utilizationPercent}
-						title="NPU utilization"
-						value={`${npu.utilizationPercent.toFixed(0)}%`}
+						title={t("overview.stats.npuUtilization")}
+						value={percentText(npu.utilizationPercent)}
 					/>
 				</Grid>
 				<Grid size={{ lg: 3, sm: 6, xs: 12 }}>
 					<StatCard
-						caption={`${formatBytes(npu.memoryUsedBytes)} of ${formatBytes(npu.memoryTotalBytes)}`}
+						id="NPU memory"
+						caption={usedOfTotal(npu.memoryUsedBytes, npu.memoryTotalBytes)}
 						color="var(--mui-palette-success-main)"
 						icon={MemoryIcon}
 						percent={percent(npu.memoryUsedBytes, npu.memoryTotalBytes)}
-						title="NPU memory"
-						value={`${percent(npu.memoryUsedBytes, npu.memoryTotalBytes).toFixed(0)}%`}
+						title={t("overview.stats.npuMemory")}
+						value={percentText(percent(npu.memoryUsedBytes, npu.memoryTotalBytes))}
 					/>
 				</Grid>
 				<Grid size={{ lg: 3, sm: 6, xs: 12 }}>
 					<StatCard
-						caption={`CPU ${data.cpuPercent.toFixed(0)}% · ${formatBytes(memory.usedBytes)} of ${formatBytes(memory.totalBytes)} RAM`}
+						id="System memory"
+						caption={t("overview.stats.systemMemoryCaption", {
+							cpu: percentText(data.cpuPercent),
+							used: format.bytes(memory.usedBytes),
+							total: format.bytes(memory.totalBytes),
+						})}
 						color="var(--mui-palette-warning-main)"
 						icon={CpuIcon}
 						percent={percent(memory.usedBytes, memory.totalBytes)}
-						title="System memory"
-						value={`${percent(memory.usedBytes, memory.totalBytes).toFixed(0)}%`}
+						title={t("overview.stats.systemMemory")}
+						value={percentText(percent(memory.usedBytes, memory.totalBytes))}
 					/>
 				</Grid>
 				<Grid size={{ lg: 3, sm: 6, xs: 12 }}>
 					<StatCard
-						caption={`${formatBytes(disk.usedBytes)} of ${formatBytes(disk.totalBytes)}`}
+						id="Storage"
+						caption={usedOfTotal(disk.usedBytes, disk.totalBytes)}
 						color="var(--mui-palette-info-main)"
 						icon={HardDrivesIcon}
 						percent={percent(disk.usedBytes, disk.totalBytes)}
-						title="Storage"
-						value={`${percent(disk.usedBytes, disk.totalBytes).toFixed(0)}%`}
+						title={t("overview.stats.storage")}
+						value={percentText(percent(disk.usedBytes, disk.totalBytes))}
 					/>
 				</Grid>
 			</Grid>

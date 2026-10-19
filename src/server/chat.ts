@@ -28,18 +28,19 @@ export function parseAttachment(value: unknown): Attachment {
 	if (item?.kind === "document" && typeof item.name === "string" && typeof item.text === "string") {
 		return { kind: "document", name: item.name, text: item.text };
 	}
-	throw new DeviceError("Invalid attachment", 400);
+	throw new DeviceError("errors.chat.invalidAttachment", 400);
 }
 
 export function parseMessage(value: unknown): ChatMessage {
 	const message = value as Record<string, unknown>;
 	if ((message?.role !== "user" && message?.role !== "assistant") || typeof message.content !== "string") {
-		throw new DeviceError("Expected messages: [{ role, content, attachments? }]", 400);
+		throw new DeviceError("errors.request.expected", 400, { shape: "messages: [{ role, content, attachments? }]" });
 	}
 	const attachments = Array.isArray(message.attachments)
 		? message.attachments.map((item) => parseAttachment(item))
 		: [];
-	if (attachments.length > MAX_ATTACHMENTS) throw new DeviceError(`At most ${MAX_ATTACHMENTS} attachments`, 400);
+	if (attachments.length > MAX_ATTACHMENTS)
+		throw new DeviceError("errors.chat.tooManyAttachments", 400, { count: MAX_ATTACHMENTS });
 	return { role: message.role, content: message.content, ...(attachments.length > 0 && { attachments }) };
 }
 

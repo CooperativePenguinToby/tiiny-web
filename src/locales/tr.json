@@ -1,0 +1,1207 @@
+{
+	"nav": {
+		"overview": "Genel bakış",
+		"models": "Modeller",
+		"agents": "Ajanlar",
+		"chat": "Sohbet",
+		"playground": "Deneme alanı",
+		"vault": "Kasa",
+		"connectors": "Bağlayıcılar",
+		"settings": "Ayarlar",
+		"openNavigation": "Gezinmeyi aç",
+		"signOut": "Çıkış yap",
+		"language": "Dil",
+		"languageCurrent": "Dil: {{language}}"
+	},
+	"titles": {
+		"page": "{{page}} | {{site}}",
+		"notFound": "Bulunamadı",
+		"settings": "Ayarlar",
+		"overview": "Genel bakış",
+		"agents": "Ajanlar",
+		"history": "Geçmiş",
+		"signIn": "Giriş yap",
+		"playground": "Deneme alanı",
+		"connectors": "Bağlayıcılar",
+		"models": "Modeller",
+		"store": "Mağaza",
+		"chat": "Sohbet",
+		"vault": "Kasa",
+		"huggingFace": "Hugging Face"
+	},
+	"errors": {
+		"notSignedIn": "Giriş yapılmadı",
+		"internal": "Dahili hata",
+		"unknownLanguage": "Bilinmeyen dil",
+		"incorrectPassword": "Parola yanlış",
+		"passthrough": "{{message}}",
+		"request": {
+			"expected": "Beklenen: {{shape}}",
+			"required": "{{field}} gerekli",
+			"mustBeText": "{{field}} metin olmalı",
+			"tooLong_one": "{{field}} {{count}} karakterden uzun",
+			"tooLong_other": "{{field}} {{count}} karakterden uzun",
+			"modelIdFormat": "{{field}}, Org/Name biçiminde olmalı",
+			"modelIdLike": "{{field}}, Org/Name gibi bir model kimliği olmalı",
+			"range": "{{field}} {{min}}-{{max}} arasında olmalı",
+			"oneOf": "{{field}} şunlardan biri olmalı: {{options}}",
+			"dateFormat": "{{field}}, {{example}} gibi bir tarih olmalı",
+			"jsonList": "{{field}} bir JSON listesi olmalı",
+			"emptySearch": "Aranacak bir şey girin"
+		},
+		"device": {
+			"notConfigured": "Cihaz yapılandırılmamış: TIINY_DEVICE_URL ve TIINY_AUTH_KEY değerlerini ayarlayın veya önce tiiny CLI ile giriş yapın",
+			"notConfiguredShort": "Cihaz yapılandırılmamış",
+			"responded": "Cihaz {{status}} yanıtı verdi: {{message}}",
+			"respondedUnavailable": "Cihaz {{status}} yanıtı verdi: hizmet kullanılamıyor",
+			"unreachable": "{{url}} adresindeki cihaza ulaşılamıyor: {{reason}}",
+			"emptyStream": "Cihaz boş bir akış döndürdü",
+			"refusedChange": "Cihaz değişikliği reddetti",
+			"reportedError": "Cihaz bir hata bildirdi"
+		},
+		"file": {
+			"tooLarge": "{{name}}, {{megabytes}} MB'tan büyük"
+		},
+		"hf": {
+			"invalidRepo": "Bir Hugging Face deposunu org/name veya huggingface.co URL'si olarak girin",
+			"unreachable": "Hugging Face'e ulaşılamıyor: {{reason}}",
+			"responded": "Hugging Face {{status}} yanıtı verdi"
+		},
+		"models": {
+			"didNotLoad": "Model yüklenmedi",
+			"didNotLoadStatus": "Model yüklenmedi ({{status}})",
+			"didNotLoadNoStatus": "Model yüklenmedi (durum yok)"
+		},
+		"connectors": {
+			"unknown": "Bilinmeyen bağlayıcı",
+			"noAccountSignIn": "Bu bağlayıcı hesapla giriş kullanmıyor",
+			"accountSignIn": "Bu bağlayıcı hesapla giriş kullanıyor",
+			"tokenRejected": "Cihaz token'ı reddetti",
+			"xLoginRejected": "X girişi reddetti",
+			"mailLoginRefused": "Posta sunucusu girişi reddetti",
+			"whatsappFailed": "Cihaz WhatsApp'ı başlatamadı",
+			"invalidMcpId": "Geçersiz MCP sunucu kimliği",
+			"mcpConfig": "{{example}} gibi bir JSON nesnesi bekleniyor"
+		},
+		"chat": {
+			"invalidAttachment": "Geçersiz ek",
+			"tooManyAttachments_one": "En fazla {{count}} ek",
+			"tooManyAttachments_other": "En fazla {{count}} ek",
+			"chooseFile": "Bir dosya seçin",
+			"unsupportedFile": "{{name}}: görsel veya {{extensions}} dosyaları ekleyin",
+			"noText": "Cihaz {{name}} içinde metin bulamadı",
+			"invalidMediaId": "Geçersiz medya kimliği"
+		},
+		"task": {
+			"interrupted": "Kesildi.",
+			"tooManySteps_one": "{{count}} adımdan sonra nihai yanıt olmadan durduruldu.",
+			"tooManySteps_other": "{{count}} adımdan sonra nihai yanıt olmadan durduruldu."
+		},
+		"history": {
+			"invalidConversationId": "Geçersiz konuşma kimliği"
+		},
+		"vault": {
+			"invalidSourceId": "Geçersiz kaynak kimliği",
+			"chooseFiles": "En az bir dosya seçin",
+			"tooManyFiles_one": "Tek seferde en fazla {{count}} dosya yükleyin",
+			"tooManyFiles_other": "Tek seferde en fazla {{count}} dosya yükleyin",
+			"unsupportedFile": "{{name}}: Kasa {{extensions}} dosyalarını kabul eder",
+			"invalidName": "Eğik çizgi içermeyen bir dosya adı girin"
+		},
+		"memory": {
+			"chooseTextModel": "İndirilmiş bir metin modeli seçin"
+		},
+		"settings": {
+			"deviceNameLength_one": "Cihaz adı 1-{{count}} karakter olmalı",
+			"deviceNameLength_other": "Cihaz adı 1-{{count}} karakter olmalı"
+		},
+		"agents": {
+			"noDomain": "Ajan alt alan adları yapılandırılmamış (AGENT_DOMAIN)"
+		},
+		"playground": {
+			"textRequired": "Metin gerekli",
+			"textTooLong_one": "Metin {{count}} karakterden uzun",
+			"textTooLong_other": "Metin {{count}} karakterden uzun",
+			"queryRequired": "Sorgu gerekli",
+			"queryTooLong_one": "Sorgu {{count}} karakterden uzun",
+			"queryTooLong_other": "Sorgu {{count}} karakterden uzun",
+			"numberedTextRequired": "Metin {{number}} gerekli",
+			"numberedTextTooLong_one": "Metin {{number}}, {{count}} karakterden uzun",
+			"numberedTextTooLong_other": "Metin {{number}}, {{count}} karakterden uzun",
+			"documentRequired": "Belge {{number}} gerekli",
+			"documentTooLong_one": "Belge {{number}}, {{count}} karakterden uzun",
+			"documentTooLong_other": "Belge {{number}}, {{count}} karakterden uzun",
+			"textCount": "{{min}} ile {{max}} arasında metin girin",
+			"documentCount": "{{min}} ile {{max}} arasında belge girin",
+			"chooseAudio": "Ses seçin veya kaydedin",
+			"audioTooLarge": "Ses {{megabytes}} MB'tan büyük",
+			"wavOnly": "Cihaz yalnızca WAV sesini yazıya dökebilir. Önce dosyayı WAV'a dönüştürün.",
+			"chooseImage": "Bir görsel seçin",
+			"imageTooLarge": "Görsel {{megabytes}} MB'tan büyük"
+		},
+		"backup": {
+			"chooseFile": "Bir yedek dosyası seçin",
+			"chooseCategory": "Cihazın sunduğu en az bir kategori seçin",
+			"unexpectedReply": "Beklenmeyen yedekleme yanıtı ({{type}})",
+			"unexpectedReplyNoType": "Beklenmeyen yedekleme yanıtı (tür yok)",
+			"noArchive": "Cihazın yedeğinde arşiv yoktu",
+			"notBackup": "Bu dosya bir Tiiny yedeği değil",
+			"otherDevice": "Bu yedek başka bir cihazda alındı; yalnızca orada geri yüklenebilir",
+			"missing": "Yedek şunları içermiyor: {{services}}"
+		},
+		"wifi": {
+			"unknownAction": "Bilinmeyen Wi-Fi işlemi",
+			"wouldDropLink": "Bu uygulama cihaza Wi-Fi üzerinden ulaşıyor, bu yüzden bu değişiklik bağlantıyı keser. Değişikliği TiinyOS'tan veya cihaz kabloyla bağlıyken yapın."
+		},
+		"update": {
+			"upToDate": "TiinyOS güncel",
+			"notReady": "Kurulmaya hazır indirilmiş bir güncelleme yok",
+			"unknownAction": "Bilinmeyen güncelleme işlemi"
+		},
+		"agentProxy": {
+			"noAnswer": "Ajan yanıt vermedi ({{reason}}). Durdurulmuş olabilir.",
+			"linkExpired": "Bu bağlantının süresi doldu. Ajanı tiiny-web'in Ajanlar sayfasından yeniden açın.",
+			"signIn": "tiiny-web'e giriş yapın ve bu ajanı Ajanlar sayfasından açın."
+		}
+	},
+	"chat": {
+		"title": "Sohbet",
+		"tabs": {
+			"chat": "Sohbet",
+			"history": "Geçmiş"
+		},
+		"intro": "Yüklü bir modelle konuşun. Sohbetler cihazın TiinyOS ile paylaşılan sohbet geçmişinde tutulur. Cihaz her model için aynı anda tek bir isteği yanıtlar, bu yüzden yanıtlar sıraya girebilir.",
+		"message": {
+			"you": "Siz",
+			"assistant": "Asistan",
+			"thinking": "Düşünme"
+		},
+		"notes": {
+			"stopped": "Durduruldu.",
+			"noReply": "Yanıt tamamlanmadı.",
+			"interrupted": "Kesildi.",
+			"drawing": "Çiziliyor… adım {{step}}/{{total}}",
+			"picture_one": "{{size}}, {{count}} adım",
+			"picture_other": "{{size}}, {{count}} adım"
+		},
+		"errors": {
+			"openConversation": "Konuşma açılamadı: {{message}}",
+			"load": "{{name}} yüklenemedi: {{message}}",
+			"device": "Cihaz bir hata bildirdi",
+			"gaveUp": "Cihaz beklemeyi bıraktı: model başka isteklerle meşguldü. Tekrar deneyin. ({{message}})",
+			"drawFailed": "Cihaz resmi çizemedi",
+			"noPicture": "Cihaz resim üretmeden bitirdi",
+			"notSaved": "Geçmişe kaydedilmedi: {{message}}"
+		},
+		"models": {
+			"loading": "Sohbet modelleri yükleniyor",
+			"none": "İndirilmiş sohbet veya görsel modeli yok. Mağazadan bir model edinin, ardından yükleyin.",
+			"modelsButton": "Modeller",
+			"label": "Model",
+			"choose": "Bir model seçin",
+			"notLoadedOption": "{{name}} (yüklü değil)"
+		},
+		"loading": {
+			"starting": "Başlatılıyor",
+			"unloading": "{{name}} kaldırılıyor",
+			"status": "{{name}} yükleniyor: {{message}}",
+			"statusProgress": "{{name}} yükleniyor: {{message}} %{{progress}}",
+			"progressLabel": "Model yükleniyor",
+			"notLoaded": "{{name}} yüklü değil.",
+			"load": "Yükle"
+		},
+		"makeRoom": {
+			"title": "{{name}} için yer açılsın mı?",
+			"text": "Cihazda yeterli boş NPU belleği yok. Önce {{models}} kaldırılsın mı? Bunları kullanan uygulamalar durur.",
+			"otherModels": "diğer modeller",
+			"cancel": "İptal",
+			"confirm": "Kaldır ve yükle"
+		},
+		"mode": {
+			"label": "Mod",
+			"chat": "Sohbet",
+			"chatTitle": "Model doğrudan yanıtlar",
+			"task": "Görev",
+			"taskTitle": "Model; Kasa, web sayfaları ve MCP araçlarıyla adım adım çalışır"
+		},
+		"tools": {
+			"vault": "Kasa",
+			"vaultTitle": "Modelin Kasa dosyalarınızda ve sohbet özetlerinizde arama yapmasına izin verin",
+			"web": "Web",
+			"webTitle": "Modelin web sayfalarını okumasına izin verin"
+		},
+		"image": {
+			"size": "Boyut",
+			"steps": "Adım"
+		},
+		"thinking": {
+			"label": "Düşünme",
+			"off": "Kapalı"
+		},
+		"newChat": "Yeni sohbet",
+		"conversation": {
+			"opening": "Konuşma açılıyor",
+			"empty": "{{name}} ile sohbete başlamak için bir mesaj gönderin.",
+			"theModel": "model",
+			"waiting": "Cihaz bekleniyor · {{seconds}} sn",
+			"waitingQueued_one": "Cihaz bekleniyor · {{seconds}} sn · model {{count}} başka istekle meşgul, sizinki sırada",
+			"waitingQueued_other": "Cihaz bekleniyor · {{seconds}} sn · model {{count}} başka istekle meşgul, sizinki sırada"
+		},
+		"composer": {
+			"files": "Eklenecek dosyalar",
+			"attachImagesOrDocuments": "Görsel veya belge ekle",
+			"attachDocuments": "Belge ekle",
+			"message": "Mesaj",
+			"placeholder": "Göndermek için Enter, yeni satır için Shift+Enter",
+			"stop": "Durdur",
+			"send": "Gönder"
+		},
+		"attachments": {
+			"charactersRead_one": "Cihaz {{characters}} karakter okudu",
+			"charactersRead_other": "Cihaz {{characters}} karakter okudu",
+			"uploading": "{{name}}…",
+			"missing": "{{name}} (artık cihazda değil)",
+			"download": "İndir"
+		},
+		"task": {
+			"running": "{{label}} çalışıyor",
+			"showResult": "Sonucu göster",
+			"hideResult": "Sonucu gizle"
+		},
+		"history": {
+			"intro": "Cihazda tutulan, bu uygulamadan ve TiinyOS'tan gelen konuşmalar.",
+			"search": "Konuşmalarda ara",
+			"searchButton": "Ara",
+			"searching": "Aranıyor…",
+			"loading": "Konuşmalar yükleniyor",
+			"noMatches": "“{{query}}” geçen konuşma yok.",
+			"empty": "Henüz konuşma yok. Sohbetleriniz burada tutulur.",
+			"untitled": "Başlıksız",
+			"delete": "Sil",
+			"confirmTitle": "Konuşma silinsin mi?",
+			"confirmText": "“{{title}}” cihazdan silinsin mi? TiinyOS'tan da kaldırılır."
+		}
+	},
+	"auth": {
+		"layout": {
+			"welcome": "<brand>Tiiny</brand>'ye hoş geldiniz",
+			"tagline": "Ağınızdaki herhangi bir tarayıcıdan cihazı izleyin, yüklü modelleri yönetin ve sohbet edin."
+		},
+		"signIn": {
+			"title": "Giriş yap",
+			"description": "Bu sunucu için yapılandırılmış yönetici parolasını girin.",
+			"password": "Parola",
+			"passwordRequired": "Parola gerekli",
+			"showPassword": "Parolayı göster",
+			"hidePassword": "Parolayı gizle",
+			"submit": "Giriş yap",
+			"submitting": "Giriş yapılıyor…",
+			"failed": "Giriş başarısız ({{status}})",
+			"unreachable": "Sunucuya ulaşılamadı"
+		}
+	},
+	"core": {
+		"backHome": "Ana sayfaya dön",
+		"notFound": {
+			"heading": "404: Aradığınız sayfa burada değil",
+			"hint": "Panoya dönmek için gezinmeyi kullanın."
+		},
+		"errors": {
+			"requestFailed": "İstek başarısız ({{status}})",
+			"deviceReported": "Cihaz {{status}} bildirdi"
+		}
+	},
+	"agents": {
+		"page": {
+			"title": "Ajanlar",
+			"description": "Cihazda kurulu ajanlar burada HTTPS üzerinden, bu uygulamanın girişinin arkasında açılır."
+		},
+		"loading": "Ajanlar yükleniyor",
+		"recommendedModels_one": "Önerilen model: {{models}}",
+		"recommendedModels_other": "Önerilen modeller: {{models}}",
+		"stream": {
+			"failed": "Başarısız",
+			"working": "Çalışıyor"
+		},
+		"progress": {
+			"percent": "{{message}} %{{percent}}",
+			"ariaLabel": "{{name}} ilerlemesi",
+			"startingInstall": "Kurulum başlatılıyor…",
+			"resumingInstall": "Kurulum sürdürülüyor…",
+			"updating": "Güncelleniyor…",
+			"stopping": "Durduruluyor…",
+			"starting": "Başlatılıyor…",
+			"deleting": "Siliniyor…"
+		},
+		"install": {
+			"paused": "Kurulum %{{percent}} noktasında duraklatıldı",
+			"running": "Kuruluyor %{{percent}}",
+			"ariaLabel": "{{name}} kurulumu"
+		},
+		"outcome": {
+			"installed": "{{name}} kuruldu.",
+			"installPaused": "{{name}} kurulumu duraklatıldı.",
+			"updated": "{{name}}, {{version}} sürümüne güncellendi.",
+			"stopped": "{{name}} durduruldu.",
+			"started": "{{name}} başlatıldı.",
+			"deleted": "{{name}} silindi.",
+			"error": "{{name}}: {{message}}"
+		},
+		"actions": {
+			"resume": "Sürdür",
+			"pause": "Duraklat",
+			"cancelInstall": "Kurulumu iptal et",
+			"update": "Güncelle",
+			"open": "Aç",
+			"stop": "Durdur",
+			"start": "Başlat",
+			"delete": "Sil",
+			"installOnDevice": "Cihaza kur",
+			"cancel": "İptal"
+		},
+		"installed": {
+			"heading": "Bu cihazda",
+			"empty": "Cihazda kurulu ajan yok. Aşağıdaki mağazadan bir ajan kurun.",
+			"version": "Sürüm {{version}}",
+			"versionWithUpdate": "Sürüm {{version}} · {{latest}} mevcut",
+			"unknownVersion": "bilinmiyor",
+			"usage": "CPU %{{cpu}} · bellek {{memory}}",
+			"containersStopped": "Cihaz, bu ajanın container'larının beklenmedik şekilde durduğunu bildiriyor. Yeniden başlatın veya sıfırlamak için Durdur'a basın.",
+			"proxyError": "{{port}} portundaki proxy: {{error}}"
+		},
+		"store": {
+			"heading": "Ajan mağazası: cihazda çalıştır",
+			"allInstalled": "Mağazadaki tüm web ajanları zaten kurulu.",
+			"version": "Sürüm {{version}}"
+		},
+		"desktop": {
+			"heading": "Ajan mağazası: bilgisayarınızda çalıştır",
+			"description": "Bu ajanlar bir bilgisayarda çalışır ve cihazın OpenAI uyumlu API'sini kullanır. Onları cihaza yönlendirin (örneğin <code>http://&lt;cihaz adresi&gt;/v1</code>) ve <code>tiiny auth key</code> komutundaki anahtarı kullanın.",
+			"noDownloads": "Yayınlanmış indirme yok."
+		},
+		"deleteDialog": {
+			"title": "{{name}} silinsin mi?",
+			"text": "Bu işlem ajanı cihazdan kaldırır. Ajan mağazasından yeniden kurabilirsiniz."
+		},
+		"status": {
+			"created": "oluşturuldu",
+			"running": "çalışıyor",
+			"starting": "başlatılıyor",
+			"stopped": "durduruldu",
+			"exited": "çıktı",
+			"paused": "duraklatıldı",
+			"error": "hata"
+		}
+	},
+	"connectors": {
+		"page": {
+			"title": "Bağlayıcılar",
+			"description": "Modellerin Görev modunda kullanabileceği e-posta, takvim, mesajlaşma ve MCP araçları."
+		},
+		"category": {
+			"email": "E-posta",
+			"calendar": "Takvim",
+			"messaging": "Mesajlaşma"
+		},
+		"state": {
+			"connected": "Bağlı",
+			"notConnected": "Bağlı değil",
+			"notReachable": "Ulaşılamıyor"
+		},
+		"actions": {
+			"connect": "Bağla",
+			"disconnect": "Bağlantıyı kes",
+			"cancel": "İptal",
+			"close": "Kapat",
+			"remove": "Kaldır"
+		},
+		"services": {
+			"heading": "Hizmetler",
+			"description": "Modeller bağlı hizmetleri Görev modunda, verdiğiniz yetki dahilinde kullanır. Bağlantılar cihazda tutulur ve TiinyOS ile paylaşılır.",
+			"loading": "Bağlayıcılar yükleniyor",
+			"waitingForSignIn": "Girişi tamamlamanız bekleniyor… <link>Giriş sayfasını aç</link>"
+		},
+		"outcome": {
+			"connected": "{{name}} bağlandı: {{detail}}.",
+			"whatsappConnected": "WhatsApp bağlandı.",
+			"disconnected": "{{name}} bağlantısı kesildi.",
+			"error": "{{name}}: {{message}}"
+		},
+		"disconnectDialog": {
+			"title": "Bağlantı kesilsin mi?",
+			"text": "{{name}} bağlantısı kesilsin mi? Cihaz kayıtlı giriş bilgilerini unutur ve modeller artık bunu kullanamaz."
+		},
+		"connect": {
+			"title": "{{name}} bağla",
+			"telegramIntro": "Telegram'da @BotFather ile bir bot oluşturun (/newbot) ve verdiği token'ı yapıştırın.",
+			"discordIntro": "Discord Developer Portal'da bir bot oluşturun, Message Content Intent'i açın, botu sunucunuza davet edin ve token'ını yapıştırın.",
+			"xIntro": "Bir tarayıcıda x.com'a giriş yapın ve auth_token ile ct0 çerezlerini kopyalayın.",
+			"botToken": "Bot token'ı",
+			"channelId": "Kanal kimliği",
+			"channelIdHelp": "Botun okuyabileceği ve yazabileceği kanal.",
+			"whatsappQrAlt": "WhatsApp eşleştirme QR kodu",
+			"whatsappIntro": "Telefonunuzdaki WhatsApp'ta Ayarlar → Bağlı cihazlar → Cihaz bağla'yı açın ve bu kodu tarayın.",
+			"newCode": "Yeni kod",
+			"emailIntro": "Bir uygulama şifresi kullanın (iki adımlı doğrulama açıkken Gmail, Outlook ve iCloud bunu gerektirir).",
+			"provider": "Sağlayıcı",
+			"otherProvider": "Diğer",
+			"emailAddress": "E-posta adresi",
+			"appPassword": "Uygulama şifresi",
+			"imapServer": "IMAP sunucusu",
+			"smtpServer": "SMTP sunucusu",
+			"checking": "Kontrol ediliyor…"
+		},
+		"mcp": {
+			"heading": "Özel MCP sunucuları",
+			"addServer": "MCP sunucusu ekle",
+			"description": "Bu sunuculardaki araçlar Görev modunda modellere sunulur. Cihazda çalışırlar.",
+			"loading": "MCP sunucuları yükleniyor",
+			"empty": "Henüz MCP sunucusu yok.",
+			"tools": "Araçlar",
+			"hideTools": "Araçları gizle",
+			"loadingTools": "Araçlar yükleniyor",
+			"added": "MCP sunucusu eklendi.",
+			"removed": "{{name}} kaldırıldı.",
+			"removeDialog": {
+				"title": "MCP sunucusu kaldırılsın mı?",
+				"text": "{{name}} cihazdan kaldırılsın mı? Modeller artık araçlarını kullanamaz."
+			},
+			"addDialog": {
+				"title": "MCP sunucusu ekle",
+				"description": "Sunucu cihazda çalışır, bu yüzden oradan erişilebilir olmalıdır. Masaüstü veya tarayıcı gerektiren sunucular cihazda çalışmaz.",
+				"byUrl": "URL ile",
+				"fromJson": "JSON'dan",
+				"name": "Ad",
+				"url": "URL",
+				"urlHelp": "HTTP veya SSE uç noktası, örn. {{example}}",
+				"config": "MCP yapılandırması",
+				"invalidJson": "Bu geçerli bir JSON değil",
+				"add": "Ekle",
+				"adding": "Ekleniyor…"
+			}
+		}
+	},
+	"settings": {
+		"page": {
+			"title": "Ayarlar",
+			"subtitle": "Cihazın kendi ayarları, TiinyOS'taki gibi."
+		},
+		"actions": {
+			"cancel": "İptal",
+			"save": "Kaydet",
+			"saving": "Kaydediliyor…",
+			"retry": "Yeniden dene",
+			"copy": "Kopyala",
+			"copied": "Kopyalandı",
+			"delete": "Sil",
+			"deleting": "Siliniyor…"
+		},
+		"section": {
+			"staleValues": "Bilinen son değerler gösteriliyor. {{error}}"
+		},
+		"device": {
+			"title": "Cihazım",
+			"subheader": "Cihazın bildirdiği bilgiler",
+			"loading": "Cihaz bilgileri yükleniyor",
+			"name": "Ad",
+			"rename": "Yeniden adlandır",
+			"nameField": "Cihaz adı",
+			"serialNumber": "Seri numarası",
+			"copySerialNumber": "Seri numarasını kopyala",
+			"model": "Model",
+			"osService": "TiinyOS hizmeti"
+		},
+		"personalization": {
+			"title": "Kişiselleştirme",
+			"subheader": "Cihazın Görev modunda modellere sizinle ilgili verdiği bağlam",
+			"loading": "Kişiselleştirme yükleniyor",
+			"fields": {
+				"userName": {
+					"label": "Ad",
+					"hint": "Modellerin size nasıl hitap edeceği."
+				},
+				"occupation": {
+					"label": "Meslek",
+					"hint": "Örneğin: yazılım mühendisi."
+				},
+				"preferences": {
+					"label": "Tercihler",
+					"hint": "Yanıtları nasıl istediğiniz."
+				},
+				"recentFocus": {
+					"label": "Güncel odak",
+					"hint": "Şu anda üzerinde çalıştığınız şey."
+				}
+			},
+			"fieldHelper": "{{hint}} {{length}}/{{limit}}",
+			"saved": "Kaydedildi. Modeller bunu bir sonraki Görev modu konuşmasından itibaren görür.",
+			"discardChanges": "Değişiklikleri at"
+		},
+		"power": {
+			"title": "Sistem",
+			"subheader": "Güç ve TiinyOS güncellemeleri",
+			"autoPowerOn": {
+				"title": "Otomatik açılma",
+				"description": "Cihaz güce bağlandığında kendiliğinden açılır. Cihaz bu özelliğin açık olup olmadığını bildirmez (her zaman kapalı görünür), bu yüzden yalnızca bir değişikliğin sonucu gösterilir.",
+				"turnOn": "Aç",
+				"turnOff": "Kapat",
+				"deviceReply": "Cihaz: {{message}}"
+			},
+			"update": {
+				"title": "Sistem güncellemesi",
+				"current": "TiinyOS {{version}}",
+				"available": "TiinyOS {{version}} · {{available}} sürümü mevcut",
+				"upToDate": "TiinyOS {{version}} · güncel",
+				"loading": "Güncelleme durumu yükleniyor",
+				"inProgress": "Güncelleme: {{state}}…",
+				"progress": "Güncelleme ilerlemesi",
+				"check": "Güncellemeleri denetle",
+				"checking": "Denetleniyor…",
+				"download": "Güncellemeyi indir",
+				"install": "Güncellemeyi kur",
+				"confirmTitle": "Güncelleme kurulsun mu?",
+				"confirmText": "Kurulum sırasında modeller durur ve cihaz yeniden başlar. Cihaz geri gelene kadar fişini çekmeyin.",
+				"confirmLabel": "Kur",
+				"installing": "Güncelleme kuruluyor. Cihaz bir kez yeniden başlayacak; fişini çekmeyin."
+			},
+			"power": {
+				"title": "Güç",
+				"restart": "Yeniden başlat",
+				"shutDown": "Kapat",
+				"restarting": "Yeniden başlatılıyor… cihazın geri gelmesi bekleniyor.",
+				"back": "Cihaz geri geldi.",
+				"notBack": "Cihaz 10 dakika sonra geri gelmedi",
+				"shuttingDown": "Cihaz kapanıyor.",
+				"restartTitle": "Cihaz yeniden başlatılsın mı?",
+				"restartText": "Yüklü modeller, sohbetler ve ajanlar durur ve cihaza birkaç dakika ulaşılamaz.",
+				"shutDownTitle": "Cihaz kapatılsın mı?",
+				"shutDownText": "Yüklü modeller, sohbetler ve ajanlar durur. Cihaz, üzerinden açılana kadar (veya Otomatik açılma etkinken yeniden güce bağlanana kadar) kapalı kalır."
+			}
+		},
+		"apiAccess": {
+			"title": "API erişimi",
+			"subheader": "Cihazın modellerini ağınızdaki diğer uygulamalardan kullanın",
+			"loading": "API erişimi yükleniyor",
+			"openaiCompatible": "OpenAI uyumlu",
+			"uses": {
+				"openai": "Metin, embedding, yeniden sıralama, görsel, konuşma",
+				"anthropic": "Metin üretimi",
+				"ollama": "Metin üretimi, embedding"
+			},
+			"copyBaseUrl": "{{format}} temel URL'sini kopyala",
+			"apiKey": "API anahtarı",
+			"copyApiKey": "API anahtarını kopyala",
+			"reveal": "Göster",
+			"hint": "Modeller sayfasındaki bir model kimliğini veya en son kullanılan model için <code>default</code> değerini kullanın. Anahtarı gizli tutun: anahtara sahip herkes cihazın API'sini kullanabilir."
+		},
+		"storage": {
+			"title": "Depolama",
+			"subheader": "Cihazdaki disk kullanımı",
+			"loading": "Depolama yükleniyor",
+			"used": "{{used}} / {{total}} kullanılıyor",
+			"usedBar": "Kullanılan depolama",
+			"category": "{{name}}: {{size}}",
+			"modelFiles": "Model dosyaları",
+			"agentFiles": "Ajan dosyaları",
+			"size": "Boyut",
+			"usedByVault": "Kasa tarafından kullanılan",
+			"deleted": "{{id}} silindi.",
+			"deleteModelTitle": "Model silinsin mi?",
+			"deleteModelText": "{{id}} cihazdan silinsin mi? Kullanmak için yeniden indirmeniz gerekir.",
+			"deleteAgentTitle": "Ajan silinsin mi?",
+			"deleteAgentText": "{{id}} ve verileri cihazdan silinsin mi? Bu işlem geri alınamaz."
+		},
+		"backup": {
+			"title": "Yedekleme ve geri yükleme",
+			"subheader": "Sohbet geçmişi ve Kasa, bu bilgisayara kaydedilir",
+			"backUp": {
+				"title": "Yedekle",
+				"loading": "Yedekleme yükleniyor",
+				"category": "{{name}} · yaklaşık {{size}}",
+				"categoryNotReady": "{{name}} · yaklaşık {{size}} (hazır değil)",
+				"download": "Yedeği indir",
+				"inProgress": "Yedekleniyor…",
+				"saved": "{{name}} kaydedildi ({{size}}).",
+				"savedWithout": "{{name}} kaydedildi ({{size}}), şunlar hariç: {{failed}}."
+			},
+			"restore": {
+				"title": "Geri yükle",
+				"chooseFile": "Bir yedek dosyası seçin",
+				"fileField": "Yedek dosyası",
+				"restore": "Geri yükle",
+				"inProgress": "Geri yükleniyor…",
+				"otherDevice": "Bu yedek başka bir cihazda ({{deviceId}}) alındı; yalnızca orada geri yüklenebilir.",
+				"unknownDevice": "bilinmiyor",
+				"result": "{{name}}: {{message}}",
+				"restored": "geri yüklendi",
+				"failed": "Cihaz yedeği geri yükleyemedi",
+				"confirmTitle": "Yedek geri yüklensin mi?",
+				"confirmText": "Cihazdaki {{categories}} yedeğin içeriğiyle değiştirilsin mi? Yedekten sonra eklenenler kaybolur.",
+				"categoryJoiner": " ve "
+			}
+		},
+		"network": {
+			"title": "Ağ",
+			"subheader": "Cihazın Wi-Fi ve kablolu bağlantıları",
+			"loading": "Ağ yükleniyor",
+			"wifi": "Wi-Fi",
+			"wifiTurnedOn": "Wi-Fi açıldı.",
+			"wifiTurnedOff": "Wi-Fi kapatıldı.",
+			"connectedTo": "{{ssid}} ağına bağlı (sinyal %{{signal}})",
+			"notConnected": "Bağlı değil",
+			"off": "Kapalı",
+			"wifiLink": "Bu uygulama cihaza Wi-Fi ({{interface}}) üzerinden ulaşıyor, bu yüzden Wi-Fi'ı kapatmak, {{ssid}} ağını unutmak veya başka bir ağa katılmak burada devre dışı. Bu değişiklikler için TiinyOS'u kullanın veya cihazı kabloyla bağlayın.",
+			"interfaces": {
+				"interface": "Arayüz",
+				"state": "Durum",
+				"addresses": "Adresler",
+				"appLink": "Bu uygulamanın bağlantısı"
+			},
+			"networks": {
+				"scanning": "Ağlar taranıyor…",
+				"network": "Ağ",
+				"autoJoin": "Otomatik katıl",
+				"connected": "Bağlı",
+				"connecting": "Bağlanıyor…",
+				"saved": "Kayıtlı",
+				"open": "Açık",
+				"signal": "Sinyal %{{signal}}",
+				"autoJoinSwitch": "{{ssid}} ağına otomatik katıl",
+				"autoJoinOn": "{{ssid}} için otomatik katılma açık.",
+				"autoJoinOff": "{{ssid}} için otomatik katılma kapalı.",
+				"join": "Katıl",
+				"joining": "{{ssid}} ağına katılınıyor.",
+				"forget": "Unut",
+				"forgotten": "{{ssid}} unutuldu."
+			},
+			"joinDialog": {
+				"title": "{{ssid}} ağına katıl",
+				"password": "Parola"
+			},
+			"forgetDialog": {
+				"title": "Ağ unutulsun mu?",
+				"text": "Cihaz {{ssid}} ağını ve parolasını unutacak."
+			}
+		}
+	},
+	"models": {
+		"heading": "Modeller",
+		"percent": "%{{value}}",
+		"tabs": {
+			"models": "Modeller",
+			"store": "Mağaza"
+		},
+		"pages": {
+			"models": "İndirilmiş bir modeli NPU belleğine yükleyin veya yer açmak için kaldırın.",
+			"store": "Tiiny mağazasındaki modeller. İndirmeler cihaza kaydedilir; onları Modeller sekmesinden yükleyin.",
+			"huggingFace": "Hugging Face'ten özel modeller içe aktarın. Neyin içe aktarılabileceğine cihaz karar verir: genellikle mağazasındaki modellerin ince ayarlı sürümleri ve LoRA adaptörleri; bazıları ancak ilgili mağaza modeli indirildikten sonra."
+		},
+		"columns": {
+			"model": "Model",
+			"type": "Tür",
+			"size": "Boyut",
+			"npuShare": "NPU payı",
+			"status": "Durum",
+			"action": "İşlem"
+		},
+		"table": {
+			"loading": "Modeller yükleniyor",
+			"title": "İndirilen modeller",
+			"npuFree": "NPU'nun %{{percent}} kadarı boş",
+			"empty": "Cihazda indirilmiş model yok.",
+			"status": {
+				"loaded": "yüklü",
+				"notLoaded": "yüklü değil",
+				"tooBig": "yeterli boş NPU yok",
+				"tooBigHint": "NPU'nun %{{needed}} kadarı gerekiyor; %{{free}} boş. Yer açmak için bir modeli kaldırın."
+			},
+			"pending": {
+				"load": "Başlatılıyor…",
+				"unload": "Kaldırılıyor…",
+				"delete": "Siliniyor…"
+			},
+			"progress": {
+				"load": "yükleme ilerlemesi",
+				"unload": "kaldırma ilerlemesi",
+				"delete": "silme ilerlemesi"
+			},
+			"done": {
+				"load": "{{name}} yüklendi.",
+				"unload": "{{name}} kaldırıldı.",
+				"delete": "{{name}} silindi."
+			},
+			"failed": {
+				"load": "{{name}} yüklenemedi: {{reason}}",
+				"unload": "{{name}} kaldırılamadı: {{reason}}",
+				"delete": "{{name}} silinemedi: {{reason}}",
+				"unloadAll": "Tüm modeller kaldırılamadı: {{reason}}",
+				"interrupt": "{{name}} kesilemedi: {{reason}}"
+			},
+			"allUnloaded": "Tüm modeller kaldırıldı.",
+			"interrupted": "{{name}} modelinin üzerinde çalıştığı işler durduruldu.",
+			"interrupt": "Kes",
+			"interruptHint": "Bu modelin üzerinde çalıştığı istekleri, hangi uygulamadan gelirse gelsin durdur",
+			"unload": "Kaldır",
+			"unloading": "Kaldırılıyor…",
+			"unloadAll": "Tümünü kaldır",
+			"delete": "Sil",
+			"load": "Yükle",
+			"cancel": "İptal",
+			"unloadAllDialog": {
+				"title": "Tüm modeller kaldırılsın mı?",
+				"text": "Yüklü tüm modeller NPU'dan bırakılır. Bu uygulamadan veya diğer istemcilerden gelen, devam eden istekler durur."
+			},
+			"deleteDialog": {
+				"title": "{{name}} silinsin mi?",
+				"text": "Bu işlem modelin dosyalarını cihazdan kaldırır. Mağazadan yeniden indirebilirsiniz."
+			},
+			"unloadDialog": {
+				"title": "{{name}} kaldırılsın mı?",
+				"text": "Bu işlem modelin NPU payını boşaltır. Modeli şu anda kullanan, bu uygulamadan veya diğer istemcilerden gelen tüm istekler durdurulur."
+			}
+		},
+		"store": {
+			"loading": "Mağaza yükleniyor",
+			"search": "Mağazada ara",
+			"searchPlaceholder": "Model ara",
+			"allTypes": "Tüm türler",
+			"empty": "Aramanızla eşleşen mağaza modeli yok.",
+			"tableLabel": "Mağaza modelleri",
+			"trending": "popüler",
+			"stage": {
+				"starting": "Başlatılıyor",
+				"downloading": "İndiriliyor",
+				"verifying": "Doğrulanıyor",
+				"installing": "Kuruluyor"
+			},
+			"status": {
+				"loaded": "yüklü",
+				"downloaded": "indirildi",
+				"paused": "duraklatıldı %{{percent}}",
+				"downloading": "indiriliyor %{{percent}}",
+				"notDownloaded": "indirilmedi"
+			},
+			"downloadProgress": "indirme ilerlemesi",
+			"pause": "Duraklat",
+			"cancel": "İptal",
+			"resume": "Sürdür",
+			"download": "İndir",
+			"deviceReported": "Cihaz {{status}} bildirdi",
+			"streamEnded": "İndirme akışı model indirilmeden sona erdi",
+			"pausedDone": "{{name}} duraklatıldı. İstediğiniz zaman sürdürebilirsiniz.",
+			"downloaded": "{{name}} indirildi. Modeller sayfasından yükleyin.",
+			"cancelled": "{{name}} indirmesi iptal edildi.",
+			"failed": {
+				"download": "{{name}} indirilemedi: {{reason}}",
+				"pause": "{{name}} duraklatılamadı: {{reason}}",
+				"cancel": "{{name}} iptal edilemedi: {{reason}}"
+			},
+			"details": {
+				"tableLabel": "Model ayrıntıları",
+				"close": "Kapat",
+				"modelId": "Model kimliği",
+				"type": "Tür",
+				"parameters": "Parametreler",
+				"inputOutput": "Girdi → çıktı",
+				"npuShare": "NPU payı",
+				"contextWindow": "Bağlam penceresi",
+				"tokens_one": "{{tokens}} token",
+				"tokens_other": "{{tokens}} token",
+				"imageSize": "Görsel boyutu",
+				"defaultSteps": "Varsayılan adım",
+				"guidanceScale": "Guidance scale",
+				"reasoning": "Akıl yürütme",
+				"loadTime": "Yükleme süresi",
+				"loadSeconds": "yaklaşık {{seconds}} sn",
+				"downloadsLikes": "İndirme · beğeni",
+				"thinking": {
+					"none": "Yok",
+					"toggleable": "Kapatılabilir",
+					"alwaysOn": "Her zaman açık",
+					"levels": "seviyeler {{levels}}",
+					"defaultLevel": "varsayılan {{level}}"
+				}
+			}
+		},
+		"huggingFace": {
+			"verdict": {
+				"compatible": "uyumlu",
+				"needsBaseModel": "temel model gerekli",
+				"incompatible": "uyumlu değil"
+			},
+			"kind": {
+				"adapter": "LoRA adaptörü",
+				"fineTune": "ince ayar"
+			},
+			"search": {
+				"title": "Uyumlu modelleri bul",
+				"subheader": "Hugging Face'te bir mağaza modeli üzerine kurulmuş, cihaza göre denetlenen LoRA adaptörleri ve ince ayarlar.",
+				"baseModel": "Temel model",
+				"onDevice": "{{modelId}} (cihazda)",
+				"query": "Arama (isteğe bağlı)",
+				"submit": "Hugging Face'te ara",
+				"checkingBases": "Hangi mağaza modellerinin içe aktarma temeli olabileceği cihaza soruluyor…",
+				"autoCheck": "Sonuçları otomatik denetle",
+				"compatibleOnly": "Yalnızca uyumlular",
+				"limit": "Tür başına sonuç",
+				"searching": "Hugging Face'te aranıyor",
+				"empty": "Hugging Face'te {{base}} için adaptör veya ince ayar bulunamadı.",
+				"tableLabel": "Hugging Face depoları",
+				"groups": {
+					"importable": "İçe aktarılabilir temeller",
+					"checking": "Cihazla denetleniyor…",
+					"notOnHf": "Hugging Face'te yok",
+					"unsupported": "İçe aktarma desteklenmiyor"
+				},
+				"columns": {
+					"repo": "Depo",
+					"kind": "Tür",
+					"downloads": "İndirme",
+					"compatibility": "Uyumluluk",
+					"action": "İşlem"
+				},
+				"details": "Ayrıntılar",
+				"checking": "denetleniyor…",
+				"notChecked": "denetlenmedi",
+				"checkFailed": "denetim başarısız",
+				"downloadBase": "Önce Mağaza'dan {{name}} indirin",
+				"summary": {
+					"checked": "{{total}} içinden {{finished}} denetlendi · {{compatible}} uyumlu",
+					"needBase_one": "{{count}} tanesi temel model gerektiriyor",
+					"needBase_other": "{{count}} tanesi temel model gerektiriyor",
+					"hidden_one": "{{count}} uyumsuz gizlendi",
+					"hidden_other": "{{count}} uyumsuz gizlendi"
+				},
+				"checkingCompatibility": "Uyumluluk denetleniyor"
+			},
+			"check": {
+				"title": "Bir depoyu denetle",
+				"subheader": "Bir depoyu içe aktarıp aktaramayacağına cihaz karar verir.",
+				"repo": "Hugging Face deposu",
+				"placeholder": "org/name veya https://huggingface.co/org/name",
+				"checking": "Denetleniyor…",
+				"check": "Denetle",
+				"checkingRepo": "Depo denetleniyor",
+				"store": "Mağaza",
+				"needsBase": "{{name}} ({{modelId}}) Mağaza'dan cihaza indirildikten sonra içe aktarılabilir.",
+				"cannotImport": "Cihaz bu depoyu içe aktaramaz.",
+				"size": "Boyut {{size}}",
+				"baseModel": "temel model {{modelId}}",
+				"disk": "{{required}} disk alanı gerekiyor, {{available}} boş",
+				"toolkit": "İçe aktarma önce {{toolkit}} araç setini cihaza indirir ({{size}}).",
+				"noDisk": "Cihazda yeterli boş disk alanı yok.",
+				"bytes": "{{downloaded}} / {{total}}",
+				"importProgress": "içe aktarma ilerlemesi",
+				"continues": "İçe aktarma cihazda çalışır ve bu sayfadan ayrılsanız da devam eder.",
+				"cancelImport": "İçe aktarmayı iptal et",
+				"import": "Cihaza aktar",
+				"starting": "Başlatılıyor",
+				"importing": "İçe aktarılıyor",
+				"importFailed": "İçe aktarma başarısız",
+				"cancelled": "İçe aktarma iptal edildi.",
+				"imported": "{{repo}} içe aktarıldı. Modeller sayfasından yükleyin.",
+				"streamStopped": "İlerleme güncellemeleri durdu. İçe aktarma cihazda hâlâ çalışıyor olabilir."
+			}
+		}
+	},
+	"vault": {
+		"layout": {
+			"title": "Kasa",
+			"description": "Cihazın bilgi tabanı: dosyalarınız ve geçmiş sohbetlerin özetleri, modellerin arayabilmesi için cihazda dizinlenir.",
+			"tabs": {
+				"files": "Dosyalar",
+				"chatHistory": "Sohbet geçmişi"
+			}
+		},
+		"files": {
+			"title": "Dosyalar",
+			"subheader": "PDF, Word, Excel, CSV, metin, Markdown veya HTML; her biri en fazla 200 MB. Modeller bunları Görev modunda kullanır.",
+			"upload": "Dosya yükle",
+			"uploadInput": "Yüklenecek dosyalar",
+			"loading": "Kasa dosyaları yükleniyor",
+			"empty": "Henüz dosya yok. Modellerin kullanması için belge yükleyin.",
+			"fileCount_one": "{{count}} dosya",
+			"fileCount_other": "{{count}} dosya",
+			"columns": {
+				"file": "Dosya",
+				"size": "Boyut",
+				"added": "Eklenme",
+				"status": "Durum"
+			},
+			"status": {
+				"indexed": "Dizinlendi",
+				"indexFailed": "Dizinleme başarısız",
+				"notIndexed": "Dizinlenmedi"
+			},
+			"actions": {
+				"index": "Dizinle",
+				"download": "İndir",
+				"rename": "Yeniden adlandır",
+				"delete": "Sil"
+			},
+			"progress": {
+				"label": "Kasa ilerlemesi",
+				"line": "{{label}}: {{message}}",
+				"uploading": "Yükleniyor…",
+				"indexing": "Dizinleniyor…",
+				"loadingModel": "Embedding modeli yükleniyor",
+				"stage": "Dizinleme: {{stage}}",
+				"withChunks": "{{stage}} ({{processed}}/{{total}} parça)",
+				"retrying": "Cihazda dizinleme başarısız oldu, yeniden deneniyor…"
+			},
+			"outcome": {
+				"added": "{{label}} Kasa'ya eklendi.",
+				"indexed": "{{name}} dizinlendi.",
+				"renamed": "{{name}} olarak yeniden adlandırıldı.",
+				"deleted": "{{name}} silindi."
+			},
+			"errors": {
+				"device": "Cihaz bir hata bildirdi",
+				"uploadUnconfirmed": "Cihaz yüklemeyi onaylamadı"
+			},
+			"renameDialog": {
+				"title": "Dosyayı yeniden adlandır",
+				"name": "Dosya adı",
+				"cancel": "İptal",
+				"confirm": "Yeniden adlandır"
+			},
+			"deleteDialog": {
+				"title": "Dosya silinsin mi?",
+				"text": "{{name}} ve dizini cihazdan silinsin mi? Modeller artık onu bulamaz.",
+				"confirm": "Sil"
+			}
+		},
+		"search": {
+			"title": "Kasa'da ara",
+			"subheader": "Modellerin Kasa'da arama yaptığında bulduğu sonuçlar",
+			"label": "Ara",
+			"submit": "Ara",
+			"searching": "Aranıyor…",
+			"empty": "İlgili bir şey bulunamadı."
+		},
+		"chatHistory": {
+			"title": "Sohbet geçmişi",
+			"subheader": "Geçmiş konuşmaların Kasa'da tutulan günlük özetleri.",
+			"loading": "Sohbet geçmişi yükleniyor",
+			"empty": "Henüz özet yok.",
+			"read": "Oku",
+			"hide": "Gizle",
+			"delete": "Sil",
+			"loadingSummary": "Özet yükleniyor",
+			"deleted": "{{day}} özeti silindi.",
+			"deleteDialog": {
+				"title": "Özet silinsin mi?",
+				"text": "{{day}} özeti silinsin mi? Modeller artık o günün konuşmalarını hatırlamaz.",
+				"confirm": "Sil"
+			}
+		},
+		"summarySettings": {
+			"loading": "Günlük özetler yükleniyor",
+			"enabled": "Günlük özetler",
+			"time": "Saat",
+			"deviceTime": "Cihazda {{time}} ({{zone}})",
+			"model": "Model",
+			"save": "Kaydet",
+			"saving": "Kaydediliyor…",
+			"savedOn": "Günlük özetler açık, saat {{time}}.",
+			"savedOff": "Günlük özetler kapalı.",
+			"description": "Cihaz her gün o günün konuşmalarını özetleyip Kasa'ya kaydeder; böylece modeller bunları Görev modunda hatırlayabilir. Bu sırada modeli yükler, bu da modeli bir süre meşgul edebilir."
+		}
+	},
+	"playground": {
+		"layout": {
+			"title": "Deneme alanı",
+			"description": "Cihazın konuşma, görüntü, embedding ve yeniden sıralama modellerini deneyin ve metin modellerinin hızını ölçün (tiiny CLI'daki gibi). Model ilk çalıştırmada yüklenir."
+		},
+		"tabs": {
+			"asr": {
+				"label": "Konuşmadan metne",
+				"intro": "Bir WAV kaydını konuşma tanıma modeliyle yazıya dökün."
+			},
+			"tts": {
+				"label": "Metinden konuşmaya",
+				"intro": "Bir ses modeliyle metni konuşmaya dönüştürün."
+			},
+			"ocr": {
+				"label": "OCR",
+				"intro": "Bir görseldeki metni okuyun."
+			},
+			"embed": {
+				"label": "Embedding",
+				"intro": "Metinleri vektörlere dönüştürün ve ne kadar benzer olduklarını karşılaştırın."
+			},
+			"rerank": {
+				"label": "Yeniden sıralama",
+				"intro": "Belgeleri bir sorguyu ne kadar iyi yanıtladıklarına göre sıralayın."
+			},
+			"text": {
+				"label": "Hız testi",
+				"intro": "Bir metin modelinin ne kadar hızlı ürettiğini ölçün, tiiny bench gibi."
+			}
+		},
+		"model": {
+			"label": "Model",
+			"loadsWhenRun": "{{name}} (çalıştırınca yüklenir)"
+		},
+		"loading": "Modeller yükleniyor",
+		"noModel": "Bunun için indirilmiş bir model yok. Mağazadan bir tane edinin.",
+		"run": "Çalıştır",
+		"running": "Çalışıyor…",
+		"asr": {
+			"chooseFile": "Bir WAV dosyası seçin",
+			"fileInput": "Ses dosyası"
+		},
+		"tts": {
+			"text": "Metin",
+			"voice": "Ses (isteğe bağlı)",
+			"voiceHelp": "Yalnızca bazı ses modelleri gerektirir, örn. Supertonic.",
+			"download": "İndir"
+		},
+		"ocr": {
+			"chooseImage": "Görsel seç",
+			"imageInput": "Görsel dosyası",
+			"noText": "Metin bulunamadı.",
+			"lines": "Tanınan satırlar",
+			"score": "%{{value}}"
+		},
+		"embed": {
+			"texts": "Metinler",
+			"textsHelp": "Her satıra bir metin",
+			"summary_one": "{{count}} boyut. Kosinüs benzerliği:",
+			"summary_other": "{{count}} boyut. Kosinüs benzerliği:"
+		},
+		"rerank": {
+			"query": "Sorgu",
+			"documents": "Belgeler",
+			"documentsHelp": "Her satıra bir belge",
+			"results": "Sıralanmış belgeler"
+		},
+		"bench": {
+			"tokensInput": "Üretilecek token",
+			"results": "Hız testi",
+			"speed": "Üretim hızı",
+			"speedValue": "{{value}} token/sn",
+			"firstToken": "İlk token süresi",
+			"seconds": "{{value}} sn",
+			"tokens": "Token",
+			"tokensValue": "{{prompt}} giriş · {{completion}} çıkış · toplam {{total}} sn"
+		}
+	},
+	"overview": {
+		"title": "Genel bakış",
+		"npuReady": "NPU hazır.",
+		"loading": "Cihaz durumu yükleniyor",
+		"retry": "Yeniden dene",
+		"staleValues": "Bilinen son değerler gösteriliyor. {{error}}",
+		"percent": "%{{value}}",
+		"usedOfTotal": "{{used}} / {{total}}",
+		"stats": {
+			"npuUtilization": "NPU kullanımı",
+			"npuReserved": "{{percent}} yüklü modellerce ayrıldı",
+			"npuMemory": "NPU belleği",
+			"systemMemory": "Sistem belleği",
+			"systemMemoryCaption": "CPU {{cpu}} · {{used}} / {{total}} RAM",
+			"storage": "Depolama",
+			"progress": "{{title}} {{percent}}"
+		},
+		"running": {
+			"title": "Yüklü modeller",
+			"empty": "Yüklü model yok. Modeller sayfasından bir model yükleyin.",
+			"columns": {
+				"model": "Model",
+				"type": "Tür",
+				"status": "Durum",
+				"npuShare": "NPU payı",
+				"activeRequests": "Etkin istekler"
+			}
+		},
+		"usage": {
+			"title": "Token kullanımı",
+			"subheader": "{{tokens}}, {{requests}} (metin modelleri)",
+			"subheaderLoading": "Metin modelleri",
+			"tokens_one": "{{value}} token",
+			"tokens_other": "{{value}} token",
+			"requests_one": "{{value}} istek",
+			"requests_other": "{{value}} istek",
+			"previousWeek": "Önceki hafta",
+			"nextWeek": "Sonraki hafta",
+			"weekRange": "{{start}} – {{end}}",
+			"dayBar": "{{day}}: {{tokens}}",
+			"segment": "{{day}} · {{model}}: {{tokens}}",
+			"other": "Diğer",
+			"showTable": "Tablo olarak göster",
+			"showChart": "Grafiği göster",
+			"loading": "Token kullanımı yükleniyor",
+			"empty": "Bu hafta token yok.",
+			"table": {
+				"label": "Günlere göre token kullanımı",
+				"day": "Gün",
+				"model": "Model",
+				"requests": "İstekler",
+				"prompt": "İstem",
+				"completion": "Yanıt",
+				"total": "Toplam"
+			}
+		},
+		"apps": {
+			"title": "Uygulamaya göre kullanım",
+			"subheader": "Bu haftaki tokenlar, uygulamaya göre",
+			"label": "Uygulamaya göre kullanım",
+			"loading": "Uygulama kullanımı yükleniyor",
+			"empty": "Bu hafta token yok."
+		}
+	},
+	"server": {
+		"done": "Tamamlandı",
+		"models": {
+			"allUnloaded": "Tüm modeller kaldırıldı"
+		},
+		"settings": {
+			"shuttingDown": "Kapanıyor",
+			"restarting": "Yeniden başlatılıyor",
+			"enabled": "Etkin",
+			"disabled": "Devre dışı",
+			"specs": {
+				"peakInt8": "En yüksek INT8",
+				"storage": "Depolama",
+				"network": "Ağ"
+			}
+		},
+		"connectors": {
+			"connected": "Bağlı",
+			"notConnected": "Bağlı değil",
+			"unavailable": "Kullanılamıyor",
+			"waitingForQr": "QR taraması bekleniyor",
+			"scanQr": "QR kodunu WhatsApp ile tarayın",
+			"signIn": "{{provider}} hesabınızla giriş yapın",
+			"names": {
+				"email": "E-posta (IMAP/SMTP)",
+				"telegram": "Telegram botu",
+				"discord": "Discord botu"
+			}
+		},
+		"backup": {
+			"categories": {
+				"conversationService": "Sohbet geçmişi",
+				"knowledgeBase": "Kasa ve kişiselleştirme",
+				"agentUsage": "Ajan kullanımı",
+				"connectorService": "Bağlayıcılar",
+				"scheduled": "Zamanlanmış görevler",
+				"skills": "Beceriler"
+			}
+		},
+		"usage": {
+			"otherApps": "API ve diğer uygulamalar"
+		},
+		"task": {
+			"searchedVault": "Kasa'da arandı: {{query}}",
+			"readHost": "{{host}} okundu",
+			"readWebPage": "Bir web sayfası okundu",
+			"updatedOccupation": "Mesleğiniz güncellendi",
+			"updatedPreferences": "Tercihleriniz güncellendi",
+			"updatedRecentFocus": "Güncel odağınız güncellendi",
+			"updatedProfile": "Profiliniz güncellendi",
+			"updatedField": "{{field}} alanınız güncellendi"
+		}
+	}
+}

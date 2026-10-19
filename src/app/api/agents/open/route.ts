@@ -8,9 +8,10 @@ import { createHandoffToken } from "@/server/shared/session-token.mjs";
 // redirects to the agent host with a one-time link, which signs that host in.
 export const GET = apiRoute(async (request) => {
 	const domain = agentDomain();
-	if (!domain) throw new DeviceError("Agent subdomains are not configured (AGENT_DOMAIN)", 404);
+	if (!domain) throw new DeviceError("errors.agents.noDomain", 404);
 	const serviceId = new URL(request.url).searchParams.get("id")?.toLowerCase() ?? "";
-	if (!/^[a-z0-9-]+$/.test(serviceId)) throw new DeviceError("Expected ?id=<agent service id>", 400);
+	if (!/^[a-z0-9-]+$/.test(serviceId))
+		throw new DeviceError("errors.request.expected", 400, { shape: "?id=<agent service id>" });
 	const port = /:(\d+)$/.exec(request.headers.get("host") ?? "")?.[1];
 	const target = new URL(`https://${serviceId}.${domain}${port ? `:${port}` : ""}${HANDOFF_PATH}`);
 	target.searchParams.set("token", createHandoffToken(serviceId));

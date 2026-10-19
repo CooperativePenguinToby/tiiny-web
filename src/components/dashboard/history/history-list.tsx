@@ -10,12 +10,13 @@ import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 import type { ConversationSummary } from "@/types/device";
 import { paths } from "@/paths";
 import { postJson } from "@/lib/api";
 import { responseError } from "@/lib/sse";
+import { useFormat } from "@/i18n/client";
 import { usePolling } from "@/hooks/use-polling";
 import { ConfirmDialog } from "@/components/dashboard/settings/confirm-dialog";
 
@@ -24,6 +25,8 @@ type Found = ConversationSummary & { snippet?: string };
 const errorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
 export function HistoryList(): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const all = usePolling<ConversationSummary[]>("/api/history", 30_000);
 	const [query, setQuery] = React.useState("");
 	const [found, setFound] = React.useState<{ query: string; items: Found[] } | null>(null);
@@ -80,7 +83,7 @@ export function HistoryList(): React.JSX.Element {
 			>
 				<TextField
 					fullWidth
-					label="Search conversations"
+					label={t("chat.history.search")}
 					onChange={(event) => {
 						setQuery(event.target.value);
 						if (!event.target.value.trim()) setFound(null);
@@ -89,7 +92,7 @@ export function HistoryList(): React.JSX.Element {
 					value={query}
 				/>
 				<Button disabled={searching} type="submit" variant="contained">
-					{searching ? "Searching…" : "Search"}
+					{t(searching ? "chat.history.searching" : "chat.history.searchButton")}
 				</Button>
 			</Stack>
 			{error ? (
@@ -101,7 +104,7 @@ export function HistoryList(): React.JSX.Element {
 			{items === null ? (
 				all.isLoading ? (
 					<Stack sx={{ alignItems: "center", py: 6 }}>
-						<CircularProgress aria-label="Loading conversations" />
+						<CircularProgress aria-label={t("chat.history.loading")} />
 					</Stack>
 				) : null
 			) : items.length === 0 ? (
@@ -111,7 +114,7 @@ export function HistoryList(): React.JSX.Element {
 						color: "text.secondary",
 					}}
 				>
-					{found ? `No conversations mention “${found.query}”.` : "No conversations yet. Chats you have are kept here."}
+					{found ? t("chat.history.noMatches", { query: found.query }) : t("chat.history.empty")}
 				</Typography>
 			) : (
 				<Card>
@@ -131,7 +134,7 @@ export function HistoryList(): React.JSX.Element {
 										sx={{ color: "inherit", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
 										variant="subtitle2"
 									>
-										{conversation.title || "Untitled"}
+										{conversation.title || t("chat.history.untitled")}
 									</Typography>
 									{conversation.snippet ? (
 										<Typography
@@ -150,11 +153,11 @@ export function HistoryList(): React.JSX.Element {
 											color: "text.secondary",
 										}}
 									>
-										{dayjs(conversation.updatedAt).format("D MMM YYYY HH:mm")}
+										{format.date(conversation.updatedAt).format("D MMM YYYY HH:mm")}
 									</Typography>
 								</Stack>
 								<Button color="error" onClick={() => setDeleting(conversation)} size="small">
-									Delete
+									{t("chat.history.delete")}
 								</Button>
 							</Stack>
 						))}
@@ -162,12 +165,12 @@ export function HistoryList(): React.JSX.Element {
 				</Card>
 			)}
 			<ConfirmDialog
-				confirmLabel="Delete"
+				confirmLabel={t("chat.history.delete")}
 				onCancel={() => setDeleting(null)}
 				onConfirm={() => deleting && void remove(deleting)}
 				open={deleting !== null}
-				text={`Delete “${deleting?.title ?? ""}” from the device? It is removed from TiinyOS too.`}
-				title="Delete conversation?"
+				text={t("chat.history.confirmText", { title: deleting?.title ?? "" })}
+				title={t("chat.history.confirmTitle")}
 			/>
 		</Stack>
 	);

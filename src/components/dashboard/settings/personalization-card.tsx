@@ -10,16 +10,41 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import type { ParseKeys } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import type { Personalization } from "@/types/device";
 import { responseError } from "@/lib/sse";
 
-const FIELDS: { key: keyof Personalization; label: string; limit: number; multiline?: boolean; hint: string }[] = [
-	{ key: "userName", label: "Name", limit: 30, hint: "What models call you." },
-	{ key: "occupation", label: "Occupation", limit: 50, hint: "For example: software engineer." },
-	{ key: "preferences", label: "Preferences", limit: 1000, multiline: true, hint: "How you like answers." },
-	{ key: "recentFocus", label: "Recent focus", limit: 1000, multiline: true, hint: "What you are working on." },
-];
+const FIELDS: { key: keyof Personalization; label: ParseKeys; limit: number; multiline?: boolean; hint: ParseKeys }[] =
+	[
+		{
+			key: "userName",
+			label: "settings.personalization.fields.userName.label",
+			limit: 30,
+			hint: "settings.personalization.fields.userName.hint",
+		},
+		{
+			key: "occupation",
+			label: "settings.personalization.fields.occupation.label",
+			limit: 50,
+			hint: "settings.personalization.fields.occupation.hint",
+		},
+		{
+			key: "preferences",
+			label: "settings.personalization.fields.preferences.label",
+			limit: 1000,
+			multiline: true,
+			hint: "settings.personalization.fields.preferences.hint",
+		},
+		{
+			key: "recentFocus",
+			label: "settings.personalization.fields.recentFocus.label",
+			limit: 1000,
+			multiline: true,
+			hint: "settings.personalization.fields.recentFocus.hint",
+		},
+	];
 
 type Loaded = { profile: Personalization } | { error: string };
 
@@ -32,6 +57,7 @@ async function loadProfile(): Promise<Loaded> {
 }
 
 export function PersonalizationCard(): React.JSX.Element {
+	const { t } = useTranslation();
 	const [saved, setSaved] = React.useState<Personalization | null>(null);
 	const [draft, setDraft] = React.useState<Personalization | null>(null);
 	const [error, setError] = React.useState<string | null>(null);
@@ -73,7 +99,7 @@ export function PersonalizationCard(): React.JSX.Element {
 			const profile = (await response.json()) as Personalization;
 			setSaved(profile);
 			setDraft(profile);
-			setNotice("Saved. Models see it from the next Task mode conversation.");
+			setNotice(t("settings.personalization.saved"));
 		} catch (error_) {
 			setError(error_ instanceof Error ? error_.message : String(error_));
 		} finally {
@@ -86,7 +112,7 @@ export function PersonalizationCard(): React.JSX.Element {
 
 	return (
 		<Card data-testid="settings-personalization">
-			<CardHeader subheader="Context the device gives models about you in Task mode" title="Personalization" />
+			<CardHeader subheader={t("settings.personalization.subheader")} title={t("settings.personalization.title")} />
 			<Divider />
 			<CardContent>
 				{draft ? (
@@ -94,9 +120,13 @@ export function PersonalizationCard(): React.JSX.Element {
 						{FIELDS.map(({ key, label, limit, multiline, hint }) => (
 							<TextField
 								error={draft[key].length > limit}
-								helperText={`${hint} ${draft[key].length}/${limit}`}
+								helperText={t("settings.personalization.fieldHelper", {
+									hint: t(hint),
+									length: draft[key].length,
+									limit,
+								})}
 								key={key}
-								label={label}
+								label={t(label)}
 								maxRows={8}
 								minRows={multiline ? 3 : undefined}
 								multiline={multiline}
@@ -112,10 +142,10 @@ export function PersonalizationCard(): React.JSX.Element {
 						) : null}
 						<Stack direction="row" spacing={1}>
 							<Button disabled={!isChanged || isInvalid || saving} onClick={() => void save()} variant="contained">
-								{saving ? "Saving…" : "Save"}
+								{t(saving ? "settings.actions.saving" : "settings.actions.save")}
 							</Button>
 							<Button disabled={!isChanged || saving} onClick={() => setDraft(saved)}>
-								Discard changes
+								{t("settings.personalization.discardChanges")}
 							</Button>
 						</Stack>
 					</Stack>
@@ -123,7 +153,7 @@ export function PersonalizationCard(): React.JSX.Element {
 					<Alert
 						action={
 							<Button color="inherit" onClick={() => void retry()} size="small">
-								Retry
+								{t("settings.actions.retry")}
 							</Button>
 						}
 						severity="error"
@@ -132,7 +162,7 @@ export function PersonalizationCard(): React.JSX.Element {
 					</Alert>
 				) : (
 					<Stack sx={{ alignItems: "center", py: 4 }}>
-						<CircularProgress aria-label="Loading personalization" />
+						<CircularProgress aria-label={t("settings.personalization.loading")} />
 					</Stack>
 				)}
 			</CardContent>

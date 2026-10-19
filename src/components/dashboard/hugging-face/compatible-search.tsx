@@ -25,9 +25,12 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import type { ParseKeys } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import type { HfRepository, StoreModel } from "@/types/device";
 import { responseError } from "@/lib/sse";
+import { useFormat } from "@/i18n/client";
 import { useDeviceChecks, type Check } from "@/hooks/use-device-checks";
 
 export interface CompatibleSearchProperties {
@@ -89,11 +92,11 @@ function useSettings(): [Settings, (change: Partial<Settings>) => void] {
 type BaseGroup = "importable" | "checking" | "not-on-hf" | "unsupported";
 
 const GROUP_ORDER: BaseGroup[] = ["importable", "checking", "not-on-hf", "unsupported"];
-const GROUP_TITLES: Record<BaseGroup, string> = {
-	importable: "Importable bases",
-	checking: "Checking with the device…",
-	"not-on-hf": "Not on Hugging Face",
-	unsupported: "Not supported for import",
+const GROUP_TITLES: Record<BaseGroup, ParseKeys> = {
+	importable: "models.huggingFace.search.groups.importable",
+	checking: "models.huggingFace.search.groups.checking",
+	"not-on-hf": "models.huggingFace.search.groups.notOnHf",
+	unsupported: "models.huggingFace.search.groups.unsupported",
 };
 
 function baseGroup(check: Check | undefined): BaseGroup {
@@ -122,6 +125,7 @@ function GroupHeader({ children, ...injected }: { children: React.ReactNode }): 
 }
 
 function VerdictCell({ check }: { check: Check | undefined }): React.JSX.Element {
+	const { t } = useTranslation();
 	if (!check || check.state === "checking") {
 		return (
 			<Typography
@@ -130,25 +134,26 @@ function VerdictCell({ check }: { check: Check | undefined }): React.JSX.Element
 					color: "text.secondary",
 				}}
 			>
-				{check ? "checking…" : "not checked"}
+				{t(check ? "models.huggingFace.search.checking" : "models.huggingFace.search.notChecked")}
 			</Typography>
 		);
 	}
 	if (check.state === "error") {
 		return (
 			<Typography color="error" title={check.message} variant="body2">
-				check failed
+				{t("models.huggingFace.search.checkFailed")}
 			</Typography>
 		);
 	}
 	const { verdict, requiredBaseModel, reason, reasonCode } = check.result;
-	if (verdict === "compatible") return <Chip color="success" label="compatible" size="small" />;
+	if (verdict === "compatible")
+		return <Chip color="success" label={t("models.huggingFace.verdict.compatible")} size="small" />;
 	return (
 		<Stack spacing={0.5} sx={{ alignItems: "flex-start" }}>
 			{verdict === "needs-base-model" ? (
-				<Chip color="warning" label="needs base model" size="small" />
+				<Chip color="warning" label={t("models.huggingFace.verdict.needsBaseModel")} size="small" />
 			) : (
-				<Chip color="error" label="not compatible" size="small" />
+				<Chip color="error" label={t("models.huggingFace.verdict.incompatible")} size="small" />
 			)}
 			<Typography
 				variant="caption"
@@ -157,7 +162,7 @@ function VerdictCell({ check }: { check: Check | undefined }): React.JSX.Element
 				}}
 			>
 				{verdict === "needs-base-model" && requiredBaseModel
-					? `Download ${requiredBaseModel.name} from the Store first`
+					? t("models.huggingFace.search.downloadBase", { name: requiredBaseModel.name })
 					: (reason ?? reasonCode)}
 			</Typography>
 		</Stack>
@@ -165,6 +170,8 @@ function VerdictCell({ check }: { check: Check | undefined }): React.JSX.Element
 }
 
 export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const [store, setStore] = React.useState<StoreModel[] | null>(null);
 	const [base, setBase] = React.useState<string>("");
 	const [query, setQuery] = React.useState<string>("");
@@ -224,10 +231,7 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React
 
 	return (
 		<Card>
-			<CardHeader
-				subheader="LoRA adapters and fine-tunes on Hugging Face built on a store model, checked against the device."
-				title="Find compatible models"
-			/>
+			<CardHeader subheader={t("models.huggingFace.search.subheader")} title={t("models.huggingFace.search.title")} />
 			<Divider />
 			<Stack
 				component="form"
@@ -240,10 +244,10 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React
 				sx={{ p: 2 }}
 			>
 				<FormControl sx={{ minWidth: 340 }}>
-					<InputLabel id="hf-base-label">Base model</InputLabel>
+					<InputLabel id="hf-base-label">{t("models.huggingFace.search.baseModel")}</InputLabel>
 					<Select
 						disabled={!store}
-						label="Base model"
+						label={t("models.huggingFace.search.baseModel")}
 						labelId="hf-base-label"
 						onChange={(event) => setBase(event.target.value)}
 						value={base}
@@ -252,11 +256,12 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React
 							const models = grouped.get(group)!;
 							if (models.length === 0) return [];
 							return [
-								<GroupHeader key={`group-${group}`}>{GROUP_TITLES[group]}</GroupHeader>,
+								<GroupHeader key={`group-${group}`}>{t(GROUP_TITLES[group])}</GroupHeader>,
 								...models.map((model) => (
 									<MenuItem key={model.modelId} value={model.modelId}>
-										{model.modelId}
-										{model.status === "not_downloaded" ? "" : " (on device)"}
+										{model.status === "not_downloaded"
+											? model.modelId
+											: t("models.huggingFace.search.onDevice", { modelId: model.modelId })}
 									</MenuItem>
 								)),
 							];
@@ -264,13 +269,13 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React
 					</Select>
 				</FormControl>
 				<TextField
-					label="Search (optional)"
+					label={t("models.huggingFace.search.query")}
 					onChange={(event) => setQuery(event.target.value)}
 					sx={{ flex: "1 1 auto" }}
 					value={query}
 				/>
 				<Button disabled={!base || searching} sx={{ flexShrink: 0 }} type="submit" variant="contained">
-					Search Hugging Face
+					{t("models.huggingFace.search.submit")}
 				</Button>
 			</Stack>
 			{baseChecksPending ? (
@@ -283,7 +288,7 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React
 						pb: 1,
 					}}
 				>
-					Asking the device which store models can be import bases…
+					{t("models.huggingFace.search.checkingBases")}
 				</Typography>
 			) : null}
 			<Stack direction="row" spacing={3} sx={{ alignItems: "center", flexWrap: "wrap", px: 2, pb: 2 }}>
@@ -295,7 +300,7 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React
 							slotProps={{ input: { role: "switch" } }}
 						/>
 					}
-					label="Auto-check results"
+					label={t("models.huggingFace.search.autoCheck")}
 				/>
 				<FormControlLabel
 					control={
@@ -305,25 +310,25 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React
 							slotProps={{ input: { role: "switch" } }}
 						/>
 					}
-					label="Compatible only"
+					label={t("models.huggingFace.search.compatibleOnly")}
 				/>
 				<FormControl size="small" sx={{ minWidth: 160 }}>
-					<InputLabel id="hf-limit-label">Results per kind</InputLabel>
+					<InputLabel id="hf-limit-label">{t("models.huggingFace.search.limit")}</InputLabel>
 					<Select
-						label="Results per kind"
+						label={t("models.huggingFace.search.limit")}
 						labelId="hf-limit-label"
 						onChange={(event) => updateSettings({ limit: Number(event.target.value) })}
 						value={settings.limit}
 					>
 						{LIMIT_OPTIONS.map((option) => (
 							<MenuItem key={option} value={option}>
-								{option}
+								{format.number(option)}
 							</MenuItem>
 						))}
 					</Select>
 				</FormControl>
 			</Stack>
-			{searching ? <LinearProgress aria-label="Searching Hugging Face" /> : null}
+			{searching ? <LinearProgress aria-label={t("models.huggingFace.search.searching")} /> : null}
 			{error ? (
 				<Alert severity="error" sx={{ m: 2 }}>
 					{error}
@@ -340,18 +345,18 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React
 						p: 3,
 					}}
 				>
-					No adapters or fine-tunes of {base} found on Hugging Face.
+					{t("models.huggingFace.search.empty", { base })}
 				</Typography>
 			) : (
 				<Box sx={{ overflowX: "auto" }}>
-					<Table aria-label="Hugging Face repos" sx={{ minWidth: 700 }}>
+					<Table aria-label={t("models.huggingFace.search.tableLabel")} sx={{ minWidth: 700 }}>
 						<TableHead>
 							<TableRow>
-								<TableCell>Repo</TableCell>
-								<TableCell>Kind</TableCell>
-								<TableCell align="right">Downloads</TableCell>
-								<TableCell>Compatibility</TableCell>
-								<TableCell align="right">Action</TableCell>
+								<TableCell>{t("models.huggingFace.search.columns.repo")}</TableCell>
+								<TableCell>{t("models.huggingFace.search.columns.kind")}</TableCell>
+								<TableCell align="right">{t("models.huggingFace.search.columns.downloads")}</TableCell>
+								<TableCell>{t("models.huggingFace.search.columns.compatibility")}</TableCell>
+								<TableCell align="right">{t("models.huggingFace.search.columns.action")}</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
@@ -372,15 +377,22 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React
 										</Link>
 									</TableCell>
 									<TableCell>
-										<Chip label={repository.relation === "adapter" ? "LoRA adapter" : "fine-tune"} size="small" />
+										<Chip
+											label={t(
+												repository.relation === "adapter"
+													? "models.huggingFace.kind.adapter"
+													: "models.huggingFace.kind.fineTune"
+											)}
+											size="small"
+										/>
 									</TableCell>
-									<TableCell align="right">{repository.downloads.toLocaleString()}</TableCell>
+									<TableCell align="right">{format.number(repository.downloads)}</TableCell>
 									<TableCell data-testid="hf-verdict-cell">
 										<VerdictCell check={repositoryChecks[repository.repoId]} />
 									</TableCell>
 									<TableCell align="right">
 										<Button onClick={() => onCheck(repository.repoId)} size="small">
-											Details
+											{t("models.huggingFace.search.details")}
 										</Button>
 									</TableCell>
 								</TableRow>
@@ -411,6 +423,7 @@ function CheckSummary({
 	checks: Record<string, Check>;
 	compatibleOnly: boolean;
 }): React.JSX.Element {
+	const { t } = useTranslation();
 	const ids = [...new Set(repos.map((repository) => repository.repoId))];
 	const finished = ids.filter((id) => checks[id]?.state === "done" || checks[id]?.state === "error").length;
 	const count = (verdict: string): number =>
@@ -431,13 +444,17 @@ function CheckSummary({
 					color: "text.secondary",
 				}}
 			>
-				Checked {finished} of {ids.length} · {count("compatible")} compatible
-				{needsBase > 0 ? ` · ${needsBase} need a base model` : ""}
-				{hidden > 0 ? ` · ${hidden} incompatible hidden` : ""}
+				{t("models.huggingFace.search.summary.checked", {
+					finished,
+					total: ids.length,
+					compatible: count("compatible"),
+				})}
+				{needsBase > 0 ? ` · ${t("models.huggingFace.search.summary.needBase", { count: needsBase })}` : ""}
+				{hidden > 0 ? ` · ${t("models.huggingFace.search.summary.hidden", { count: hidden })}` : ""}
 			</Typography>
 			{isChecking ? (
 				<LinearProgress
-					aria-label="Checking compatibility"
+					aria-label={t("models.huggingFace.search.checkingCompatibility")}
 					value={(finished / ids.length) * 100}
 					variant="determinate"
 				/>

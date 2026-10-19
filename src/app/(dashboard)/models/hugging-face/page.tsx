@@ -4,11 +4,16 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { config } from "@/config";
+import { getT } from "@/i18n/server";
 import { HuggingFacePanel } from "@/components/dashboard/hugging-face/hugging-face-panel";
 
-export const metadata = { title: `Hugging Face | ${config.site.name}` } satisfies Metadata;
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getT();
+	return { title: t("titles.page", { page: t("titles.huggingFace"), site: config.site.name }) };
+}
 
-export default function Page(): React.JSX.Element {
+export default async function Page(): Promise<React.JSX.Element> {
+	const t = await getT();
 	return (
 		<Stack spacing={3}>
 			<Typography
@@ -17,8 +22,7 @@ export default function Page(): React.JSX.Element {
 					color: "text.secondary",
 				}}
 			>
-				Import custom models from Hugging Face. The device decides what it can import: typically fine-tunes and LoRA
-				adapters of models in its store, some only after that store model is downloaded.
+				{t("models.pages.huggingFace")}
 			</Typography>
 			<HuggingFacePanel />
 		</Stack>

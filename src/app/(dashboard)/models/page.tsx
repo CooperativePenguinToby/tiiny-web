@@ -4,11 +4,16 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { config } from "@/config";
+import { getT } from "@/i18n/server";
 import { ModelsTable } from "@/components/dashboard/models/models-table";
 
-export const metadata = { title: `Models | ${config.site.name}` } satisfies Metadata;
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getT();
+	return { title: t("titles.page", { page: t("titles.models"), site: config.site.name }) };
+}
 
-export default function Page(): React.JSX.Element {
+export default async function Page(): Promise<React.JSX.Element> {
+	const t = await getT();
 	return (
 		<Stack spacing={3}>
 			<Typography
@@ -17,7 +22,7 @@ export default function Page(): React.JSX.Element {
 					color: "text.secondary",
 				}}
 			>
-				Load a downloaded model into NPU memory, or unload it to free space.
+				{t("models.pages.models")}
 			</Typography>
 			<ModelsTable />
 		</Stack>

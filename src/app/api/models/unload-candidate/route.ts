@@ -12,7 +12,8 @@ interface Candidate {
 // GET ?modelId=…: whether loading the model first needs other models unloaded, and which.
 export const GET = apiRoute(async (request) => {
 	const modelId = new URL(request.url).searchParams.get("modelId") ?? "";
-	if (!/^[\w.-]+\/[\w.-]+$/.test(modelId)) throw new DeviceError("modelId must look like Org/Name", 400);
+	if (!/^[\w.-]+\/[\w.-]+$/.test(modelId))
+		throw new DeviceError("errors.request.modelIdFormat", 400, { field: "modelId" });
 	const [reply, downloaded] = await Promise.all([
 		deviceJson<Candidate>(`/api/v1/models/${modelPath(modelId)}/unload_candidate`),
 		deviceJson<{ data: { model_id: string; display_name: string }[] }>("/api/v1/models/?including_downloading=false"),

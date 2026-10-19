@@ -9,6 +9,7 @@ export async function agentIdFrom(request: Request, field: "serviceId" | "appId"
 		body = {};
 	}
 	const value = body[field];
-	if (typeof value !== "string" || !/^[\w.-]{1,128}$/.test(value)) throw new DeviceError(`${field} is required`, 400);
+	if (typeof value !== "string" || !/^[\w.-]{1,128}$/.test(value))
+		throw new DeviceError("errors.request.required", 400, { field });
 	return value;
 }

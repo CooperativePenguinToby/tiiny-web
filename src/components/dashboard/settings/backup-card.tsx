@@ -12,10 +12,11 @@ import Divider from "@mui/material/Divider";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useTranslation } from "react-i18next";
 
 import type { BackupArchive, BackupCategory, RestoreEvent } from "@/types/device";
-import { formatBytes } from "@/lib/format";
 import { readSse, responseError } from "@/lib/sse";
+import { useFormat } from "@/i18n/client";
 import { usePolling } from "@/hooks/use-polling";
 
 import { ConfirmDialog } from "./confirm-dialog";
@@ -23,6 +24,8 @@ import { ConfirmDialog } from "./confirm-dialog";
 const errorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
 function BackupSection(): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	const categories = usePolling<BackupCategory[]>("/api/backup", 60_000);
 	const [chosen, setChosen] = React.useState<Set<string> | null>(null);
 	const [busy, setBusy] = React.useState(false);
@@ -36,7 +39,7 @@ function BackupSection(): React.JSX.Element {
 		return categories.error ? (
 			<Alert severity="error">{categories.error}</Alert>
 		) : (
-			<CircularProgress aria-label="Loading backup" />
+			<CircularProgress aria-label={t("settings.backup.backUp.loading")} />
 		);
 	}
 
@@ -67,9 +70,13 @@ function BackupSection(): React.JSX.Element {
 				failed.length > 0
 					? {
 							severity: "warning",
-							message: `Saved ${name} (${formatBytes(blob.size)}), without: ${failed.join(", ")}.`,
+							message: t("settings.backup.backUp.savedWithout", {
+								name,
+								size: format.bytes(blob.size),
+								failed: failed.join(", "),
+							}),
 						}
-					: { severity: "success", message: `Saved ${name} (${formatBytes(blob.size)}).` }
+					: { severity: "success", message: t("settings.backup.backUp.saved", { name, size: format.bytes(blob.size) }) }
 			);
 		} catch (error) {
 			setOutcome({ severity: "error", message: errorMessage(error) });
@@ -80,7 +87,7 @@ function BackupSection(): React.JSX.Element {
 
 	return (
 		<Stack spacing={1.5}>
-			<Typography variant="subtitle2">Back up</Typography>
+			<Typography variant="subtitle2">{t("settings.backup.backUp.title")}</Typography>
 			{categories.data.map((category) => (
 				<FormControlLabel
 					control={
@@ -96,12 +103,15 @@ function BackupSection(): React.JSX.Element {
 						/>
 					}
 					key={category.service}
-					label={`${category.name} · about ${formatBytes(category.sizeBytes)}${category.ready ? "" : " (not ready)"}`}
+					label={t(category.ready ? "settings.backup.backUp.category" : "settings.backup.backUp.categoryNotReady", {
+						name: category.name,
+						size: format.bytes(category.sizeBytes),
+					})}
 				/>
 			))}
 			<Stack direction="row" spacing={1}>
 				<Button disabled={busy || selected.size === 0} onClick={() => void download()} variant="contained">
-					{busy ? "Backing up…" : "Download backup"}
+					{t(busy ? "settings.backup.backUp.inProgress" : "settings.backup.backUp.download")}
 				</Button>
 			</Stack>
 			{outcome ? (
@@ -114,6 +124,7 @@ function BackupSection(): React.JSX.Element {
 }
 
 function RestoreSection(): React.JSX.Element {
+	const { t } = useTranslation();
 	const [file, setFile] = React.useState<File | null>(null);
 	const [archive, setArchive] = React.useState<BackupArchive | null>(null);
 	const [chosen, setChosen] = React.useState<Set<string>>(() => new Set());
@@ -154,7 +165,7 @@ function RestoreSection(): React.JSX.Element {
 			if (!response.ok) throw new Error(await responseError(response));
 			for await (const { event, data } of readSse(response)) {
 				const update = JSON.parse(data) as RestoreEvent;
-				if (event === "error") throw new Error(update.message ?? "The device could not restore the backup");
+				if (event === "error") throw new Error(update.message ?? t("settings.backup.restore.failed"));
 				setResults((current) => [...current, { ...update, sequence: current.length }]);
 			}
 		} catch (error_) {
@@ -167,12 +178,12 @@ function RestoreSection(): React.JSX.Element {
 	const names = new Map(archive?.categories.map((category) => [category.service, category.name]));
 	return (
 		<Stack data-testid="restore-section" spacing={1.5}>
-			<Typography variant="subtitle2">Restore</Typography>
+			<Typography variant="subtitle2">{t("settings.backup.restore.title")}</Typography>
 			<Button component="label" disabled={busy} sx={{ alignSelf: "flex-start" }} variant="outlined">
-				{file ? file.name : "Choose a backup file"}
+				{file ? file.name : t("settings.backup.restore.chooseFile")}
 				<input
 					accept=".zip,application/zip"
-					aria-label="Backup file"
+					aria-label={t("settings.backup.restore.fileField")}
 					hidden
 					onChange={(event) => {
 						const picked = event.target.files?.[0];
@@ -210,13 +221,15 @@ function RestoreSection(): React.JSX.Element {
 								onClick={() => setConfirm(true)}
 								variant="contained"
 							>
-								{busy ? "Restoring…" : "Restore"}
+								{t(busy ? "settings.backup.restore.inProgress" : "settings.backup.restore.restore")}
 							</Button>
 						</Stack>
 					</>
 				) : (
 					<Alert severity="error">
-						This backup was made on another device ({archive.deviceId ?? "unknown"}); it can only be restored there.
+						{t("settings.backup.restore.otherDevice", {
+							deviceId: archive.deviceId ?? t("settings.backup.restore.unknownDevice"),
+						})}
 					</Alert>
 				)
 			) : null}
@@ -224,28 +237,36 @@ function RestoreSection(): React.JSX.Element {
 				<Stack data-testid="restore-results" spacing={0.5}>
 					{results.map((result) => (
 						<Alert key={result.sequence} severity={result.code && result.code !== "ok" ? "error" : "success"}>
-							{names.get(result.service ?? "") ?? result.service}: {result.message ?? "restored"}
+							{t("settings.backup.restore.result", {
+								name: names.get(result.service ?? "") ?? result.service,
+								message: result.message ?? t("settings.backup.restore.restored"),
+							})}
 						</Alert>
 					))}
 				</Stack>
 			) : null}
 			{error ? <Alert severity="error">{error}</Alert> : null}
 			<ConfirmDialog
-				confirmLabel="Restore"
+				confirmLabel={t("settings.backup.restore.restore")}
 				onCancel={() => setConfirm(false)}
 				onConfirm={() => void restore()}
 				open={confirm}
-				text={`Replace ${[...chosen].map((service) => names.get(service) ?? service).join(" and ")} on the device with the backup's contents? What was added since the backup is lost.`}
-				title="Restore backup?"
+				text={t("settings.backup.restore.confirmText", {
+					categories: [...chosen]
+						.map((service) => names.get(service) ?? service)
+						.join(t("settings.backup.restore.categoryJoiner")),
+				})}
+				title={t("settings.backup.restore.confirmTitle")}
 			/>
 		</Stack>
 	);
 }
 
 export function BackupCard(): React.JSX.Element {
+	const { t } = useTranslation();
 	return (
 		<Card data-testid="settings-backup">
-			<CardHeader subheader="Chat history and Vault, saved to this computer" title="Backup & restore" />
+			<CardHeader subheader={t("settings.backup.subheader")} title={t("settings.backup.title")} />
 			<Divider />
 			<CardContent>
 				<Stack divider={<Divider />} spacing={3}>

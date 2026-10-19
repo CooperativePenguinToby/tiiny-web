@@ -24,6 +24,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { useTranslation } from "react-i18next";
 
 import type { NetworkOverview, WifiAction, WifiNetwork } from "@/types/device";
 import { postJson } from "@/lib/api";
@@ -41,15 +42,16 @@ function PasswordDialog({
 	onCancel: () => void;
 	onConnect: (password: string) => void;
 }): React.JSX.Element {
+	const { t } = useTranslation();
 	const [password, setPassword] = React.useState("");
 	return (
 		<Dialog onClose={onCancel} open={network !== null}>
-			<DialogTitle>Join {network?.ssid}</DialogTitle>
+			<DialogTitle>{t("settings.network.joinDialog.title", { ssid: network?.ssid ?? "" })}</DialogTitle>
 			<DialogContent>
 				<TextField
 					autoFocus
 					fullWidth
-					label="Password"
+					label={t("settings.network.joinDialog.password")}
 					margin="dense"
 					onChange={(event) => setPassword(event.target.value)}
 					type="password"
@@ -57,9 +59,9 @@ function PasswordDialog({
 				/>
 			</DialogContent>
 			<DialogActions>
-				<Button onClick={onCancel}>Cancel</Button>
+				<Button onClick={onCancel}>{t("settings.actions.cancel")}</Button>
 				<Button disabled={password.length === 0} onClick={() => onConnect(password)} variant="contained">
-					Join
+					{t("settings.network.networks.join")}
 				</Button>
 			</DialogActions>
 		</Dialog>
@@ -81,19 +83,20 @@ function NetworksTable({
 	onJoin: (network: WifiNetwork) => void;
 	onForget: (network: WifiNetwork) => void;
 }): React.JSX.Element {
+	const { t } = useTranslation();
 	if (!networks.data) {
 		return networks.error ? (
 			<Alert severity="error">{networks.error}</Alert>
 		) : (
 			<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-				<CircularProgress aria-label="Scanning for networks" size={16} />
+				<CircularProgress aria-label={t("settings.network.networks.scanning")} size={16} />
 				<Typography
 					variant="body2"
 					sx={{
 						color: "text.secondary",
 					}}
 				>
-					Scanning for networks…
+					{t("settings.network.networks.scanning")}
 				</Typography>
 			</Stack>
 		);
@@ -103,8 +106,8 @@ function NetworksTable({
 			<Table size="small">
 				<TableHead>
 					<TableRow>
-						<TableCell>Network</TableCell>
-						<TableCell>Auto-join</TableCell>
+						<TableCell>{t("settings.network.networks.network")}</TableCell>
+						<TableCell>{t("settings.network.networks.autoJoin")}</TableCell>
 						<TableCell align="right" />
 					</TableRow>
 				</TableHead>
@@ -114,10 +117,16 @@ function NetworksTable({
 							<TableCell>
 								<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
 									<span>{wifi.ssid}</span>
-									{wifi.connected ? <Chip color="success" label="Connected" size="small" /> : null}
-									{wifi.connecting ? <Chip label="Connecting…" size="small" /> : null}
-									{!wifi.connected && wifi.saved ? <Chip label="Saved" size="small" variant="outlined" /> : null}
-									{wifi.needsPassword ? null : <Chip label="Open" size="small" variant="outlined" />}
+									{wifi.connected ? (
+										<Chip color="success" label={t("settings.network.networks.connected")} size="small" />
+									) : null}
+									{wifi.connecting ? <Chip label={t("settings.network.networks.connecting")} size="small" /> : null}
+									{!wifi.connected && wifi.saved ? (
+										<Chip label={t("settings.network.networks.saved")} size="small" variant="outlined" />
+									) : null}
+									{wifi.needsPassword ? null : (
+										<Chip label={t("settings.network.networks.open")} size="small" variant="outlined" />
+									)}
 								</Stack>
 								<Typography
 									variant="caption"
@@ -125,7 +134,7 @@ function NetworksTable({
 										color: "text.secondary",
 									}}
 								>
-									Signal {wifi.signal}%
+									{t("settings.network.networks.signal", { signal: wifi.signal })}
 								</Typography>
 							</TableCell>
 							<TableCell>
@@ -136,12 +145,17 @@ function NetworksTable({
 										onChange={(event) =>
 											onAct(
 												{ action: "auto-join", ssid: wifi.ssid, enabled: event.target.checked },
-												`Auto-join ${event.target.checked ? "on" : "off"} for ${wifi.ssid}.`
+												t(
+													event.target.checked
+														? "settings.network.networks.autoJoinOn"
+														: "settings.network.networks.autoJoinOff",
+													{ ssid: wifi.ssid }
+												)
 											)
 										}
 										size="small"
 										slotProps={{
-											input: { "aria-label": `Auto-join ${wifi.ssid}` },
+											input: { "aria-label": t("settings.network.networks.autoJoinSwitch", { ssid: wifi.ssid }) },
 										}}
 									/>
 								) : null}
@@ -152,12 +166,15 @@ function NetworksTable({
 										disabled={busy}
 										onClick={() =>
 											wifi.saved || !wifi.needsPassword
-												? onAct({ action: "connect", ssid: wifi.ssid }, `Joining ${wifi.ssid}.`)
+												? onAct(
+														{ action: "connect", ssid: wifi.ssid },
+														t("settings.network.networks.joining", { ssid: wifi.ssid })
+													)
 												: onJoin(wifi)
 										}
 										size="small"
 									>
-										Join
+										{t("settings.network.networks.join")}
 									</Button>
 								)}
 								{wifi.saved ? (
@@ -167,7 +184,7 @@ function NetworksTable({
 										onClick={() => onForget(wifi)}
 										size="small"
 									>
-										Forget
+										{t("settings.network.networks.forget")}
 									</Button>
 								) : null}
 							</TableCell>
@@ -180,6 +197,7 @@ function NetworksTable({
 }
 
 export function NetworkCard(): React.JSX.Element {
+	const { t } = useTranslation();
 	const polled = usePolling<NetworkOverview>("/api/settings/network", 10_000);
 	const networks = usePolling<WifiNetwork[]>("/api/settings/wifi", 10_000);
 	const [busy, setBusy] = React.useState(false);
@@ -203,10 +221,10 @@ export function NetworkCard(): React.JSX.Element {
 
 	return (
 		<Card data-testid="settings-network">
-			<CardHeader subheader="Wi-Fi and wired connections of the device" title="Network" />
+			<CardHeader subheader={t("settings.network.subheader")} title={t("settings.network.title")} />
 			<Divider />
 			<CardContent>
-				<SectionState label="network" polled={polled}>
+				<SectionState loadingLabel={t("settings.network.loading")} polled={polled}>
 					{(network) => {
 						const wifiLink = network.linkInterface?.startsWith("wlan") ?? false;
 						return (
@@ -220,26 +238,22 @@ export function NetworkCard(): React.JSX.Element {
 												onChange={(event) =>
 													void act(
 														{ action: "radio", enabled: event.target.checked },
-														event.target.checked ? "Wi-Fi turned on." : "Wi-Fi turned off."
+														t(event.target.checked ? "settings.network.wifiTurnedOn" : "settings.network.wifiTurnedOff")
 													)
 												}
 											/>
 										}
-										label="Wi-Fi"
+										label={t("settings.network.wifi")}
 									/>
 									<Typography data-testid="wifi-status" variant="body2">
 										{network.wifi.connected
-											? `Connected to ${network.wifi.ssid} (signal ${network.wifi.signal ?? 0}%)`
-											: network.wifi.enabled
-												? "Not connected"
-												: "Off"}
+											? t("settings.network.connectedTo", { ssid: network.wifi.ssid, signal: network.wifi.signal ?? 0 })
+											: t(network.wifi.enabled ? "settings.network.notConnected" : "settings.network.off")}
 									</Typography>
 								</Stack>
 								{wifiLink ? (
 									<Alert severity="info">
-										This app reaches the device over Wi-Fi ({network.linkInterface}), so turning Wi-Fi off, forgetting{" "}
-										{network.wifi.ssid} or joining another network is disabled here. Use TiinyOS or connect the device
-										by cable to make those changes.
+										{t("settings.network.wifiLink", { interface: network.linkInterface, ssid: network.wifi.ssid })}
 									</Alert>
 								) : null}
 								{network.wifi.error ? <Alert severity="warning">{network.wifi.error}</Alert> : null}
@@ -259,9 +273,9 @@ export function NetworkCard(): React.JSX.Element {
 								<Table size="small">
 									<TableHead>
 										<TableRow>
-											<TableCell>Interface</TableCell>
-											<TableCell>State</TableCell>
-											<TableCell>Addresses</TableCell>
+											<TableCell>{t("settings.network.interfaces.interface")}</TableCell>
+											<TableCell>{t("settings.network.interfaces.state")}</TableCell>
+											<TableCell>{t("settings.network.interfaces.addresses")}</TableCell>
 										</TableRow>
 									</TableHead>
 									<TableBody>
@@ -270,7 +284,12 @@ export function NetworkCard(): React.JSX.Element {
 												<TableCell>
 													{entry.name}
 													{entry.name === network.linkInterface ? (
-														<Chip label="This app's link" size="small" sx={{ ml: 1 }} variant="outlined" />
+														<Chip
+															label={t("settings.network.interfaces.appLink")}
+															size="small"
+															sx={{ ml: 1 }}
+															variant="outlined"
+														/>
 													) : null}
 												</TableCell>
 												<TableCell>{entry.state}</TableCell>
@@ -291,20 +310,20 @@ export function NetworkCard(): React.JSX.Element {
 				onConnect={(password) => {
 					const ssid = joining?.ssid ?? "";
 					setJoining(null);
-					void act({ action: "connect", ssid, password }, `Joining ${ssid}.`);
+					void act({ action: "connect", ssid, password }, t("settings.network.networks.joining", { ssid }));
 				}}
 			/>
 			<ConfirmDialog
-				confirmLabel="Forget"
+				confirmLabel={t("settings.network.networks.forget")}
 				onCancel={() => setForgetting(null)}
 				onConfirm={() => {
 					const ssid = forgetting?.ssid ?? "";
 					setForgetting(null);
-					void act({ action: "forget", ssid }, `${ssid} forgotten.`);
+					void act({ action: "forget", ssid }, t("settings.network.networks.forgotten", { ssid }));
 				}}
 				open={forgetting !== null}
-				text={`The device will forget ${forgetting?.ssid ?? ""} and its password.`}
-				title="Forget network?"
+				text={t("settings.network.forgetDialog.text", { ssid: forgetting?.ssid ?? "" })}
+				title={t("settings.network.forgetDialog.title")}
 			/>
 		</Card>
 	);

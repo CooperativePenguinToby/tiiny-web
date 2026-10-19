@@ -33,6 +33,7 @@ import { CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import { PaperclipIcon } from "@phosphor-icons/react/dist/ssr/Paperclip";
 import { PaperPlaneRightIcon } from "@phosphor-icons/react/dist/ssr/PaperPlaneRight";
 import { StopIcon } from "@phosphor-icons/react/dist/ssr/Stop";
+import { useTranslation } from "react-i18next";
 
 import {
 	IMAGE_SIZES,
@@ -156,6 +157,7 @@ function useElapsedSeconds(isRunning: boolean): number {
 }
 
 function MessageBubble({ turn }: { turn: Turn }): React.JSX.Element {
+	const { t } = useTranslation();
 	const isUser = turn.role === "user";
 	return (
 		<Box
@@ -170,7 +172,7 @@ function MessageBubble({ turn }: { turn: Turn }): React.JSX.Element {
 					textAlign: isUser ? "right" : "left",
 				}}
 			>
-				{isUser ? "You" : "Assistant"}
+				{t(isUser ? "chat.message.you" : "chat.message.assistant")}
 			</Typography>
 			{turn.attachments?.length ? (
 				<MessageAttachments align={isUser ? "end" : "start"} attachments={turn.attachments} />
@@ -185,7 +187,7 @@ function MessageBubble({ turn }: { turn: Turn }): React.JSX.Element {
 								color: "text.secondary",
 							}}
 						>
-							Thinking
+							{t("chat.message.thinking")}
 						</Typography>
 					</AccordionSummary>
 					<AccordionDetails>
@@ -231,6 +233,7 @@ function MessageBubble({ turn }: { turn: Turn }): React.JSX.Element {
 }
 
 export function ChatPanel(): React.JSX.Element {
+	const { t } = useTranslation();
 	const models = usePolling<ChatModel[]>("/api/chat/models", 5000);
 	const [modelId, setModelId] = React.useState<string>("");
 	const [thinking, setThinking] = React.useState<ThinkingSetting>("off");
@@ -295,20 +298,22 @@ export function ChatPanel(): React.JSX.Element {
 						...(turn.attachments && { attachments: turn.attachments }),
 						...(turn.steps && { steps: turn.steps }),
 						...(turn.reasoning && { reasoning: turn.reasoning }),
-						...(turn.status === "paused" && { note: "Stopped." }),
+						...(turn.status === "paused" && { note: t("chat.notes.stopped") }),
 					}))
 				);
 			})
 			.catch((error_: unknown) => {
 				if (controller.signal.aborted) return;
-				setError(`Could not open the conversation: ${error_ instanceof Error ? error_.message : String(error_)}`);
+				setError(
+					t("chat.errors.openConversation", { message: error_ instanceof Error ? error_.message : String(error_) })
+				);
 			})
 			.finally(() => {
 				// Unless a newer conversation is being opened instead.
 				if (!controller.signal.aborted) setOpeningId(null);
 			});
 		return () => controller.abort();
-	}, [openingId, newTurnId]);
+	}, [openingId, newTurnId, t]);
 
 	const [loading, setLoading] = React.useState<{ name: string; message: string; progress: number | null } | null>(null);
 	const [makeRoom, setMakeRoom] = React.useState<{
@@ -319,15 +324,17 @@ export function ChatPanel(): React.JSX.Element {
 	// Loads a model chosen in chat, first unloading the ones the device says must make room (as agreed).
 	const load = async (next: ChatModel, unloadFirst: { modelId: string; name: string }[]): Promise<void> => {
 		setError(null);
-		setLoading({ name: next.name, message: "Starting", progress: null });
+		setLoading({ name: next.name, message: t("chat.loading.starting"), progress: null });
 		try {
 			for (const other of unloadFirst) {
-				setLoading({ name: next.name, message: `Unloading ${other.name}`, progress: null });
+				setLoading({ name: next.name, message: t("chat.loading.unloading", { name: other.name }), progress: null });
 				await postJson("/api/models/unload", { modelId: other.modelId });
 			}
 			await loadModel(next.modelId, (message, progress) => setLoading({ name: next.name, message, progress }));
 		} catch (error_) {
-			setError(`Could not load ${next.name}: ${error_ instanceof Error ? error_.message : String(error_)}`);
+			setError(
+				t("chat.errors.load", { name: next.name, message: error_ instanceof Error ? error_.message : String(error_) })
+			);
 		} finally {
 			setLoading(null);
 			await models.refresh();
@@ -345,7 +352,9 @@ export function ChatPanel(): React.JSX.Element {
 			if (plan.unloadRequired) setMakeRoom({ model: next, unload: plan.unload });
 			else await load(next, []);
 		} catch (error_) {
-			setError(`Could not load ${next.name}: ${error_ instanceof Error ? error_.message : String(error_)}`);
+			setError(
+				t("chat.errors.load", { name: next.name, message: error_ instanceof Error ? error_.message : String(error_) })
+			);
 		}
 	};
 
@@ -435,12 +444,10 @@ export function ChatPanel(): React.JSX.Element {
 					break;
 				}
 				if (chunk.error) {
-					const message = chunk.error.message ?? "The device reported an error";
+					const message = chunk.error.message ?? t("chat.errors.device");
 					// The device gives up on requests that wait too long behind other clients' requests.
 					throw new Error(
-						/upstream chat stream (timed out|failed)/i.test(message)
-							? `The device gave up waiting: the model was busy with other requests. Try again. (${message})`
-							: message
+						/upstream chat stream (timed out|failed)/i.test(message) ? t("chat.errors.gaveUp", { message }) : message
 					);
 				}
 				if (chunk.usage) reply.usage = chunk.usage;
@@ -460,16 +467,16 @@ export function ChatPanel(): React.JSX.Element {
 			}
 		} catch (error_) {
 			if (controller.signal.aborted) {
-				updateLast((turn) => ({ ...turn, note: "Stopped." }));
+				updateLast((turn) => ({ ...turn, note: t("chat.notes.stopped") }));
 			} else {
 				const message = error_ instanceof Error ? error_.message : String(error_);
 				setError(message);
-				updateLast((turn) => ({ ...turn, note: "No complete reply." }));
+				updateLast((turn) => ({ ...turn, note: t("chat.notes.noReply") }));
 			}
 		} finally {
 			abortRef.current = null;
 			// Saved before the next message can be sent, so that one joins the same conversation.
-			if (isInterrupted) updateLast((turn) => ({ ...turn, note: "Interrupted." }));
+			if (isInterrupted) updateLast((turn) => ({ ...turn, note: t("chat.notes.interrupted") }));
 			if (reply.content.trim() || reply.attachments.length > 0) {
 				await remember(text, attachments, reply, controller.signal.aborted || isInterrupted);
 			}
@@ -519,7 +526,7 @@ export function ChatPanel(): React.JSX.Element {
 					break;
 				}
 				case "error": {
-					if (event.message === "Interrupted.") return "interrupted";
+					if (event.interrupted) return "interrupted";
 					throw new Error(event.message);
 				}
 				case "done": {
@@ -549,15 +556,18 @@ export function ChatPanel(): React.JSX.Element {
 		for await (const { event, data } of readSse(response)) {
 			const update = JSON.parse(data) as ImageEvent;
 			if (event === "error" || update.status === "error" || update.error) {
-				throw new Error(update.error || update.message || "The device could not draw the picture");
+				throw new Error(update.error || update.message || t("chat.errors.drawFailed"));
 			}
 			if (update.total_steps) {
 				setPhase("streaming");
-				updateLast((turn) => ({ ...turn, note: `Drawing… step ${update.step ?? 0} of ${update.total_steps}` }));
+				updateLast((turn) => ({
+					...turn,
+					note: t("chat.notes.drawing", { step: update.step ?? 0, total: update.total_steps }),
+				}));
 			}
 			if (update.image) image = update.image;
 		}
-		if (!image) throw new Error("The device finished without a picture");
+		if (!image) throw new Error(t("chat.errors.noPicture"));
 		// The device sends a data: URL (older firmware sent bare base64).
 		const base64 = image.startsWith("data:") ? image.slice(image.indexOf(",") + 1) : image;
 		const bytes = Uint8Array.from(atob(base64), (character) => character.codePointAt(0)!);
@@ -570,7 +580,7 @@ export function ChatPanel(): React.JSX.Element {
 		updateLast((turn) => ({
 			...turn,
 			attachments: [picture],
-			note: `${imageSize.replace("x", " × ")}, ${imageSteps} steps`,
+			note: t("chat.notes.picture", { size: imageSize.replace("x", " × "), count: imageSteps }),
 		}));
 	};
 
@@ -604,14 +614,14 @@ export function ChatPanel(): React.JSX.Element {
 				setConversationId(saved.conversationId);
 			}
 		} catch (error_) {
-			setSaveError(`Not saved to history: ${error_ instanceof Error ? error_.message : String(error_)}`);
+			setSaveError(t("chat.errors.notSaved", { message: error_ instanceof Error ? error_.message : String(error_) }));
 		}
 	};
 
 	if (models.isLoading) {
 		return (
 			<Stack sx={{ alignItems: "center", py: 8 }}>
-				<CircularProgress aria-label="Loading chat models" />
+				<CircularProgress aria-label={t("chat.models.loading")} />
 			</Stack>
 		);
 	}
@@ -621,12 +631,12 @@ export function ChatPanel(): React.JSX.Element {
 			<Alert
 				action={
 					<Button color="inherit" component={RouterLink} href={paths.dashboard.models} size="small">
-						Models
+						{t("chat.models.modelsButton")}
 					</Button>
 				}
 				severity={models.error ? "error" : "info"}
 			>
-				{models.error ?? "No chat or image model is downloaded. Get one from the Store, then load it."}
+				{models.error ?? t("chat.models.none")}
 			</Alert>
 		);
 	}
@@ -639,13 +649,13 @@ export function ChatPanel(): React.JSX.Element {
 			<Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
 				<FormControl sx={{ minWidth: 260 }}>
 					<InputLabel id="chat-model-label" shrink>
-						Model
+						{t("chat.models.label")}
 					</InputLabel>
 					<Select
 						displayEmpty
 						notched
 						disabled={isBusy}
-						label="Model"
+						label={t("chat.models.label")}
 						labelId="chat-model-label"
 						onChange={(event) =>
 							chooseModel(
@@ -655,24 +665,24 @@ export function ChatPanel(): React.JSX.Element {
 						}
 						renderValue={(value) => {
 							const chosen = models.data?.find((candidate) => candidate.modelId === value);
-							if (!chosen) return "Choose a model";
-							return chosen.loaded ? chosen.name : `${chosen.name} (not loaded)`;
+							if (!chosen) return t("chat.models.choose");
+							return chosen.loaded ? chosen.name : t("chat.models.notLoadedOption", { name: chosen.name });
 						}}
 						value={modelId}
 					>
 						<MenuItem disabled value="">
-							Choose a model
+							{t("chat.models.choose")}
 						</MenuItem>
 						{models.data.map((candidate) => (
 							<MenuItem key={candidate.modelId} value={candidate.modelId}>
-								{candidate.loaded ? candidate.name : `${candidate.name} (not loaded)`}
+								{candidate.loaded ? candidate.name : t("chat.models.notLoadedOption", { name: candidate.name })}
 							</MenuItem>
 						))}
 					</Select>
 				</FormControl>
 				{model?.kind === "chat" ? (
 					<ToggleButtonGroup
-						aria-label="Mode"
+						aria-label={t("chat.mode.label")}
 						disabled={isBusy}
 						exclusive
 						onChange={(_event, next: Mode | null) => next && chooseMode(next)}
@@ -680,11 +690,11 @@ export function ChatPanel(): React.JSX.Element {
 						sx={{ alignSelf: "center" }}
 						value={mode}
 					>
-						<ToggleButton title="The model answers directly" value="chat">
-							Chat
+						<ToggleButton title={t("chat.mode.chatTitle")} value="chat">
+							{t("chat.mode.chat")}
 						</ToggleButton>
-						<ToggleButton title="The model works in steps with Vault, web pages and MCP tools" value="task">
-							Task
+						<ToggleButton title={t("chat.mode.taskTitle")} value="task">
+							{t("chat.mode.task")}
 						</ToggleButton>
 					</ToggleButtonGroup>
 				) : null}
@@ -694,25 +704,25 @@ export function ChatPanel(): React.JSX.Element {
 							control={
 								<Switch checked={taskTools.vault} disabled={isBusy} onChange={() => toggleTool("vault")} size="small" />
 							}
-							label="Vault"
-							title="Let the model search your Vault files and chat summaries"
+							label={t("chat.tools.vault")}
+							title={t("chat.tools.vaultTitle")}
 						/>
 						<FormControlLabel
 							control={
 								<Switch checked={taskTools.web} disabled={isBusy} onChange={() => toggleTool("web")} size="small" />
 							}
-							label="Web"
-							title="Let the model read web pages"
+							label={t("chat.tools.web")}
+							title={t("chat.tools.webTitle")}
 						/>
 					</Stack>
 				) : null}
 				{model?.kind === "image" ? (
 					<>
 						<FormControl sx={{ minWidth: 160 }}>
-							<InputLabel id="image-size-label">Size</InputLabel>
+							<InputLabel id="image-size-label">{t("chat.image.size")}</InputLabel>
 							<Select
 								disabled={isBusy}
-								label="Size"
+								label={t("chat.image.size")}
 								labelId="image-size-label"
 								onChange={(event) => setImageSize(event.target.value)}
 								value={imageSize}
@@ -726,7 +736,7 @@ export function ChatPanel(): React.JSX.Element {
 						</FormControl>
 						<TextField
 							disabled={isBusy}
-							label="Steps"
+							label={t("chat.image.steps")}
 							onChange={(event) => {
 								const steps = Number(event.target.value) || 1;
 								setImageSteps(Math.min(50, Math.max(1, steps)));
@@ -740,15 +750,15 @@ export function ChatPanel(): React.JSX.Element {
 				) : null}
 				{model?.thinking.supported ? (
 					<FormControl sx={{ minWidth: 180 }}>
-						<InputLabel id="chat-thinking-label">Thinking</InputLabel>
+						<InputLabel id="chat-thinking-label">{t("chat.thinking.label")}</InputLabel>
 						<Select
 							disabled={isBusy}
-							label="Thinking"
+							label={t("chat.thinking.label")}
 							labelId="chat-thinking-label"
 							onChange={(event) => setThinking(event.target.value)}
 							value={thinking}
 						>
-							{model.thinking.toggleable ? <MenuItem value="off">Off</MenuItem> : null}
+							{model.thinking.toggleable ? <MenuItem value="off">{t("chat.thinking.off")}</MenuItem> : null}
 							{model.thinking.levels.map((level) => (
 								<MenuItem key={level} value={level}>
 									{level}
@@ -769,17 +779,22 @@ export function ChatPanel(): React.JSX.Element {
 						setConversationId(null);
 					}}
 				>
-					New chat
+					{t("chat.newChat")}
 				</Button>
 			</Stack>
 			{loading ? (
 				<Stack data-testid="chat-loading" role="status" spacing={0.5}>
 					<Typography variant="body2">
-						Loading {loading.name}: {loading.message}
-						{loading.progress === null ? "" : ` ${loading.progress.toFixed(0)}%`}
+						{loading.progress === null
+							? t("chat.loading.status", { name: loading.name, message: loading.message })
+							: t("chat.loading.statusProgress", {
+									name: loading.name,
+									message: loading.message,
+									progress: loading.progress.toFixed(0),
+								})}
 					</Typography>
 					<LinearProgress
-						aria-label="Model loading"
+						aria-label={t("chat.loading.progressLabel")}
 						value={loading.progress ?? 0}
 						variant={loading.progress === null ? "indeterminate" : "determinate"}
 					/>
@@ -788,24 +803,25 @@ export function ChatPanel(): React.JSX.Element {
 				<Alert
 					action={
 						<Button color="inherit" onClick={() => void ensureLoaded(model)} size="small">
-							Load
+							{t("chat.loading.load")}
 						</Button>
 					}
 					severity="info"
 				>
-					{model.name} is not loaded.
+					{t("chat.loading.notLoaded", { name: model.name })}
 				</Alert>
 			) : null}
 			<Dialog onClose={() => setMakeRoom(null)} open={makeRoom !== null}>
-				<DialogTitle>Make room for {makeRoom?.model.name}?</DialogTitle>
+				<DialogTitle>{t("chat.makeRoom.title", { name: makeRoom?.model.name })}</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
-						The device does not have enough free NPU memory. Unload{" "}
-						{makeRoom?.unload.map((other) => other.name).join(", ") || "other models"} first? Apps using them stop.
+						{t("chat.makeRoom.text", {
+							models: makeRoom?.unload.map((other) => other.name).join(", ") || t("chat.makeRoom.otherModels"),
+						})}
 					</DialogContentText>
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={() => setMakeRoom(null)}>Cancel</Button>
+					<Button onClick={() => setMakeRoom(null)}>{t("chat.makeRoom.cancel")}</Button>
 					<Button
 						onClick={() => {
 							const plan = makeRoom!;
@@ -814,7 +830,7 @@ export function ChatPanel(): React.JSX.Element {
 						}}
 						variant="contained"
 					>
-						Unload and load
+						{t("chat.makeRoom.confirm")}
 					</Button>
 				</DialogActions>
 			</Dialog>
@@ -822,7 +838,7 @@ export function ChatPanel(): React.JSX.Element {
 				<CardContent>
 					<Stack spacing={2} sx={{ minHeight: 240 }}>
 						{openingId ? (
-							<CircularProgress aria-label="Opening the conversation" sx={{ m: "auto" }} />
+							<CircularProgress aria-label={t("chat.conversation.opening")} sx={{ m: "auto" }} />
 						) : turns.length === 0 ? (
 							<Typography
 								variant="body2"
@@ -831,7 +847,7 @@ export function ChatPanel(): React.JSX.Element {
 									m: "auto",
 								}}
 							>
-								Send a message to start chatting with {model?.name ?? "the model"}.
+								{t("chat.conversation.empty", { name: model?.name ?? t("chat.conversation.theModel") })}
 							</Typography>
 						) : (
 							turns.map((turn) => <MessageBubble key={turn.id} turn={turn} />)
@@ -845,10 +861,9 @@ export function ChatPanel(): React.JSX.Element {
 										color: "text.secondary",
 									}}
 								>
-									Waiting for the device · {elapsed}s
 									{others > 0
-										? ` · the model is busy with ${others} other request${others === 1 ? "" : "s"}, yours is queued`
-										: ""}
+										? t("chat.conversation.waitingQueued", { seconds: elapsed, count: others })
+										: t("chat.conversation.waiting", { seconds: elapsed })}
 								</Typography>
 							</Stack>
 						) : null}
@@ -869,7 +884,7 @@ export function ChatPanel(): React.JSX.Element {
 			<AttachmentChips attachments={files.attachments} onRemove={files.remove} uploading={files.uploading} />
 			<input
 				accept={model?.supportsVision ? `image/*,${DOCUMENT_ACCEPT}` : DOCUMENT_ACCEPT}
-				aria-label="Files to attach"
+				aria-label={t("chat.composer.files")}
 				hidden
 				multiple
 				onChange={(event) => {
@@ -891,11 +906,13 @@ export function ChatPanel(): React.JSX.Element {
 				sx={{ alignItems: "flex-end" }}
 			>
 				<Button
-					aria-label={model?.supportsVision ? "Attach images or documents" : "Attach documents"}
+					aria-label={t(
+						model?.supportsVision ? "chat.composer.attachImagesOrDocuments" : "chat.composer.attachDocuments"
+					)}
 					disabled={isBusy || model?.kind === "image"}
 					onClick={() => fileInputRef.current?.click()}
 					sx={{ flexShrink: 0, minWidth: 0, px: 1.5 }}
-					title={model?.supportsVision ? "Attach images or documents" : "Attach documents"}
+					title={t(model?.supportsVision ? "chat.composer.attachImagesOrDocuments" : "chat.composer.attachDocuments")}
 					variant="outlined"
 				>
 					<PaperclipIcon />
@@ -903,7 +920,7 @@ export function ChatPanel(): React.JSX.Element {
 				<TextField
 					disabled={isBusy}
 					fullWidth
-					label="Message"
+					label={t("chat.composer.message")}
 					maxRows={8}
 					multiline
 					onChange={(event) => setDraft(event.target.value)}
@@ -915,7 +932,7 @@ export function ChatPanel(): React.JSX.Element {
 						event.preventDefault();
 						void send();
 					}}
-					placeholder="Enter to send, Shift+Enter for a new line"
+					placeholder={t("chat.composer.placeholder")}
 					value={draft}
 				/>
 				{isBusy ? (
@@ -926,7 +943,7 @@ export function ChatPanel(): React.JSX.Element {
 						sx={{ flexShrink: 0 }}
 						variant="outlined"
 					>
-						Stop
+						{t("chat.composer.stop")}
 					</Button>
 				) : (
 					<Button
@@ -936,7 +953,7 @@ export function ChatPanel(): React.JSX.Element {
 						type="submit"
 						variant="contained"
 					>
-						Send
+						{t("chat.composer.send")}
 					</Button>
 				)}
 			</Stack>

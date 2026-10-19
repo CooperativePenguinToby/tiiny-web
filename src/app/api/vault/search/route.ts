@@ -11,6 +11,6 @@ export const POST = apiRoute(async (request) => {
 		// A missing or malformed body is handled like an empty one.
 	}
 	const { query } = body;
-	if (typeof query !== "string" || !query.trim()) throw new DeviceError("Enter something to search for", 400);
+	if (typeof query !== "string" || !query.trim()) throw new DeviceError("errors.request.emptySearch", 400);
 	return NextResponse.json(await searchVault(query.trim()));
 });

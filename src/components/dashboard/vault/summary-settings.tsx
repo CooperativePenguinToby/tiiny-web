@@ -12,6 +12,7 @@ import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { useTranslation } from "react-i18next";
 
 import type { MemorySettings } from "@/types/device";
 import { responseError } from "@/lib/sse";
@@ -39,6 +40,7 @@ interface Draft {
 
 // Daily summaries, as in TiinyOS: once a day the device summarises the day's chats into Vault.
 export function SummarySettings(): React.JSX.Element {
+	const { t } = useTranslation();
 	const polled = usePolling<MemorySettings>("/api/vault/memory/settings", 60_000);
 	const [draft, setDraft] = React.useState<Draft | null>(null);
 	const [saving, setSaving] = React.useState(false);
@@ -52,7 +54,7 @@ export function SummarySettings(): React.JSX.Element {
 					{polled.error ? (
 						<Alert severity="error">{polled.error}</Alert>
 					) : (
-						<CircularProgress aria-label="Loading daily summaries" />
+						<CircularProgress aria-label={t("vault.summarySettings.loading")} />
 					)}
 				</CardContent>
 			</Card>
@@ -91,7 +93,9 @@ export function SummarySettings(): React.JSX.Element {
 			setDraft(null);
 			setOutcome({
 				severity: "success",
-				message: value.enabled ? `Daily summaries on, at ${value.time}.` : "Daily summaries off.",
+				message: value.enabled
+					? t("vault.summarySettings.savedOn", { time: value.time })
+					: t("vault.summarySettings.savedOff"),
 			});
 		} catch (error) {
 			setOutcome({ severity: "error", message: error instanceof Error ? error.message : String(error) });
@@ -112,12 +116,19 @@ export function SummarySettings(): React.JSX.Element {
 									onChange={(event) => setDraft({ ...value, enabled: event.target.checked })}
 								/>
 							}
-							label="Daily summaries"
+							label={t("vault.summarySettings.enabled")}
 						/>
 						<TextField
 							disabled={!value.enabled}
-							helperText={deviceTime ? `${deviceTime} on the device (${utcLabel(settings.deviceOffsetMinutes)})` : " "}
-							label="Time"
+							helperText={
+								deviceTime
+									? t("vault.summarySettings.deviceTime", {
+											time: deviceTime,
+											zone: utcLabel(settings.deviceOffsetMinutes),
+										})
+									: " "
+							}
+							label={t("vault.summarySettings.time")}
 							onChange={(event) => setDraft({ ...value, time: event.target.value })}
 							size="small"
 							slotProps={{ htmlInput: { step: 60 }, inputLabel: { shrink: true } }}
@@ -127,7 +138,7 @@ export function SummarySettings(): React.JSX.Element {
 						<TextField
 							disabled={!value.enabled}
 							helperText=" "
-							label="Model"
+							label={t("vault.summarySettings.model")}
 							onChange={(event) => setDraft({ ...value, modelId: event.target.value })}
 							select
 							size="small"
@@ -146,7 +157,7 @@ export function SummarySettings(): React.JSX.Element {
 							sx={{ alignSelf: { sm: "flex-start" } }}
 							variant="contained"
 						>
-							{saving ? "Saving…" : "Save"}
+							{t(saving ? "vault.summarySettings.saving" : "vault.summarySettings.save")}
 						</Button>
 					</Stack>
 					<Typography
@@ -155,8 +166,7 @@ export function SummarySettings(): React.JSX.Element {
 							color: "text.secondary",
 						}}
 					>
-						Each day the device summarises the day&apos;s conversations into Vault, so models can recall them in Task
-						mode. It loads the model while it works, which can make that model busy for a while.
+						{t("vault.summarySettings.description")}
 					</Typography>
 					{outcome ? (
 						<Alert onClose={() => setOutcome(null)} severity={outcome.severity}>

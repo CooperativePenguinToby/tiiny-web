@@ -13,6 +13,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
+import { Trans, useTranslation } from "react-i18next";
 
 import type { ApiAccess } from "@/types/device";
 import { postJson } from "@/lib/api";
@@ -22,6 +23,7 @@ import { CopyButton } from "./copy-button";
 import { SectionState } from "./section-state";
 
 export function ApiAccessCard(): React.JSX.Element {
+	const { t } = useTranslation();
 	const polled = usePolling<ApiAccess>("/api/settings/api-access", 300_000);
 	const [key, setKey] = React.useState<string | null>(null);
 	const [error, setError] = React.useState<string | null>(null);
@@ -38,23 +40,29 @@ export function ApiAccessCard(): React.JSX.Element {
 
 	return (
 		<Card data-testid="settings-api">
-			<CardHeader subheader="Use the device's models from other apps on your network" title="API access" />
+			<CardHeader subheader={t("settings.apiAccess.subheader")} title={t("settings.apiAccess.title")} />
 			<Divider />
 			<CardContent>
-				<SectionState label="API access" polled={polled}>
+				<SectionState loadingLabel={t("settings.apiAccess.loading")} polled={polled}>
 					{(access) => (
 						<Stack spacing={2}>
 							<Table size="small">
 								<TableBody>
 									{(
 										[
-											["OpenAI-compatible", access.openai, "Text, embeddings, rerank, images, speech"],
-											["Anthropic", access.anthropic, "Text generation"],
-											["Ollama", access.ollama, "Text generation, embeddings"],
+											// The id names the format in test ids; the label is what is shown.
+											[
+												"OpenAI-compatible",
+												t("settings.apiAccess.openaiCompatible"),
+												access.openai,
+												t("settings.apiAccess.uses.openai"),
+											],
+											["Anthropic", "Anthropic", access.anthropic, t("settings.apiAccess.uses.anthropic")],
+											["Ollama", "Ollama", access.ollama, t("settings.apiAccess.uses.ollama")],
 										] as const
-									).map(([format, url, use]) => (
+									).map(([format, label, url, use]) => (
 										<TableRow key={format}>
-											<TableCell component="th">{format}</TableCell>
+											<TableCell component="th">{label}</TableCell>
 											<TableCell>
 												<code data-testid={`api-base-${format}`}>{url}</code>
 												<Typography
@@ -68,21 +76,21 @@ export function ApiAccessCard(): React.JSX.Element {
 												</Typography>
 											</TableCell>
 											<TableCell align="right">
-												<CopyButton label={`Copy ${format} base URL`} text={url} />
+												<CopyButton label={t("settings.apiAccess.copyBaseUrl", { format: label })} text={url} />
 											</TableCell>
 										</TableRow>
 									))}
 									<TableRow>
-										<TableCell component="th">API key</TableCell>
+										<TableCell component="th">{t("settings.apiAccess.apiKey")}</TableCell>
 										<TableCell>
 											<code data-testid="api-key">{key ?? "••••••••••••••••"}</code>
 										</TableCell>
 										<TableCell align="right">
 											{key ? (
-												<CopyButton label="Copy API key" text={key} />
+												<CopyButton label={t("settings.apiAccess.copyApiKey")} text={key} />
 											) : (
 												<Button onClick={() => void reveal()} size="small">
-													Reveal
+													{t("settings.apiAccess.reveal")}
 												</Button>
 											)}
 										</TableCell>
@@ -96,8 +104,7 @@ export function ApiAccessCard(): React.JSX.Element {
 									color: "text.secondary",
 								}}
 							>
-								Use a model id from the Models page, or <code>default</code> for the model most recently used. Keep the
-								key private: anyone with it can use the device&apos;s API.
+								<Trans components={{ code: <code /> }} i18nKey="settings.apiAccess.hint" />
 							</Typography>
 						</Stack>
 					)}

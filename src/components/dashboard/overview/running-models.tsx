@@ -9,13 +9,17 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
+import { useTranslation } from "react-i18next";
 
 import type { RunningModel } from "@/types/device";
+import { useFormat } from "@/i18n/client";
 
 export function RunningModels({ models }: { models: RunningModel[] }): React.JSX.Element {
+	const { t } = useTranslation();
+	const format = useFormat();
 	return (
 		<Card>
-			<CardHeader title="Loaded models" />
+			<CardHeader title={t("overview.running.title")} />
 			<Divider />
 			{models.length === 0 ? (
 				<Typography
@@ -25,17 +29,17 @@ export function RunningModels({ models }: { models: RunningModel[] }): React.JSX
 						p: 3,
 					}}
 				>
-					No models are loaded. Load one from the Models page.
+					{t("overview.running.empty")}
 				</Typography>
 			) : (
-				<Table aria-label="Loaded models">
+				<Table aria-label={t("overview.running.title")}>
 					<TableHead>
 						<TableRow>
-							<TableCell>Model</TableCell>
-							<TableCell>Type</TableCell>
-							<TableCell>Status</TableCell>
-							<TableCell align="right">NPU share</TableCell>
-							<TableCell align="right">Active requests</TableCell>
+							<TableCell>{t("overview.running.columns.model")}</TableCell>
+							<TableCell>{t("overview.running.columns.type")}</TableCell>
+							<TableCell>{t("overview.running.columns.status")}</TableCell>
+							<TableCell align="right">{t("overview.running.columns.npuShare")}</TableCell>
+							<TableCell align="right">{t("overview.running.columns.activeRequests")}</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -56,8 +60,8 @@ export function RunningModels({ models }: { models: RunningModel[] }): React.JSX
 								<TableCell>
 									<Chip color={model.status === "running" ? "success" : "warning"} label={model.status} size="small" />
 								</TableCell>
-								<TableCell align="right">{model.npuUsage}%</TableCell>
-								<TableCell align="right">{model.activeRequests}</TableCell>
+								<TableCell align="right">{t("overview.percent", { value: format.number(model.npuUsage) })}</TableCell>
+								<TableCell align="right">{format.number(model.activeRequests)}</TableCell>
 							</TableRow>
 						))}
 					</TableBody>

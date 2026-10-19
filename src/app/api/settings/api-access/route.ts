@@ -7,7 +7,7 @@ import type { ApiAccess } from "@/types/device";
 
 function target(): { baseUrl: string; authKey: string } {
 	const resolved = resolveDeviceTarget();
-	if (!resolved) throw new DeviceError("Device not configured", 503);
+	if (!resolved) throw new DeviceError("errors.device.notConfiguredShort", 503);
 	return resolved;
 }
 

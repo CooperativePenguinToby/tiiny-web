@@ -13,7 +13,7 @@ export const POST = apiRoute(async (request) => {
 		// A missing or malformed body is handled like an empty one.
 	}
 	const model = modelIdOf(body.model);
-	const text = textOf(body.text, "Text", 4000);
+	const text = textOf(body.text, { kind: "text" }, 4000);
 	const audio = await withModel(model, () =>
 		deviceResponse("/v1/audio/speech", {
 			method: "POST",

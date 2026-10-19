@@ -12,6 +12,8 @@ import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import type { ParseKeys } from "i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 import type { Connector } from "@/types/device";
 import { postJson } from "@/lib/api";
@@ -23,12 +25,17 @@ import { ConnectorLogo } from "./connector-logo";
 import { McpServers } from "./mcp-servers";
 
 const OAUTH = new Set<Connector["key"]>(["gmail", "google-calendar", "outlook-mail", "outlook-calendar"]);
-const CATEGORY = { email: "Email", calendar: "Calendar", messaging: "Messaging" } as const;
+const CATEGORY: Record<Connector["category"], ParseKeys> = {
+	email: "connectors.category.email",
+	calendar: "connectors.category.calendar",
+	messaging: "connectors.category.messaging",
+};
 const CARD_SX = { height: "100%", display: "flex", flexDirection: "column" } as const;
 
 const errorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
 export function ConnectorsPanel(): React.JSX.Element {
+	const { t } = useTranslation();
 	const polled = usePolling<Connector[]>("/api/connectors", 5000);
 	const [connecting, setConnecting] = React.useState<Connector | null>(null);
 	const [signIn, setSignIn] = React.useState<{ key: Connector["key"]; url: string } | null>(null);
@@ -43,7 +50,10 @@ export function ConnectorsPanel(): React.JSX.Element {
 			setSignIn({ key: connector.key, url });
 			open(url, "_blank", "noopener");
 		} catch (error) {
-			setOutcome({ severity: "error", message: `${connector.name}: ${errorMessage(error)}` });
+			setOutcome({
+				severity: "error",
+				message: t("connectors.outcome.error", { name: connector.name, message: errorMessage(error) }),
+			});
 		}
 	};
 
@@ -51,23 +61,29 @@ export function ConnectorsPanel(): React.JSX.Element {
 	const signedIn = signIn ? polled.data?.find((entry) => entry.key === signIn.key) : undefined;
 	if (signedIn?.connected) {
 		setSignIn(null);
-		setOutcome({ severity: "success", message: `${signedIn.name} connected: ${signedIn.detail}.` });
+		setOutcome({
+			severity: "success",
+			message: t("connectors.outcome.connected", { name: signedIn.name, detail: signedIn.detail }),
+		});
 	}
 
 	// WhatsApp connects when the QR code is scanned on the phone.
 	if (connecting?.key === "whatsapp" && polled.data?.find((entry) => entry.key === "whatsapp")?.connected) {
 		setConnecting(null);
-		setOutcome({ severity: "success", message: "WhatsApp connected." });
+		setOutcome({ severity: "success", message: t("connectors.outcome.whatsappConnected") });
 	}
 
 	const disconnect = async (connector: Connector): Promise<void> => {
 		setDisconnecting(null);
 		try {
 			await postJson("/api/connectors/disconnect", { key: connector.key });
-			setOutcome({ severity: "success", message: `${connector.name} disconnected.` });
+			setOutcome({ severity: "success", message: t("connectors.outcome.disconnected", { name: connector.name }) });
 			await polled.refresh();
 		} catch (error) {
-			setOutcome({ severity: "error", message: `${connector.name}: ${errorMessage(error)}` });
+			setOutcome({
+				severity: "error",
+				message: t("connectors.outcome.error", { name: connector.name, message: errorMessage(error) }),
+			});
 		}
 	};
 
@@ -80,19 +96,18 @@ export function ConnectorsPanel(): React.JSX.Element {
 			) : null}
 			{polled.error ? <Alert severity={polled.data ? "warning" : "error"}>{polled.error}</Alert> : null}
 			<Stack spacing={2}>
-				<Typography variant="h6">Services</Typography>
+				<Typography variant="h6">{t("connectors.services.heading")}</Typography>
 				<Typography
 					variant="body2"
 					sx={{
 						color: "text.secondary",
 					}}
 				>
-					Models use connected services in Task mode, within what you authorize. Connections live on the device and are
-					shared with TiinyOS.
+					{t("connectors.services.description")}
 				</Typography>
 				{polled.data === null ? (
 					polled.isLoading ? (
-						<CircularProgress aria-label="Loading connectors" />
+						<CircularProgress aria-label={t("connectors.services.loading")} />
 					) : null
 				) : (
 					<Grid container spacing={3}>
@@ -118,7 +133,9 @@ export function ConnectorsPanel(): React.JSX.Element {
 															<Chip
 																data-testid="connector-state"
 																color={connector.connected ? "success" : "default"}
-																label={connector.connected ? "Connected" : "Not connected"}
+																label={t(
+																	connector.connected ? "connectors.state.connected" : "connectors.state.notConnected"
+																)}
 																size="small"
 															/>
 														</Stack>
@@ -128,7 +145,7 @@ export function ConnectorsPanel(): React.JSX.Element {
 																color: "text.secondary",
 															}}
 														>
-															{CATEGORY[connector.category]}
+															{t(CATEGORY[connector.category])}
 														</Typography>
 													</div>
 												</Stack>
@@ -143,10 +160,10 @@ export function ConnectorsPanel(): React.JSX.Element {
 												</Typography>
 												{isWaiting ? (
 													<Typography role="status" variant="body2">
-														Waiting for you to finish signing in…{" "}
-														<Link href={signIn.url} rel="noreferrer" target="_blank">
-															Open the sign-in page
-														</Link>
+														<Trans
+															components={{ link: <Link href={signIn.url} rel="noreferrer" target="_blank" /> }}
+															i18nKey="connectors.services.waitingForSignIn"
+														/>
 													</Typography>
 												) : null}
 											</Stack>
@@ -154,7 +171,7 @@ export function ConnectorsPanel(): React.JSX.Element {
 										<CardActions sx={{ px: 2, pb: 2, pt: 0, gap: 1 }}>
 											{connector.connected ? (
 												<Button color="error" onClick={() => setDisconnecting(connector)}>
-													Disconnect
+													{t("connectors.actions.disconnect")}
 												</Button>
 											) : (
 												<Button
@@ -163,10 +180,12 @@ export function ConnectorsPanel(): React.JSX.Element {
 													}
 													variant="contained"
 												>
-													Connect
+													{t("connectors.actions.connect")}
 												</Button>
 											)}
-											{isWaiting ? <Button onClick={() => setSignIn(null)}>Cancel</Button> : null}
+											{isWaiting ? (
+												<Button onClick={() => setSignIn(null)}>{t("connectors.actions.cancel")}</Button>
+											) : null}
 										</CardActions>
 									</Card>
 								</Grid>
@@ -190,12 +209,12 @@ export function ConnectorsPanel(): React.JSX.Element {
 				}}
 			/>
 			<ConfirmDialog
-				confirmLabel="Disconnect"
+				confirmLabel={t("connectors.actions.disconnect")}
 				onCancel={() => setDisconnecting(null)}
 				onConfirm={() => disconnecting && void disconnect(disconnecting)}
 				open={disconnecting !== null}
-				text={`Disconnect ${disconnecting?.name ?? ""}? The device forgets the stored sign-in, and models can no longer use it.`}
-				title="Disconnect?"
+				text={t("connectors.disconnectDialog.text", { name: disconnecting?.name ?? "" })}
+				title={t("connectors.disconnectDialog.title")}
 			/>
 		</Stack>
 	);
