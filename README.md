@@ -21,6 +21,17 @@ docker compose up -d --build
 The certificate and session secret live in the `tiiny-data` volume. Add a port line to `compose.yaml` for each
 agent you install, unless you use `AGENT_DOMAIN` (see Notes).
 
+Prebuilt images for `linux/amd64` and `linux/arm64` are published to `ghcr.io/<owner>/<repo>` by
+`.github/workflows/docker.yml` on every push to `main` (tags `main`, `sha-<commit>`) and every `v*` tag
+(`1.2.3`, `1.2`, `latest`). To run one instead of building, set `image:` in `compose.yaml` to it, remove
+`build: .`, and use `docker compose up -d`. The workflow needs the repository secrets `DHI_USERNAME` and
+`DHI_TOKEN` (a Docker Hub username and access token) to pull the `dhi.io` base images. To build both
+architectures locally (arm64 runs under QEMU):
+
+```sh
+docker buildx build --platform linux/amd64,linux/arm64 -t tiiny-web .
+```
+
 Without Docker (Node 26):
 
 ```sh
