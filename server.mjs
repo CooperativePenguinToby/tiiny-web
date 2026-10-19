@@ -12,6 +12,7 @@ import { generate } from "selfsigned";
 
 import { agentDomain } from "./src/server/shared/agent-domain.mjs";
 import { handleAgentRequest, handleAgentUpgrade, startAgentProxies } from "./src/server/shared/agent-proxy.mjs";
+import { handleModelApiRequest, startModelApiProxy } from "./src/server/shared/model-api-proxy.mjs";
 
 const development = process.argv.includes("--dev");
 const host = process.env.HOST ?? "0.0.0.0";
@@ -110,7 +111,8 @@ await app.prepare();
 const handle = app.getRequestHandler();
 
 const server = createServer({ cert: tls.cert, key: tls.key }, (request, response) => {
-	if (!handleAgentRequest(request, response)) void handle(request, response);
+	if (!handleModelApiRequest(request, response) && !handleAgentRequest(request, response))
+		void handle(request, response);
 });
 // Agent websockets go to the device; the rest (e.g. the dev server's HMR socket) go to Next.
 const upgrade = app.getUpgradeHandler();
@@ -124,3 +126,4 @@ server.listen(port, host, () => {
 });
 
 startAgentProxies({ tls, host, appPort: port });
+startModelApiProxy({ tls, host });

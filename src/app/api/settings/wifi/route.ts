@@ -43,7 +43,9 @@ function parse(body: unknown): WifiAction {
 
 export const GET = apiRoute(async () => NextResponse.json(await wifiNetworks()));
 
-// Applies a Wi-Fi change on the device, refusing changes that would drop the link this app uses.
+// Applies a Wi-Fi change on the device, refusing changes that would drop the link this app uses for
+// good. Joining another network is allowed (the UI warns first): the device may come back at the same
+// address on the new network.
 export const POST = apiRoute(async (request) => {
 	let body: unknown = {};
 	try {
@@ -56,9 +58,7 @@ export const POST = apiRoute(async (request) => {
 	const current = overview.wifi.ssid;
 	const dropsLink =
 		isWifiLink(overview) &&
-		((action.action === "radio" && !action.enabled) ||
-			(action.action === "forget" && action.ssid === current) ||
-			(action.action === "connect" && action.ssid !== current));
+		((action.action === "radio" && !action.enabled) || (action.action === "forget" && action.ssid === current));
 	if (dropsLink) throw new DeviceError("errors.wifi.wouldDropLink", 409);
 
 	let result: ActionResult;
@@ -74,20 +74,29 @@ export const POST = apiRoute(async (request) => {
 		case "connect": {
 			const networks = await wifiNetworks();
 			const known = networks.find((network) => network.ssid === action.ssid);
-			result =
+			const join = (): Promise<ActionResult> =>
 				known?.saved && !action.password
-					? await deviceJson<ActionResult>("/api/v1/sys/wifi/wifi_change", {
+					? deviceJson<ActionResult>("/api/v1/sys/wifi/wifi_change", {
 							method: "POST",
 							service: "wifi",
 							body: { connected_wifi_name: action.ssid },
 							slow: true,
 						})
-					: await deviceJson<ActionResult>("/api/v1/sys/wifi/wifi_connect", {
+					: deviceJson<ActionResult>("/api/v1/sys/wifi/wifi_connect", {
 							method: "POST",
 							service: "wifi",
 							body: { wifi_name: action.ssid, password: action.password ?? "" },
 							slow: true,
 						});
+			try {
+				result = await join();
+			} catch (error) {
+				// Over a Wi-Fi link, losing the device mid-join means it left the network this app reaches it on.
+				if (isWifiLink(overview) && error instanceof DeviceError && error.key === "errors.device.unreachable") {
+					throw new DeviceError("errors.wifi.lostDuringJoin", 502, { ssid: action.ssid });
+				}
+				throw error;
+			}
 			break;
 		}
 		case "forget": {

@@ -151,7 +151,8 @@
 		},
 		"wifi": {
 			"unknownAction": "Unknown Wi-Fi action",
-			"wouldDropLink": "This app reaches the device over Wi-Fi, so this change would cut it off. Make it from TiinyOS or with the device on a cable."
+			"wouldDropLink": "This app reaches the device over Wi-Fi, so this change would cut it off. Make it from TiinyOS or with the device on a cable.",
+			"lostDuringJoin": "The device stopped answering while joining {{ssid}}. If it has a different address on that network, point this app at the new address."
 		},
 		"update": {
 			"upToDate": "TiinyOS is up to date",
@@ -162,6 +163,10 @@
 			"noAnswer": "The agent did not answer ({{reason}}). It may be stopped.",
 			"linkExpired": "This link has expired. Open the agent again from tiiny-web's Agents page.",
 			"signIn": "Sign in to tiiny-web and open this agent from its Agents page."
+		},
+		"modelApi": {
+			"noAnswer": "The device did not answer ({{reason}}).",
+			"notFound": "{{path}} is not a model API path this proxy forwards."
 		}
 	},
 	"chat": {
@@ -592,7 +597,7 @@
 			"apiKey": "API key",
 			"copyApiKey": "Copy API key",
 			"reveal": "Reveal",
-			"hint": "Use a model id from the Models page, or <code>default</code> for the model most recently used. Keep the key private: anyone with it can use the device's API."
+			"hint": "Use a model id from the Models page, or <code>default</code> for the model most recently used. Send the API key as a Bearer token or an <code>x-api-key</code> header; it goes to the device as is. Keep the key private: anyone with it can use the device's API."
 		},
 		"storage": {
 			"title": "Storage",
@@ -650,7 +655,8 @@
 			"connectedTo": "Connected to {{ssid}} (signal {{signal}}%)",
 			"notConnected": "Not connected",
 			"off": "Off",
-			"wifiLink": "This app reaches the device over Wi-Fi ({{interface}}), so turning Wi-Fi off, forgetting {{ssid}} or joining another network is disabled here. Use TiinyOS or connect the device by cable to make those changes.",
+			"wifiLink": "This app reaches the device over Wi-Fi ({{interface}}), so turning Wi-Fi off and forgetting {{ssid}} are disabled here. Use TiinyOS or connect the device by cable to make those changes.",
+			"joinWarning": "The device will leave its current network and join {{ssid}}. This app can lose the device while it switches, and for good if the device gets a different address on {{ssid}}.",
 			"interfaces": {
 				"interface": "Interface",
 				"state": "State",

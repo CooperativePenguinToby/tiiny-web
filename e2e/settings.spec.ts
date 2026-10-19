@@ -93,20 +93,39 @@ test("#10 storage matches the device, and deleting asks first", async ({ page })
 	expect(after.apps.map((app) => app.name)).toContain(agents.apps[0].name);
 });
 
-test("#10 API access shows LAN base URLs and reveals the device key only on request", async ({ page }) => {
+test("#10 API access shows the HTTPS proxy's base URLs and reveals the device key only on request", async ({
+	page,
+}) => {
+	const app = new URL(process.env.BASE_URL ?? "https://localhost:8443");
+	const apiOrigin = `https://${app.hostname}:${process.env.E2E_API_PORT ?? "11443"}`;
+	const domain = process.env.E2E_AGENT_DOMAIN;
+	const bases = (format: string, suffix: string): string[] => [
+		`${apiOrigin}${suffix}`,
+		...(domain ? [`https://api.${domain}:${app.port}${suffix}`] : []),
+		`${app.origin}/proxy/${format}${suffix}`,
+	];
 	await signIn(page);
 	await page.goto("/settings");
 	const card = page.getByTestId("settings-api");
-	await expect(card.getByTestId("api-base-OpenAI-compatible")).toHaveText(`${deviceBaseUrl()}/v1`);
-	await expect(card.getByTestId("api-base-Ollama")).toHaveText(deviceBaseUrl());
+	await expect(card.getByTestId("api-base-OpenAI-compatible")).toHaveText(bases("openai", "/v1"));
+	await expect(card.getByTestId("api-base-Anthropic")).toHaveText(bases("anthropic", ""));
+	await expect(card.getByTestId("api-base-Ollama")).toHaveText(bases("ollama", ""));
+	await expect(card).not.toContainText(deviceBaseUrl());
 	expect(await page.content()).not.toContain(deviceApiKey());
 
 	await card.getByRole("button", { name: "Reveal" }).click();
 	await expect(card.getByTestId("api-key")).toHaveText(deviceApiKey());
 
-	// The advertised base URL really serves the models with that key.
-	const models = await fetch(`${deviceBaseUrl()}/v1/models`, {
-		headers: { Authorization: `Bearer ${deviceApiKey()}` },
-	});
-	expect(models.ok).toBe(true);
+	// Every advertised base URL really serves the models with that key.
+	const headers = { Authorization: `Bearer ${deviceApiKey()}` };
+	for (const base of [...bases("openai", "/v1"), ...bases("anthropic", "/v1")]) {
+		const models = await page.request.get(`${base}/models`, { headers });
+		expect(models.status(), base).toBe(200);
+		expect(((await models.json()) as { data: unknown[] }).data.length, base).toBeGreaterThan(0);
+	}
+	for (const base of bases("ollama", "")) {
+		const tags = await page.request.get(`${base}/api/tags`, { headers });
+		expect(tags.status(), base).toBe(200);
+		expect(((await tags.json()) as { models: unknown[] }).models.length, base).toBeGreaterThan(0);
+	}
 });

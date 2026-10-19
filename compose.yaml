@@ -14,6 +14,8 @@ services:
       AGENT_DOMAIN: ${AGENT_DOMAIN:-}
     ports:
       - "8443:8443"
+      # The device's OpenAI-compatible, Anthropic and Ollama APIs over HTTPS (API_PORT).
+      - "11443:11443"
       # Agent ports, one per installed agent: needed only without AGENT_DOMAIN (both work together).
       - "9891:9891" # Open WebUI
       - "7866:7866" # SillyTavern

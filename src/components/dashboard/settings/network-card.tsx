@@ -48,6 +48,9 @@ function PasswordDialog({
 		<Dialog onClose={onCancel} open={network !== null}>
 			<DialogTitle>{t("settings.network.joinDialog.title", { ssid: network?.ssid ?? "" })}</DialogTitle>
 			<DialogContent>
+				<Alert severity="warning" sx={{ mb: 1 }}>
+					{t("settings.network.joinWarning", { ssid: network?.ssid ?? "" })}
+				</Alert>
 				<TextField
 					autoFocus
 					fullWidth
@@ -74,6 +77,7 @@ function NetworksTable({
 	wifiLink,
 	onAct,
 	onJoin,
+	onConfirmJoin,
 	onForget,
 }: {
 	networks: Polled<WifiNetwork[]>;
@@ -81,6 +85,7 @@ function NetworksTable({
 	wifiLink: boolean;
 	onAct: (action: WifiAction, done: string) => void;
 	onJoin: (network: WifiNetwork) => void;
+	onConfirmJoin: (network: WifiNetwork) => void;
 	onForget: (network: WifiNetwork) => void;
 }): React.JSX.Element {
 	const { t } = useTranslation();
@@ -161,17 +166,10 @@ function NetworksTable({
 								) : null}
 							</TableCell>
 							<TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
-								{wifiLink || wifi.connected ? null : (
+								{wifi.connected ? null : (
 									<Button
 										disabled={busy}
-										onClick={() =>
-											wifi.saved || !wifi.needsPassword
-												? onAct(
-														{ action: "connect", ssid: wifi.ssid },
-														t("settings.network.networks.joining", { ssid: wifi.ssid })
-													)
-												: onJoin(wifi)
-										}
+										onClick={() => (wifi.saved || !wifi.needsPassword ? onConfirmJoin(wifi) : onJoin(wifi))}
 										size="small"
 									>
 										{t("settings.network.networks.join")}
@@ -203,6 +201,7 @@ export function NetworkCard(): React.JSX.Element {
 	const [busy, setBusy] = React.useState(false);
 	const [outcome, setOutcome] = React.useState<{ severity: "success" | "error"; message: string } | null>(null);
 	const [joining, setJoining] = React.useState<WifiNetwork | null>(null);
+	const [confirmingJoin, setConfirmingJoin] = React.useState<WifiNetwork | null>(null);
 	const [forgetting, setForgetting] = React.useState<WifiNetwork | null>(null);
 
 	const act = async (action: WifiAction, done: string): Promise<void> => {
@@ -266,6 +265,7 @@ export function NetworkCard(): React.JSX.Element {
 									busy={busy}
 									networks={networks}
 									onAct={(action, done) => void act(action, done)}
+									onConfirmJoin={setConfirmingJoin}
 									onForget={setForgetting}
 									onJoin={setJoining}
 									wifiLink={wifiLink}
@@ -312,6 +312,18 @@ export function NetworkCard(): React.JSX.Element {
 					setJoining(null);
 					void act({ action: "connect", ssid, password }, t("settings.network.networks.joining", { ssid }));
 				}}
+			/>
+			<ConfirmDialog
+				confirmLabel={t("settings.network.networks.join")}
+				onCancel={() => setConfirmingJoin(null)}
+				onConfirm={() => {
+					const ssid = confirmingJoin?.ssid ?? "";
+					setConfirmingJoin(null);
+					void act({ action: "connect", ssid }, t("settings.network.networks.joining", { ssid }));
+				}}
+				open={confirmingJoin !== null}
+				text={t("settings.network.joinWarning", { ssid: confirmingJoin?.ssid ?? "" })}
+				title={t("settings.network.joinDialog.title", { ssid: confirmingJoin?.ssid ?? "" })}
 			/>
 			<ConfirmDialog
 				confirmLabel={t("settings.network.networks.forget")}

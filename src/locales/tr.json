@@ -151,7 +151,8 @@
 		},
 		"wifi": {
 			"unknownAction": "Bilinmeyen Wi-Fi işlemi",
-			"wouldDropLink": "Bu uygulama cihaza Wi-Fi üzerinden ulaşıyor, bu yüzden bu değişiklik bağlantıyı keser. Değişikliği TiinyOS'tan veya cihaz kabloyla bağlıyken yapın."
+			"wouldDropLink": "Bu uygulama cihaza Wi-Fi üzerinden ulaşıyor, bu yüzden bu değişiklik bağlantıyı keser. Değişikliği TiinyOS'tan veya cihaz kabloyla bağlıyken yapın.",
+			"lostDuringJoin": "Cihaz {{ssid}} ağına katılırken yanıt vermeyi bıraktı. O ağda farklı bir adresi varsa bu uygulamayı yeni adrese yönlendirin."
 		},
 		"update": {
 			"upToDate": "TiinyOS güncel",
@@ -162,6 +163,10 @@
 			"noAnswer": "Ajan yanıt vermedi ({{reason}}). Durdurulmuş olabilir.",
 			"linkExpired": "Bu bağlantının süresi doldu. Ajanı tiiny-web'in Ajanlar sayfasından yeniden açın.",
 			"signIn": "tiiny-web'e giriş yapın ve bu ajanı Ajanlar sayfasından açın."
+		},
+		"modelApi": {
+			"noAnswer": "Cihaz yanıt vermedi ({{reason}}).",
+			"notFound": "{{path}}, bu proxy'nin ilettiği bir model API yolu değil."
 		}
 	},
 	"chat": {
@@ -592,7 +597,7 @@
 			"apiKey": "API anahtarı",
 			"copyApiKey": "API anahtarını kopyala",
 			"reveal": "Göster",
-			"hint": "Modeller sayfasındaki bir model kimliğini veya en son kullanılan model için <code>default</code> değerini kullanın. Anahtarı gizli tutun: anahtara sahip herkes cihazın API'sini kullanabilir."
+			"hint": "Modeller sayfasındaki bir model kimliğini ya da en son kullanılan model için <code>default</code> kullanın. API anahtarını Bearer belirteci veya <code>x-api-key</code> başlığı olarak gönderin; cihaza olduğu gibi iletilir. Anahtarı gizli tutun: ona sahip olan herkes cihazın API'sini kullanabilir."
 		},
 		"storage": {
 			"title": "Depolama",
@@ -650,7 +655,8 @@
 			"connectedTo": "{{ssid}} ağına bağlı (sinyal %{{signal}})",
 			"notConnected": "Bağlı değil",
 			"off": "Kapalı",
-			"wifiLink": "Bu uygulama cihaza Wi-Fi ({{interface}}) üzerinden ulaşıyor, bu yüzden Wi-Fi'ı kapatmak, {{ssid}} ağını unutmak veya başka bir ağa katılmak burada devre dışı. Bu değişiklikler için TiinyOS'u kullanın veya cihazı kabloyla bağlayın.",
+			"wifiLink": "Bu uygulama cihaza Wi-Fi ({{interface}}) üzerinden ulaşıyor, bu yüzden Wi-Fi'yi kapatmak ve {{ssid}} ağını unutmak burada devre dışı. Bu değişiklikler için TiinyOS'u kullanın veya cihazı kabloyla bağlayın.",
+			"joinWarning": "Cihaz mevcut ağından ayrılıp {{ssid}} ağına katılacak. Geçiş sırasında bu uygulama cihazla bağlantısını kaybedebilir; cihaz {{ssid}} ağında farklı bir adres alırsa bağlantı kalıcı olarak kopar.",
 			"interfaces": {
 				"interface": "Arayüz",
 				"state": "Durum",

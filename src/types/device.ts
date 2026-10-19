@@ -219,11 +219,11 @@ export interface StorageOverview {
 	agents: { serviceId: string; sizeBytes: number }[];
 }
 
-// How other apps reach the device's models over the LAN.
+// How other apps reach the device's models over the LAN: base URLs of this app's HTTPS proxy, per format.
 export interface ApiAccess {
-	openai: string;
-	anthropic: string;
-	ollama: string;
+	openai: string[];
+	anthropic: string[];
+	ollama: string[];
 }
 
 export interface WifiNetwork {

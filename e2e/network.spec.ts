@@ -6,6 +6,7 @@ interface WifiList {
 	wifis: {
 		wifi_name: string;
 		is_paired: boolean;
+		need_password: boolean;
 		is_connected: boolean;
 		is_auto_connect: boolean;
 		signal_strength: number;
@@ -51,7 +52,7 @@ test("#11 Network shows the device's Wi-Fi state, networks and interfaces", asyn
 	await page.screenshot({ path: "test-results/settings-network.png", fullPage: true });
 });
 
-test("#11 changes that would cut this app off from the device are refused", async ({ page }) => {
+test("#11 turning Wi-Fi off or forgetting the network this app uses is refused", async ({ page }) => {
 	const status = await wifiStatus();
 	test.skip(!status.is_connected, "the device is not on Wi-Fi");
 	await signIn(page);
@@ -62,12 +63,10 @@ test("#11 changes that would cut this app off from the device are refused", asyn
 	await expect(
 		card.getByTestId(`wifi-${status.connected_wifi_name}`).getByRole("button", { name: "Forget" })
 	).toBeDisabled(SCAN);
-	await expect(card.getByRole("button", { name: "Join" })).toHaveCount(0);
 
 	for (const body of [
 		{ action: "radio", enabled: false },
 		{ action: "forget", ssid: status.connected_wifi_name },
-		{ action: "connect", ssid: "some-other-network", password: "x" },
 	]) {
 		const response = await page.request.post("/api/settings/wifi", { data: body });
 		expect(response.status(), JSON.stringify(body)).toBe(409);
@@ -75,6 +74,84 @@ test("#11 changes that would cut this app off from the device are refused", asyn
 	const after = await wifiStatus();
 	expect(after.is_connected).toBe(true);
 	expect(after.connected_wifi_name).toBe(status.connected_wifi_name);
+});
+
+test("#11 Join warns before switching networks, and Cancel leaves the device where it is", async ({ page }) => {
+	const status = await wifiStatus();
+	const { wifis } = await wifiList();
+	const other = wifis.find((wifi) => wifi.is_paired && !wifi.is_connected);
+	test.skip(!other, "no saved network other than the current one");
+	await signIn(page);
+	await page.goto("/settings");
+	const card = page.getByTestId("settings-network");
+	await expect(
+		card.getByTestId(`wifi-${status.connected_wifi_name}`).getByRole("button", { name: "Join" })
+	).toHaveCount(0, SCAN);
+	await card.getByTestId(`wifi-${other!.wifi_name}`).getByRole("button", { name: "Join" }).click(SCAN);
+	const dialog = page.getByRole("dialog", { name: `Join ${other!.wifi_name}` });
+	await expect(dialog).toContainText(`The device will leave its current network and join ${other!.wifi_name}.`);
+	await expect(dialog.getByRole("button", { name: "Join" })).toBeVisible();
+	await page.screenshot({ path: "test-results/wifi-join-warning.png" });
+	await dialog.getByRole("button", { name: "Cancel" }).click();
+	await expect(dialog).toBeHidden();
+
+	// A new network that needs a password gets the same warning in its password dialog.
+	const stranger = wifis.find((wifi) => !wifi.is_paired && wifi.need_password);
+	if (stranger) {
+		await card.getByTestId(`wifi-${stranger.wifi_name}`).getByRole("button", { name: "Join" }).click(SCAN);
+		const passwordDialog = page.getByRole("dialog", { name: `Join ${stranger.wifi_name}` });
+		await expect(passwordDialog).toContainText(
+			`The device will leave its current network and join ${stranger.wifi_name}.`
+		);
+		await expect(passwordDialog.getByLabel("Password")).toBeVisible();
+		await expect(passwordDialog.getByRole("button", { name: "Join" })).toBeDisabled();
+		await passwordDialog.getByRole("button", { name: "Cancel" }).click();
+		await expect(passwordDialog).toBeHidden();
+	}
+	const after = await wifiStatus();
+	expect(after.connected_wifi_name).toBe(status.connected_wifi_name);
+});
+
+// Really switches the device's Wi-Fi, which drops its link for a few seconds: set E2E_WIFI_SWITCH to a saved
+// network on which the device keeps its address (e.g. the same LAN under another name).
+const SWITCH_TO = process.env.E2E_WIFI_SWITCH;
+test("#11 Join switches the device to another saved network, after the warning", async ({ page }) => {
+	test.skip(!SWITCH_TO, "set E2E_WIFI_SWITCH to a saved network on the same LAN");
+	const { connected_wifi_name: original } = await wifiStatus();
+	expect(original, "the device must start on another network").not.toBe(SWITCH_TO);
+	const join = async (ssid: string): Promise<void> => {
+		const card = page.getByTestId("settings-network");
+		await card.getByTestId(`wifi-${ssid}`).getByRole("button", { name: "Join" }).click(SCAN);
+		await page
+			.getByRole("dialog", { name: `Join ${ssid}` })
+			.getByRole("button", { name: "Join" })
+			.click();
+		await expect(card.getByRole("alert").filter({ hasText: `Joining ${ssid}.` })).toBeVisible({ timeout: 120_000 });
+		await expect
+			.poll(
+				async () => {
+					const { connected_wifi_name: current } = await wifiStatus();
+					return current;
+				},
+				{ timeout: 120_000 }
+			)
+			.toBe(ssid);
+		await expect(card.getByTestId("wifi-status")).toContainText(`Connected to ${ssid}`, { timeout: 30_000 });
+	};
+	await signIn(page);
+	await page.goto("/settings");
+	try {
+		await join(SWITCH_TO!);
+		await join(original);
+	} finally {
+		const { connected_wifi_name: current } = await wifiStatus();
+		if (current !== original) {
+			await deviceCall("wifi", "/api/v1/sys/wifi/wifi_change", {
+				method: "POST",
+				body: { connected_wifi_name: original },
+			});
+		}
+	}
 });
 
 test("#11 auto-join can be switched for a saved network", async ({ page }) => {

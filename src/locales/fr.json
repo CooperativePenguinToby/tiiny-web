@@ -160,7 +160,8 @@
 		},
 		"wifi": {
 			"unknownAction": "Action Wi-Fi inconnue",
-			"wouldDropLink": "Cette application accède à l'appareil par Wi-Fi : cette modification la couperait. Effectuez-la depuis TiinyOS ou avec l'appareil branché par câble."
+			"wouldDropLink": "Cette application accède à l'appareil par Wi-Fi : cette modification la couperait. Effectuez-la depuis TiinyOS ou avec l'appareil branché par câble.",
+			"lostDuringJoin": "L'appareil a cessé de répondre en rejoignant {{ssid}}. S'il a une autre adresse sur ce réseau, indiquez la nouvelle adresse à cette app."
 		},
 		"update": {
 			"upToDate": "TiinyOS est à jour",
@@ -171,6 +172,10 @@
 			"noAnswer": "L'agent n'a pas répondu ({{reason}}). Il est peut-être arrêté.",
 			"linkExpired": "Ce lien a expiré. Rouvrez l'agent depuis la page Agents de tiiny-web.",
 			"signIn": "Connectez-vous à tiiny-web et ouvrez cet agent depuis sa page Agents."
+		},
+		"modelApi": {
+			"noAnswer": "L'appareil n'a pas répondu ({{reason}}).",
+			"notFound": "{{path}} n'est pas un chemin d'API de modèles relayé par ce proxy."
 		}
 	},
 	"chat": {
@@ -605,7 +610,7 @@
 			"apiKey": "Clé API",
 			"copyApiKey": "Copier la clé API",
 			"reveal": "Afficher",
-			"hint": "Utilisez un identifiant de modèle de la page Modèles, ou <code>default</code> pour le dernier modèle utilisé. Gardez la clé secrète : toute personne qui la possède peut utiliser l'API de l'appareil."
+			"hint": "Utilisez un id de modèle de la page Modèles, ou <code>default</code> pour le modèle utilisé le plus récemment. Envoyez la clé d'API comme jeton Bearer ou dans l'en-tête <code>x-api-key</code> ; elle est transmise telle quelle à l'appareil. Gardez la clé secrète : quiconque la possède peut utiliser l'API de l'appareil."
 		},
 		"storage": {
 			"title": "Stockage",
@@ -663,7 +668,8 @@
 			"connectedTo": "Connecté à {{ssid}} (signal {{signal}} %)",
 			"notConnected": "Non connecté",
 			"off": "Désactivé",
-			"wifiLink": "Cette application accède à l'appareil par Wi-Fi ({{interface}}) : désactiver le Wi-Fi, oublier {{ssid}} ou rejoindre un autre réseau n'est donc pas possible ici. Utilisez TiinyOS ou branchez l'appareil par câble pour effectuer ces modifications.",
+			"wifiLink": "Cette app joint l'appareil en Wi-Fi ({{interface}}) : désactiver le Wi-Fi et oublier {{ssid}} sont donc impossibles ici. Utilisez TiinyOS ou branchez l'appareil par câble pour ces changements.",
+			"joinWarning": "L'appareil va quitter son réseau actuel et rejoindre {{ssid}}. Cette app peut perdre l'appareil pendant le changement, et définitivement si l'appareil obtient une autre adresse sur {{ssid}}.",
 			"interfaces": {
 				"interface": "Interface",
 				"state": "État",

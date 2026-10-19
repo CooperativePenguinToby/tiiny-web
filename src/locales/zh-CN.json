@@ -142,7 +142,8 @@
 		},
 		"wifi": {
 			"unknownAction": "未知的 Wi-Fi 操作",
-			"wouldDropLink": "本应用通过 Wi-Fi 连接设备，此更改会使连接中断。请在 TiinyOS 中操作，或用网线连接设备后再操作。"
+			"wouldDropLink": "本应用通过 Wi-Fi 连接设备，此更改会使连接中断。请在 TiinyOS 中操作，或用网线连接设备后再操作。",
+			"lostDuringJoin": "设备在加入 {{ssid}} 时停止响应。如果它在该网络上的地址不同，请将本应用指向新地址。"
 		},
 		"update": {
 			"upToDate": "TiinyOS 已是最新版本",
@@ -153,6 +154,10 @@
 			"noAnswer": "智能体没有响应（{{reason}}），它可能已停止。",
 			"linkExpired": "此链接已过期。请从 tiiny-web 的智能体页面重新打开该智能体。",
 			"signIn": "请登录 tiiny-web，并从智能体页面打开此智能体。"
+		},
+		"modelApi": {
+			"noAnswer": "设备没有响应（{{reason}}）。",
+			"notFound": "{{path}} 不是此代理转发的模型 API 路径。"
 		}
 	},
 	"chat": {
@@ -579,7 +584,7 @@
 			"apiKey": "API 密钥",
 			"copyApiKey": "复制 API 密钥",
 			"reveal": "显示",
-			"hint": "使用“模型”页面中的模型 ID，或使用 <code>default</code> 表示最近使用的模型。请妥善保管密钥：任何持有它的人都可以使用设备的 API。"
+			"hint": "使用“模型”页面中的模型 ID，或使用 <code>default</code> 表示最近使用的模型。请以 Bearer 令牌或 <code>x-api-key</code> 请求头发送 API 密钥，它会原样转发给设备。请妥善保管密钥：任何持有它的人都可以使用设备的 API。"
 		},
 		"storage": {
 			"title": "存储",
@@ -637,7 +642,8 @@
 			"connectedTo": "已连接到 {{ssid}}（信号 {{signal}}%）",
 			"notConnected": "未连接",
 			"off": "关闭",
-			"wifiLink": "本应用通过 Wi-Fi（{{interface}}）连接设备，因此此处无法关闭 Wi-Fi、忘记 {{ssid}} 或加入其他网络。请使用 TiinyOS 或用网线连接设备后再进行这些更改。",
+			"wifiLink": "本应用通过 Wi-Fi（{{interface}}）连接设备，因此此处无法关闭 Wi-Fi 或忘记 {{ssid}}。请使用 TiinyOS 或用网线连接设备后再进行这些更改。",
+			"joinWarning": "设备将离开当前网络并加入 {{ssid}}。切换期间本应用可能与设备断开；如果设备在 {{ssid}} 上获得不同的地址，连接将无法恢复。",
 			"interfaces": {
 				"interface": "接口",
 				"state": "状态",

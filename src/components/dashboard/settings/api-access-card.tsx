@@ -60,11 +60,25 @@ export function ApiAccessCard(): React.JSX.Element {
 											["Anthropic", "Anthropic", access.anthropic, t("settings.apiAccess.uses.anthropic")],
 											["Ollama", "Ollama", access.ollama, t("settings.apiAccess.uses.ollama")],
 										] as const
-									).map(([format, label, url, use]) => (
+									).map(([format, label, urls, use]) => (
 										<TableRow key={format}>
 											<TableCell component="th">{label}</TableCell>
-											<TableCell>
-												<code data-testid={`api-base-${format}`}>{url}</code>
+											<TableCell colSpan={2}>
+												<Stack spacing={0.5}>
+													{urls.map((url) => (
+														<Stack
+															direction="row"
+															key={url}
+															spacing={1}
+															sx={{ alignItems: "center", justifyContent: "space-between" }}
+														>
+															<code data-testid={`api-base-${format}`} style={{ wordBreak: "break-all" }}>
+																{url}
+															</code>
+															<CopyButton label={t("settings.apiAccess.copyBaseUrl", { format: label })} text={url} />
+														</Stack>
+													))}
+												</Stack>
 												<Typography
 													component="div"
 													variant="caption"
@@ -74,9 +88,6 @@ export function ApiAccessCard(): React.JSX.Element {
 												>
 													{use}
 												</Typography>
-											</TableCell>
-											<TableCell align="right">
-												<CopyButton label={t("settings.apiAccess.copyBaseUrl", { format: label })} text={url} />
 											</TableCell>
 										</TableRow>
 									))}

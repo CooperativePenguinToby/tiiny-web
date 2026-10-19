@@ -22,8 +22,9 @@ COPY --from=build --chown=1000:1000 /app/.next/standalone ./
 # The TLS certificate and key, and the session secret, are created here on first start.
 COPY --from=build --chown=1000:1000 /data /data
 VOLUME ["/data"]
-# The web UI. Each installed device agent also gets an HTTPS listener on its own port (e.g. 9891, 7866, 18880).
-EXPOSE 8443
+# The web UI, and the device's model APIs. Each installed device agent also gets an HTTPS listener on its own
+# port (e.g. 9891, 7866, 18880).
+EXPOSE 8443 11443
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
 	CMD ["node", "-e", "require('node:https').get({ host: '127.0.0.1', port: process.env.PORT, path: '/auth/sign-in', rejectUnauthorized: false }, (response) => process.exit(response.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
 CMD ["node", "server.mjs"]
