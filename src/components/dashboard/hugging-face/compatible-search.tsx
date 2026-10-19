@@ -26,7 +26,7 @@ import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
-import type { HfRepo, StoreModel } from "@/types/device";
+import type { HfRepository, StoreModel } from "@/types/device";
 import { responseError } from "@/lib/sse";
 import { useDeviceChecks, type Check } from "@/hooks/use-device-checks";
 
@@ -168,7 +168,7 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React
 	const [store, setStore] = React.useState<StoreModel[] | null>(null);
 	const [base, setBase] = React.useState<string>("");
 	const [query, setQuery] = React.useState<string>("");
-	const [repos, setRepos] = React.useState<HfRepo[] | null>(null);
+	const [repos, setRepos] = React.useState<HfRepository[] | null>(null);
 	const [searching, setSearching] = React.useState<boolean>(false);
 	const [error, setError] = React.useState<string | null>(null);
 	const [settings, updateSettings] = useSettings();
@@ -212,7 +212,7 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React
 			const parameters = new URLSearchParams({ base, q: query, limit: String(settings.limit) });
 			const response = await fetch(`/api/hf/search?${parameters.toString()}`);
 			if (!response.ok) throw new Error(await responseError(response));
-			setRepos((await response.json()) as HfRepo[]);
+			setRepos((await response.json()) as HfRepository[]);
 		} catch (error_) {
 			setError(error_ instanceof Error ? error_.message : String(error_));
 		} finally {
@@ -398,7 +398,7 @@ const isIncompatible = (check: Check | undefined): boolean =>
 
 // "Compatible only" hides repos the device has said it cannot import; unchecked ones, and ones that
 // only need a base model downloaded, stay visible.
-function visibleRepos(repos: HfRepo[], checks: Record<string, Check>, isCompatibleOnly: boolean): HfRepo[] {
+function visibleRepos(repos: HfRepository[], checks: Record<string, Check>, isCompatibleOnly: boolean): HfRepository[] {
 	return isCompatibleOnly ? repos.filter((repository) => !isIncompatible(checks[repository.repoId])) : repos;
 }
 
@@ -407,7 +407,7 @@ function CheckSummary({
 	checks,
 	compatibleOnly,
 }: {
-	repos: HfRepo[];
+	repos: HfRepository[];
 	checks: Record<string, Check>;
 	compatibleOnly: boolean;
 }): React.JSX.Element {

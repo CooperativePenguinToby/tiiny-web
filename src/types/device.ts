@@ -141,7 +141,6 @@ export interface HfRepository {
 	pipelineTag: string | null;
 }
 // Former name, still imported by the Hugging Face compatible-repos search.
-export type { HfRepository as HfRepo };
 
 // One parsed event from the device's import stream, as forwarded to the browser.
 export interface ImportEvent {
