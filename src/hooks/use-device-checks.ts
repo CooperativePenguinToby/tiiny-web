@@ -4,9 +4,7 @@ import type { HfInspection } from "@/types/device";
 import { responseError } from "@/lib/sse";
 
 export type Check =
-	| { state: "checking" }
-	| { state: "done"; result: HfInspection }
-	| { state: "error"; message: string };
+	{ state: "checking" } | { state: "done"; result: HfInspection } | { state: "error"; message: string };
 
 const CONCURRENCY = 4;
 

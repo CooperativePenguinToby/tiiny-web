@@ -162,9 +162,7 @@ export const RepoCheck = React.forwardRef<RepoCheckHandle>(function RepoCheck(_,
 								<Chip
 									color={
 										{ compatible: "success", "needs-base-model": "warning", incompatible: "error" }[verdict.verdict] as
-											| "success"
-											| "warning"
-											| "error"
+											"success" | "warning" | "error"
 									}
 									label={
 										{

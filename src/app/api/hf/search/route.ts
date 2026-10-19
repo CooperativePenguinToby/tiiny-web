@@ -41,15 +41,13 @@ export const GET = apiRoute(async (request) => {
 	const results = await Promise.all(
 		RELATIONS.map(async (relation) => {
 			const models = await hubSearch(`base_model:${relation}:${base}`, query, limit);
-			return models.map(
-				(model): HfRepo => ({
-					repoId: model.id,
-					relation,
-					downloads: model.downloads ?? 0,
-					likes: model.likes ?? 0,
-					pipelineTag: model.pipeline_tag ?? null,
-				})
-			);
+			return models.map((model): HfRepo => ({
+				repoId: model.id,
+				relation,
+				downloads: model.downloads ?? 0,
+				likes: model.likes ?? 0,
+				pipelineTag: model.pipeline_tag ?? null,
+			}));
 		})
 	);
 	const repos = results.flat().sort((a, b) => b.downloads - a.downloads);
