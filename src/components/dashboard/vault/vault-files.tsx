@@ -184,19 +184,27 @@ export function VaultFiles(): React.JSX.Element {
 	const [deleting, setDeleting] = React.useState<VaultFile | null>(null);
 	const busy = progress !== null;
 
-	const index = async (sourceId: string, label: string): Promise<void> => {
+	const index = async (sourceId: string, label: string, retried = false): Promise<void> => {
 		setProgress({ label, message: "Indexing…", percent: null });
 		const response = await fetch("/api/vault/index", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ sourceId }),
 		});
-		await follow(response, (update) => {
-			const chunks = update.total_chunks ? ` (${update.processed_chunks ?? 0}/${update.total_chunks} chunks)` : "";
-			const stage =
-				update.stage === "loading_model" ? "Loading the embedding model" : `Indexing: ${update.stage ?? ""}`;
-			setProgress({ label, message: `${stage}${chunks}`, percent: update.progress_percent ?? null });
-		});
+		try {
+			await follow(response, (update) => {
+				const chunks = update.total_chunks ? ` (${update.processed_chunks ?? 0}/${update.total_chunks} chunks)` : "";
+				const stage =
+					update.stage === "loading_model" ? "Loading the embedding model" : `Indexing: ${update.stage ?? ""}`;
+				setProgress({ label, message: `${stage}${chunks}`, percent: update.progress_percent ?? null });
+			});
+		} catch (error) {
+			// The device's embedding server now and then fails a request outright; a second try succeeds.
+			if (retried || !/upstream model server failed/i.test(errorMessage(error))) throw error;
+			setProgress({ label, message: "Indexing failed on the device, trying again…", percent: null });
+			await new Promise((resolve) => setTimeout(resolve, 5000));
+			await index(sourceId, label, true);
+		}
 	};
 
 	const upload = async (files: File[]): Promise<void> => {
