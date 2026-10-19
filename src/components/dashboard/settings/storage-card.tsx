@@ -100,7 +100,12 @@ export function StorageCard(): React.JSX.Element {
 											</TableCell>
 											<TableCell align="right">
 												{model.protected ? (
-													<Typography color="text.secondary" variant="caption">
+													<Typography
+														variant="caption"
+														sx={{
+															color: "text.secondary",
+														}}
+													>
 														Used by Vault
 													</Typography>
 												) : (

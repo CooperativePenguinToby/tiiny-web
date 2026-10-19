@@ -102,7 +102,12 @@ function WeekChart({ usage }: { usage: WeekUsage }): React.JSX.Element {
 										</Tooltip>
 									))}
 							</Stack>
-							<Typography color="text.secondary" variant="caption">
+							<Typography
+								variant="caption"
+								sx={{
+									color: "text.secondary",
+								}}
+							>
 								{dayjs(day.date).format("ddd")}
 							</Typography>
 						</Stack>
@@ -119,7 +124,12 @@ function WeekTable({ usage }: { usage: WeekUsage }): React.JSX.Element {
 	);
 	if (rows.length === 0) {
 		return (
-			<Typography color="text.secondary" variant="body2">
+			<Typography
+				variant="body2"
+				sx={{
+					color: "text.secondary",
+				}}
+			>
 				No tokens this week.
 			</Typography>
 		);
@@ -226,7 +236,13 @@ export function TokenUsage(): React.JSX.Element {
 					<Divider />
 					{usage ? (
 						usage.apps.length === 0 ? (
-							<Typography color="text.secondary" sx={{ p: 3 }} variant="body2">
+							<Typography
+								variant="body2"
+								sx={{
+									color: "text.secondary",
+									p: 3,
+								}}
+							>
 								No tokens this week.
 							</Typography>
 						) : (
@@ -236,7 +252,12 @@ export function TokenUsage(): React.JSX.Element {
 										<TableRow data-testid={`app-usage-${app.app}`} key={app.app}>
 											<TableCell>
 												<Typography variant="subtitle2">{app.app}</Typography>
-												<Typography color="text.secondary" variant="caption">
+												<Typography
+													variant="caption"
+													sx={{
+														color: "text.secondary",
+													}}
+												>
 													{Object.keys(app.models).join(", ")}
 												</Typography>
 											</TableCell>

@@ -202,8 +202,8 @@ test("#23 Vault and Web can each be switched off for Task mode", async ({ page }
 	const model = await holdChatModel();
 	try {
 		await openTaskMode(page, model.name);
-		const web = page.getByRole("checkbox", { name: "Web" });
-		const vault = page.getByRole("checkbox", { name: "Vault" });
+		const web = page.getByRole("switch", { name: "Web" });
+		const vault = page.getByRole("switch", { name: "Vault" });
 		await expect(web).toBeChecked();
 		await expect(vault).toBeChecked();
 
@@ -215,10 +215,10 @@ test("#23 Vault and Web can each be switched off for Task mode", async ({ page }
 		await expect(answer(page).getByTestId("task-step").filter({ hasText: "Read example.com" })).toHaveCount(0);
 
 		await page.reload();
-		await expect(page.getByRole("checkbox", { name: "Web" })).not.toBeChecked();
-		await page.getByRole("checkbox", { name: "Web" }).click();
-		await page.getByRole("checkbox", { name: "Vault" }).click();
-		await expect(page.getByRole("checkbox", { name: "Vault" })).not.toBeChecked();
+		await expect(page.getByRole("switch", { name: "Web" })).not.toBeChecked();
+		await page.getByRole("switch", { name: "Web" }).click();
+		await page.getByRole("switch", { name: "Vault" }).click();
+		await expect(page.getByRole("switch", { name: "Vault" })).not.toBeChecked();
 		await page.getByRole("button", { name: "New chat" }).click();
 		await sendChat(page, "Search my Vault for any invoices and tell me what you find.", REPLY);
 		await expect(answer(page).getByTestId("message-content")).not.toBeEmpty();

@@ -13,7 +13,12 @@ export default function Page(): React.JSX.Element {
 		<Stack spacing={3}>
 			<div>
 				<Typography variant="h4">Store</Typography>
-				<Typography color="text.secondary" variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					Models from the Tiiny store. Downloads go to the device; load them from the Models page.
 				</Typography>
 			</div>

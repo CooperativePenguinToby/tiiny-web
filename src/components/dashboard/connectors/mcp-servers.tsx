@@ -142,7 +142,12 @@ function ServerTools({ id }: { id: string }): React.JSX.Element {
 					<Typography variant="body2" sx={{ fontFamily: "monospace" }}>
 						{tool.name}
 					</Typography>
-					<Typography color="text.secondary" variant="caption">
+					<Typography
+						variant="caption"
+						sx={{
+							color: "text.secondary",
+						}}
+					>
 						{tool.description.split("\n")[0]}
 					</Typography>
 				</div>
@@ -178,7 +183,12 @@ export function McpServers(): React.JSX.Element {
 					Add MCP server
 				</Button>
 			</Stack>
-			<Typography color="text.secondary" variant="body2">
+			<Typography
+				variant="body2"
+				sx={{
+					color: "text.secondary",
+				}}
+			>
 				Tools from these servers are offered to models in Task mode. They run on the device.
 			</Typography>
 			{outcome ? (
@@ -192,7 +202,12 @@ export function McpServers(): React.JSX.Element {
 					<CircularProgress aria-label="Loading MCP servers" />
 				) : null
 			) : polled.data.length === 0 ? (
-				<Typography color="text.secondary" variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					No MCP servers yet.
 				</Typography>
 			) : (
@@ -208,9 +223,12 @@ export function McpServers(): React.JSX.Element {
 										size="small"
 									/>
 									<Typography
-										color="text.secondary"
-										sx={{ flex: "1 1 auto", wordBreak: "break-all" }}
 										variant="caption"
+										sx={{
+											color: "text.secondary",
+											flex: "1 1 auto",
+											wordBreak: "break-all",
+										}}
 									>
 										{server.transport} · {server.target}
 									</Typography>

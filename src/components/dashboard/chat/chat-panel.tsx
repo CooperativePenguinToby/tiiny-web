@@ -126,10 +126,12 @@ function MessageBubble({ turn }: { turn: Turn }): React.JSX.Element {
 			sx={{ alignSelf: isUser ? "flex-end" : "flex-start", maxWidth: { xs: "100%", md: "80%" } }}
 		>
 			<Typography
-				color="text.secondary"
 				component="div"
-				sx={{ textAlign: isUser ? "right" : "left" }}
 				variant="caption"
+				sx={{
+					color: "text.secondary",
+					textAlign: isUser ? "right" : "left",
+				}}
 			>
 				{isUser ? "You" : "Assistant"}
 			</Typography>
@@ -140,12 +142,24 @@ function MessageBubble({ turn }: { turn: Turn }): React.JSX.Element {
 			{turn.reasoning ? (
 				<Accordion disableGutters sx={{ mb: 1 }} variant="outlined">
 					<AccordionSummary expandIcon={<CaretDownIcon />}>
-						<Typography color="text.secondary" variant="body2">
+						<Typography
+							variant="body2"
+							sx={{
+								color: "text.secondary",
+							}}
+						>
 							Thinking
 						</Typography>
 					</AccordionSummary>
 					<AccordionDetails>
-						<Typography color="text.secondary" data-testid="reasoning" sx={{ whiteSpace: "pre-wrap" }} variant="body2">
+						<Typography
+							data-testid="reasoning"
+							variant="body2"
+							sx={{
+								color: "text.secondary",
+								whiteSpace: "pre-wrap",
+							}}
+						>
 							{turn.reasoning}
 						</Typography>
 					</AccordionDetails>
@@ -166,7 +180,12 @@ function MessageBubble({ turn }: { turn: Turn }): React.JSX.Element {
 				</Typography>
 			</Box>
 			{turn.note ? (
-				<Typography color="text.secondary" variant="caption">
+				<Typography
+					variant="caption"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					{turn.note}
 				</Typography>
 			) : null}
@@ -751,7 +770,13 @@ export function ChatPanel(): React.JSX.Element {
 						{opening ? (
 							<CircularProgress aria-label="Opening the conversation" sx={{ m: "auto" }} />
 						) : turns.length === 0 ? (
-							<Typography color="text.secondary" sx={{ m: "auto" }} variant="body2">
+							<Typography
+								variant="body2"
+								sx={{
+									color: "text.secondary",
+									m: "auto",
+								}}
+							>
 								Send a message to start chatting with {model?.name ?? "the model"}.
 							</Typography>
 						) : (
@@ -760,7 +785,12 @@ export function ChatPanel(): React.JSX.Element {
 						{phase === "waiting" ? (
 							<Stack direction="row" spacing={1} sx={{ alignItems: "center" }} role="status">
 								<CircularProgress size={16} />
-								<Typography color="text.secondary" variant="body2">
+								<Typography
+									variant="body2"
+									sx={{
+										color: "text.secondary",
+									}}
+								>
 									Waiting for the device · {elapsed}s
 									{others > 0
 										? ` · the model is busy with ${others} other request${others === 1 ? "" : "s"}, yours is queued`

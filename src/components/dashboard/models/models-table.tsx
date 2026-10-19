@@ -155,7 +155,13 @@ export function ModelsTable(): React.JSX.Element {
 					/>
 					<Divider />
 					{data.models.length === 0 ? (
-						<Typography color="text.secondary" sx={{ p: 3 }} variant="body2">
+						<Typography
+							variant="body2"
+							sx={{
+								color: "text.secondary",
+								p: 3,
+							}}
+						>
 							No models are downloaded on the device.
 						</Typography>
 					) : (
@@ -181,7 +187,12 @@ export function ModelsTable(): React.JSX.Element {
 											<TableRow hover key={model.modelId} data-testid={`model-${model.modelId}`}>
 												<TableCell>
 													<Typography variant="subtitle2">{model.name}</Typography>
-													<Typography color="text.secondary" variant="body2">
+													<Typography
+														variant="body2"
+														sx={{
+															color: "text.secondary",
+														}}
+													>
 														{model.modelId}
 														{model.params ? ` · ${model.params}` : ""}
 													</Typography>
@@ -199,7 +210,13 @@ export function ModelsTable(): React.JSX.Element {
 												<TableCell align="right">
 													{active ? (
 														<Stack spacing={0.5} sx={{ alignItems: "stretch" }}>
-															<Typography color="text.secondary" variant="caption" role="status">
+															<Typography
+																variant="caption"
+																role="status"
+																sx={{
+																	color: "text.secondary",
+																}}
+															>
 																{active.message}
 															</Typography>
 															<LinearProgress

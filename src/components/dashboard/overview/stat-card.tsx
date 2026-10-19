@@ -30,7 +30,12 @@ export function StatCard({
 				<Stack spacing={2}>
 					<Stack direction="row" spacing={3} sx={{ alignItems: "flex-start", justifyContent: "space-between" }}>
 						<Stack spacing={1}>
-							<Typography color="text.secondary" variant="overline">
+							<Typography
+								variant="overline"
+								sx={{
+									color: "text.secondary",
+								}}
+							>
 								{title}
 							</Typography>
 							<Typography variant="h4">{value}</Typography>
@@ -45,7 +50,14 @@ export function StatCard({
 							value={Math.min(percent, 100)}
 							variant="determinate"
 						/>
-						<Typography color="text.secondary" sx={{ mt: 1 }} variant="caption" component="p">
+						<Typography
+							variant="caption"
+							component="p"
+							sx={{
+								color: "text.secondary",
+								mt: 1,
+							}}
+						>
 							{caption}
 						</Typography>
 					</div>

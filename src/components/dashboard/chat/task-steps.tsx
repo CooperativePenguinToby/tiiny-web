@@ -36,10 +36,11 @@ function Step({ step }: { step: TaskStep }): React.JSX.Element {
 			</Stack>
 			<Collapse in={open} unmountOnExit>
 				<Typography
-					color="text.secondary"
 					component="pre"
 					data-testid="task-step-result"
+					variant="caption"
 					sx={{
+						color: "text.secondary",
 						whiteSpace: "pre-wrap",
 						wordBreak: "break-word",
 						maxHeight: 240,
@@ -48,7 +49,6 @@ function Step({ step }: { step: TaskStep }): React.JSX.Element {
 						ml: 3,
 						mt: 0.5,
 					}}
-					variant="caption"
 				>
 					{step.result}
 				</Typography>

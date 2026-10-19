@@ -14,7 +14,12 @@ export default function Page(): React.JSX.Element {
 		<Stack spacing={3}>
 			<div>
 				<Typography variant="h4">History</Typography>
-				<Typography color="text.secondary" variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					Conversations kept on the device, from this app and from TiinyOS.
 				</Typography>
 			</div>

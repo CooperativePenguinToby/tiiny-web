@@ -13,7 +13,12 @@ export default function Page(): React.JSX.Element {
 		<Stack spacing={3}>
 			<div>
 				<Typography variant="h4">Chat</Typography>
-				<Typography color="text.secondary" variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					Talk to a loaded model. Chats are kept in the device&apos;s chat history, shared with TiinyOS. The device
 					answers one request per model at a time, so replies may queue.
 				</Typography>

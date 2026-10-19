@@ -149,7 +149,12 @@ export function SummarySettings(): React.JSX.Element {
 							{saving ? "Saving…" : "Save"}
 						</Button>
 					</Stack>
-					<Typography color="text.secondary" variant="caption">
+					<Typography
+						variant="caption"
+						sx={{
+							color: "text.secondary",
+						}}
+					>
 						Each day the device summarises the day&apos;s conversations into Vault, so models can recall them in Task
 						mode. It loads the model while it works, which can make that model busy for a while.
 					</Typography>

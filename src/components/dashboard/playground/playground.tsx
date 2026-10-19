@@ -232,7 +232,13 @@ function Ocr({ model }: { model: string }): React.JSX.Element {
 			{error ? <Alert severity="error">{error}</Alert> : null}
 			{result ? (
 				result.lines.length === 0 ? (
-					<Typography color="text.secondary">No text found.</Typography>
+					<Typography
+						sx={{
+							color: "text.secondary",
+						}}
+					>
+						No text found.
+					</Typography>
 				) : (
 					<Table aria-label="Recognized lines" data-testid="playground-result" size="small">
 						<TableBody>
@@ -444,7 +450,12 @@ export function Playground(): React.JSX.Element {
 			<Divider />
 			<CardContent>
 				<Stack spacing={2}>
-					<Typography color="text.secondary" variant="body2">
+					<Typography
+						variant="body2"
+						sx={{
+							color: "text.secondary",
+						}}
+					>
 						{tab.intro}
 					</Typography>
 					{models.error ? <Alert severity="error">{models.error}</Alert> : null}

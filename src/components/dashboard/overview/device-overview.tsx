@@ -52,7 +52,12 @@ export function DeviceOverview(): React.JSX.Element {
 		<Stack spacing={3}>
 			<div>
 				<Typography variant="h4">Overview</Typography>
-				<Typography color="text.secondary" variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					{data.device.model} · TiinyOS {data.device.os} · {npu.statusMessage}
 				</Typography>
 			</div>

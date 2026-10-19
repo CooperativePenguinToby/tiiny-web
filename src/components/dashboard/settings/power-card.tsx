@@ -58,7 +58,12 @@ function AutoPowerOn(): React.JSX.Element {
 	return (
 		<Stack spacing={1}>
 			<Typography variant="subtitle2">Auto power-on</Typography>
-			<Typography color="text.secondary" variant="body2">
+			<Typography
+				variant="body2"
+				sx={{
+					color: "text.secondary",
+				}}
+			>
 				The device turns on by itself when connected to power. The device does not report whether this is on (it always
 				reads as off), so only the result of a change is shown.
 			</Typography>
@@ -120,7 +125,13 @@ function UpdateSection({ onRestarting }: { onRestarting: (message: string) => Pr
 				<CircularProgress aria-label="Loading update status" size={20} />
 			)}
 			{checked?.updateAvailable ? (
-				<Typography color="text.secondary" sx={{ whiteSpace: "pre-wrap" }} variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+						whiteSpace: "pre-wrap",
+					}}
+				>
 					{checked.notes}
 				</Typography>
 			) : null}

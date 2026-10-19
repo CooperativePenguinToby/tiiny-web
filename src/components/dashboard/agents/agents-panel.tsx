@@ -111,7 +111,12 @@ function AgentIcon({ agent }: { agent: Agent }): React.JSX.Element {
 function RecommendedModels({ agent }: { agent: Agent }): React.JSX.Element | null {
 	if (agent.recommendedModels.length === 0) return null;
 	return (
-		<Typography color="text.secondary" variant="caption">
+		<Typography
+			variant="caption"
+			sx={{
+				color: "text.secondary",
+			}}
+		>
 			Recommended model{agent.recommendedModels.length > 1 ? "s" : ""}: {agent.recommendedModels.join(", ")}
 		</Typography>
 	);
@@ -188,7 +193,13 @@ export function AgentsPanel(): React.JSX.Element {
 	// An install in progress or paused: progress with Pause, or Resume and Cancel.
 	const installState = (agent: Agent, state: NonNullable<Agent["install"]>): React.JSX.Element => (
 		<Stack spacing={1} sx={{ width: "100%" }}>
-			<Typography color="text.secondary" role="status" variant="caption">
+			<Typography
+				role="status"
+				variant="caption"
+				sx={{
+					color: "text.secondary",
+				}}
+			>
 				{state.state === "paused" ? "Install paused at" : "Installing"} {state.percent.toFixed(0)}%
 			</Typography>
 			<LinearProgress aria-label={`${agent.name} install`} value={state.percent} variant="determinate" />
@@ -212,7 +223,13 @@ export function AgentsPanel(): React.JSX.Element {
 	const progress = (agent: Agent): React.JSX.Element | null =>
 		busy?.appId === agent.appId ? (
 			<Stack spacing={0.5} sx={{ width: "100%" }}>
-				<Typography color="text.secondary" role="status" variant="caption">
+				<Typography
+					role="status"
+					variant="caption"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					{busy.message}
 					{busy.percent === null ? "" : ` ${busy.percent.toFixed(0)}%`}
 				</Typography>
@@ -243,7 +260,12 @@ export function AgentsPanel(): React.JSX.Element {
 			<Stack spacing={2}>
 				<Typography variant="h6">On this device</Typography>
 				{installed.length === 0 ? (
-					<Typography color="text.secondary" variant="body2">
+					<Typography
+						variant="body2"
+						sx={{
+							color: "text.secondary",
+						}}
+					>
 						No agents are installed on the device. Install one from the store below.
 					</Typography>
 				) : (
@@ -267,15 +289,31 @@ export function AgentsPanel(): React.JSX.Element {
 															size="small"
 														/>
 													</Stack>
-													<Typography color="text.secondary" variant="body2">
+													<Typography
+														variant="body2"
+														sx={{
+															color: "text.secondary",
+														}}
+													>
 														{agent.description}
 													</Typography>
-													<Typography color="text.secondary" variant="caption">
+													<Typography
+														variant="caption"
+														sx={{
+															color: "text.secondary",
+														}}
+													>
 														Version {service.version ?? "unknown"}
 														{service.update ? ` · ${service.update.latestVersion} available` : ""}
 													</Typography>
 													{service.usage && running ? (
-														<Typography color="text.secondary" data-testid="agent-usage" variant="caption">
+														<Typography
+															data-testid="agent-usage"
+															variant="caption"
+															sx={{
+																color: "text.secondary",
+															}}
+														>
 															CPU {service.usage.cpuPercent.toFixed(1)}% · memory{" "}
 															{formatBytes(service.usage.memoryBytes)}
 														</Typography>
@@ -376,7 +414,12 @@ export function AgentsPanel(): React.JSX.Element {
 			<Stack spacing={2}>
 				<Typography variant="h6">Agent store: run on the device</Typography>
 				{installable.length === 0 ? (
-					<Typography color="text.secondary" variant="body2">
+					<Typography
+						variant="body2"
+						sx={{
+							color: "text.secondary",
+						}}
+					>
 						Every web agent from the store is already installed.
 					</Typography>
 				) : (
@@ -389,10 +432,20 @@ export function AgentsPanel(): React.JSX.Element {
 											<AgentIcon agent={agent} />
 											<Stack spacing={0.5} sx={{ minWidth: 0 }}>
 												<Typography variant="subtitle1">{agent.name}</Typography>
-												<Typography color="text.secondary" variant="body2">
+												<Typography
+													variant="body2"
+													sx={{
+														color: "text.secondary",
+													}}
+												>
 													{agent.description}
 												</Typography>
-												<Typography color="text.secondary" variant="caption">
+												<Typography
+													variant="caption"
+													sx={{
+														color: "text.secondary",
+													}}
+												>
 													Version {agent.cloudVersion}
 												</Typography>
 												<RecommendedModels agent={agent} />
@@ -415,7 +468,12 @@ export function AgentsPanel(): React.JSX.Element {
 
 			<Stack spacing={2}>
 				<Typography variant="h6">Agent store: run on your computer</Typography>
-				<Typography color="text.secondary" variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					These agents run on a computer and use the device&apos;s OpenAI-compatible API. Point them at the device (for
 					example <code>http://&lt;device address&gt;/v1</code>) with the key from <code>tiiny auth key</code>.
 				</Typography>
@@ -428,7 +486,12 @@ export function AgentsPanel(): React.JSX.Element {
 										<AgentIcon agent={agent} />
 										<Stack spacing={0.5} sx={{ minWidth: 0 }}>
 											<Typography variant="subtitle1">{agent.name}</Typography>
-											<Typography color="text.secondary" variant="body2">
+											<Typography
+												variant="body2"
+												sx={{
+													color: "text.secondary",
+												}}
+											>
 												{agent.description}
 											</Typography>
 											<RecommendedModels agent={agent} />
@@ -438,7 +501,12 @@ export function AgentsPanel(): React.JSX.Element {
 								<CardActions sx={ACTIONS_SX}>
 									<Stack spacing={0.5}>
 										{agent.downloads.length === 0 ? (
-											<Typography color="text.secondary" variant="caption">
+											<Typography
+												variant="caption"
+												sx={{
+													color: "text.secondary",
+												}}
+											>
 												No downloads published.
 											</Typography>
 										) : (

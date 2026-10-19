@@ -13,7 +13,12 @@ export default function Page(): React.JSX.Element {
 		<Stack spacing={3}>
 			<div>
 				<Typography variant="h4">Vault</Typography>
-				<Typography color="text.secondary" variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					The device&apos;s knowledge base: your files and summaries of past chats, indexed on the device for models to
 					search.
 				</Typography>

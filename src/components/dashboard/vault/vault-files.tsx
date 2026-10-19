@@ -150,7 +150,12 @@ function VaultSearch(): React.JSX.Element {
 					</Stack>
 					{error ? <Alert severity="error">{error}</Alert> : null}
 					{results === null ? null : results.length === 0 ? (
-						<Typography color="text.secondary" variant="body2">
+						<Typography
+							variant="body2"
+							sx={{
+								color: "text.secondary",
+							}}
+						>
 							Nothing relevant found.
 						</Typography>
 					) : (
@@ -159,9 +164,13 @@ function VaultSearch(): React.JSX.Element {
 								<Stack key={result.entryId} spacing={0.5} data-testid="vault-result">
 									<Typography variant="subtitle2">{result.source}</Typography>
 									<Typography
-										color="text.secondary"
-										sx={{ whiteSpace: "pre-wrap", maxHeight: 160, overflow: "auto" }}
 										variant="body2"
+										sx={{
+											color: "text.secondary",
+											whiteSpace: "pre-wrap",
+											maxHeight: 160,
+											overflow: "auto",
+										}}
 									>
 										{hitText(result.content)}
 									</Typography>
@@ -301,7 +310,12 @@ export function VaultFiles(): React.JSX.Element {
 								</Stack>
 							) : null
 						) : polled.data.length === 0 ? (
-							<Typography color="text.secondary" variant="body2">
+							<Typography
+								variant="body2"
+								sx={{
+									color: "text.secondary",
+								}}
+							>
 								No files yet. Upload documents for models to use.
 							</Typography>
 						) : (

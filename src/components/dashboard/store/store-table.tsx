@@ -191,7 +191,13 @@ export function StoreTable(): React.JSX.Element {
 					</Stack>
 					<Divider />
 					{visible.length === 0 ? (
-						<Typography color="text.secondary" sx={{ p: 3 }} variant="body2">
+						<Typography
+							variant="body2"
+							sx={{
+								color: "text.secondary",
+								p: 3,
+							}}
+						>
 							No store models match your search.
 						</Typography>
 					) : (
@@ -224,20 +230,25 @@ export function StoreTable(): React.JSX.Element {
 														</Button>
 														{model.trending ? <Chip label="trending" size="small" sx={{ ml: 1 }} /> : null}
 													</Typography>
-													<Typography color="text.secondary" variant="body2">
+													<Typography
+														variant="body2"
+														sx={{
+															color: "text.secondary",
+														}}
+													>
 														{model.modelId}
 														{model.params ? ` · ${model.params}` : ""}
 													</Typography>
 													<Typography
-														color="text.secondary"
+														title={model.description}
+														variant="caption"
 														sx={{
+															color: "text.secondary",
 															display: "-webkit-box",
 															overflow: "hidden",
 															WebkitBoxOrient: "vertical",
 															WebkitLineClamp: 2,
 														}}
-														title={model.description}
-														variant="caption"
 													>
 														{model.description}
 													</Typography>
@@ -248,7 +259,13 @@ export function StoreTable(): React.JSX.Element {
 												<TableCell align="right">
 													{active ? (
 														<Stack spacing={0.5}>
-															<Typography color="text.secondary" role="status" variant="caption">
+															<Typography
+																role="status"
+																variant="caption"
+																sx={{
+																	color: "text.secondary",
+																}}
+															>
 																{active.stage}
 																{active.percent === null ? "" : ` ${active.percent.toFixed(0)}%`}
 															</Typography>

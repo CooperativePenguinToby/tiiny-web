@@ -105,7 +105,12 @@ function GroupHeader({ children, ...injected }: { children: React.ReactNode }): 
 function VerdictCell({ check }: { check: Check | undefined }): React.JSX.Element {
 	if (!check || check.state === "checking") {
 		return (
-			<Typography color="text.secondary" variant="body2">
+			<Typography
+				variant="body2"
+				sx={{
+					color: "text.secondary",
+				}}
+			>
 				{check ? "checking…" : "not checked"}
 			</Typography>
 		);
@@ -126,7 +131,12 @@ function VerdictCell({ check }: { check: Check | undefined }): React.JSX.Element
 			) : (
 				<Chip color="error" label="not compatible" size="small" />
 			)}
-			<Typography color="text.secondary" variant="caption">
+			<Typography
+				variant="caption"
+				sx={{
+					color: "text.secondary",
+				}}
+			>
 				{verdict === "needs-base-model" && requiredBaseModel
 					? `Download ${requiredBaseModel.name} from the Store first`
 					: (reason ?? reasonCode)}
@@ -246,7 +256,15 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProps): React.JSX.
 				</Button>
 			</Stack>
 			{baseChecksPending ? (
-				<Typography color="text.secondary" role="status" sx={{ px: 2, pb: 1 }} variant="caption">
+				<Typography
+					role="status"
+					variant="caption"
+					sx={{
+						color: "text.secondary",
+						px: 2,
+						pb: 1,
+					}}
+				>
 					Asking the device which store models can be import bases…
 				</Typography>
 			) : null}
@@ -297,7 +315,13 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProps): React.JSX.
 				<CheckSummary checks={repoChecks} compatibleOnly={settings.compatibleOnly} repos={repos} />
 			) : null}
 			{repos === null ? null : repos.length === 0 ? (
-				<Typography color="text.secondary" sx={{ p: 3 }} variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+						p: 3,
+					}}
+				>
 					No adapters or fine-tunes of {base} found on Hugging Face.
 				</Typography>
 			) : (
@@ -377,7 +401,14 @@ function CheckSummary({
 	const needsBase = count("needs-base-model");
 	return (
 		<Stack spacing={1} sx={{ px: 2, pb: 2 }}>
-			<Typography color="text.secondary" data-testid="hf-check-summary" role="status" variant="body2">
+			<Typography
+				data-testid="hf-check-summary"
+				role="status"
+				variant="body2"
+				sx={{
+					color: "text.secondary",
+				}}
+			>
 				Checked {finished} of {ids.length} · {count("compatible")} compatible
 				{needsBase > 0 ? ` · ${needsBase} need a base model` : ""}
 				{hidden > 0 ? ` · ${hidden} incompatible hidden` : ""}

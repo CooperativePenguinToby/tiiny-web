@@ -16,7 +16,13 @@ export default function NotFound(): React.JSX.Element {
 				<Typography variant="h3" sx={{ textAlign: "center" }}>
 					404: The page you are looking for isn&apos;t here
 				</Typography>
-				<Typography color="text.secondary" variant="body1" sx={{ textAlign: "center" }}>
+				<Typography
+					variant="body1"
+					sx={{
+						color: "text.secondary",
+						textAlign: "center",
+					}}
+				>
 					Use the navigation to get back to the dashboard.
 				</Typography>
 				<BackHomeButton />

@@ -64,7 +64,12 @@ export function SignInForm(): React.JSX.Element {
 		<Stack spacing={4}>
 			<Stack spacing={1}>
 				<Typography variant="h4">Sign in</Typography>
-				<Typography color="text.secondary" variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					Enter the admin password configured for this server.
 				</Typography>
 			</Stack>

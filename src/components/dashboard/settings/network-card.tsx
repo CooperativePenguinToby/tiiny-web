@@ -87,7 +87,12 @@ function NetworksTable({
 		) : (
 			<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
 				<CircularProgress aria-label="Scanning for networks" size={16} />
-				<Typography color="text.secondary" variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					Scanning for networks…
 				</Typography>
 			</Stack>
@@ -114,7 +119,12 @@ function NetworksTable({
 									{!wifi.connected && wifi.saved ? <Chip label="Saved" size="small" variant="outlined" /> : null}
 									{wifi.needsPassword ? null : <Chip label="Open" size="small" variant="outlined" />}
 								</Stack>
-								<Typography color="text.secondary" variant="caption">
+								<Typography
+									variant="caption"
+									sx={{
+										color: "text.secondary",
+									}}
+								>
 									Signal {wifi.signal}%
 								</Typography>
 							</TableCell>
@@ -123,7 +133,6 @@ function NetworksTable({
 									<Switch
 										checked={wifi.autoJoin}
 										disabled={busy}
-										inputProps={{ "aria-label": `Auto-join ${wifi.ssid}` }}
 										onChange={(event) =>
 											onAct(
 												{ action: "auto-join", ssid: wifi.ssid, enabled: event.target.checked },
@@ -131,6 +140,9 @@ function NetworksTable({
 											)
 										}
 										size="small"
+										slotProps={{
+											input: { "aria-label": `Auto-join ${wifi.ssid}` },
+										}}
 									/>
 								) : null}
 							</TableCell>

@@ -57,7 +57,13 @@ export function ApiAccessCard(): React.JSX.Element {
 											<TableCell component="th">{format}</TableCell>
 											<TableCell>
 												<code data-testid={`api-base-${format}`}>{url}</code>
-												<Typography color="text.secondary" component="div" variant="caption">
+												<Typography
+													component="div"
+													variant="caption"
+													sx={{
+														color: "text.secondary",
+													}}
+												>
 													{use}
 												</Typography>
 											</TableCell>
@@ -84,7 +90,12 @@ export function ApiAccessCard(): React.JSX.Element {
 								</TableBody>
 							</Table>
 							{error ? <Alert severity="error">{error}</Alert> : null}
-							<Typography color="text.secondary" variant="body2">
+							<Typography
+								variant="body2"
+								sx={{
+									color: "text.secondary",
+								}}
+							>
 								Use a model id from the Models page, or <code>default</code> for the model most recently used. Keep the
 								key private: anyone with it can use the device&apos;s API.
 							</Typography>

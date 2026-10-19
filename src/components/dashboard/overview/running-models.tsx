@@ -18,7 +18,13 @@ export function RunningModels({ models }: { models: RunningModel[] }): React.JSX
 			<CardHeader title="Loaded models" />
 			<Divider />
 			{models.length === 0 ? (
-				<Typography color="text.secondary" sx={{ p: 3 }} variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+						p: 3,
+					}}
+				>
 					No models are loaded. Load one from the Models page.
 				</Typography>
 			) : (
@@ -37,7 +43,12 @@ export function RunningModels({ models }: { models: RunningModel[] }): React.JSX
 							<TableRow hover key={model.modelId} data-testid={`running-${model.modelId}`}>
 								<TableCell>
 									<Typography variant="subtitle2">{model.name}</Typography>
-									<Typography color="text.secondary" variant="body2">
+									<Typography
+										variant="body2"
+										sx={{
+											color: "text.secondary",
+										}}
+									>
 										{model.modelId}
 									</Typography>
 								</TableCell>

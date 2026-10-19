@@ -57,7 +57,7 @@ test("#11 changes that would cut this app off from the device are refused", asyn
 	await page.goto("/dashboard/settings");
 	const card = page.getByTestId("settings-network");
 	await expect(card.getByTestId("interface-wlan0")).toContainText("This app's link");
-	await expect(card.getByRole("checkbox", { name: "Wi-Fi" })).toBeDisabled();
+	await expect(card.getByRole("switch", { name: "Wi-Fi" })).toBeDisabled();
 	await expect(
 		card.getByTestId(`wifi-${status.connected_wifi_name}`).getByRole("button", { name: "Forget" })
 	).toBeDisabled(SCAN);
@@ -83,7 +83,7 @@ test("#11 auto-join can be switched for a saved network", async ({ page }) => {
 	const original = saved!.is_auto_connect;
 	await signIn(page);
 	await page.goto("/dashboard/settings");
-	const toggle = page.getByRole("checkbox", { name: `Auto-join ${saved!.wifi_name}` });
+	const toggle = page.getByRole("switch", { name: `Auto-join ${saved!.wifi_name}` });
 	try {
 		await expect(toggle).toBeChecked({ checked: original, ...SCAN });
 		await toggle.click();

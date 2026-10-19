@@ -54,7 +54,7 @@ test("#16 daily summaries are switched on and off and timed on the History page,
 	await signIn(page);
 	await page.getByRole("link", { name: "History" }).click();
 	const card = page.getByTestId("summary-settings");
-	const toggle = card.getByRole("checkbox", { name: "Daily summaries" });
+	const toggle = card.getByRole("switch", { name: "Daily summaries" });
 	try {
 		await expect(toggle).toBeChecked({ checked: model.model_id !== "" });
 		if (model.model_id !== "") {

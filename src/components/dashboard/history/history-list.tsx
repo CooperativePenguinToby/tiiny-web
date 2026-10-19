@@ -105,7 +105,12 @@ export function HistoryList(): React.JSX.Element {
 					</Stack>
 				) : null
 			) : items.length === 0 ? (
-				<Typography color="text.secondary" variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					{found ? `No conversations mention “${found.query}”.` : "No conversations yet. Chats you have are kept here."}
 				</Typography>
 			) : (
@@ -129,11 +134,22 @@ export function HistoryList(): React.JSX.Element {
 										{conversation.title || "Untitled"}
 									</Typography>
 									{conversation.snippet ? (
-										<Typography color="text.secondary" noWrap variant="body2">
+										<Typography
+											noWrap
+											variant="body2"
+											sx={{
+												color: "text.secondary",
+											}}
+										>
 											…{conversation.snippet}…
 										</Typography>
 									) : null}
-									<Typography color="text.secondary" variant="caption">
+									<Typography
+										variant="caption"
+										sx={{
+											color: "text.secondary",
+										}}
+									>
 										{dayjs(conversation.updatedAt).format("D MMM YYYY HH:mm")}
 									</Typography>
 								</Stack>

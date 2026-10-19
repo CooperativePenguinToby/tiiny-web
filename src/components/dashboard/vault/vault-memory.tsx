@@ -67,9 +67,14 @@ function SummaryItem({ summary, onDelete }: { summary: DailySummary; onDelete: (
 				)
 			) : (
 				<Typography
-					color="text.secondary"
-					sx={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
 					variant="body2"
+					sx={{
+						color: "text.secondary",
+						display: "-webkit-box",
+						WebkitLineClamp: 2,
+						WebkitBoxOrient: "vertical",
+						overflow: "hidden",
+					}}
 				>
 					{summary.preview}
 				</Typography>
@@ -104,7 +109,12 @@ export function VaultMemory(): React.JSX.Element {
 								<CircularProgress aria-label="Loading chat history" />
 							) : null
 						) : polled.data.length === 0 ? (
-							<Typography color="text.secondary" variant="body2">
+							<Typography
+								variant="body2"
+								sx={{
+									color: "text.secondary",
+								}}
+							>
 								No summaries yet.
 							</Typography>
 						) : (

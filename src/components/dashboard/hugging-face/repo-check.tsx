@@ -190,12 +190,22 @@ export const RepoCheck = React.forwardRef<RepoCheckHandle>(function RepoCheck(_,
 								</Alert>
 							) : null}
 							{verdict.verdict === "incompatible" ? (
-								<Typography color="text.secondary" variant="body2">
+								<Typography
+									variant="body2"
+									sx={{
+										color: "text.secondary",
+									}}
+								>
 									{verdict.reason ?? "The device cannot import this repo."}
 									{verdict.reasonCode ? ` (${verdict.reasonCode})` : ""}
 								</Typography>
 							) : null}
-							<Typography color="text.secondary" variant="body2">
+							<Typography
+								variant="body2"
+								sx={{
+									color: "text.secondary",
+								}}
+							>
 								Size {formatBytes(verdict.sizeBytes)}
 								{verdict.baseModelId ? ` · base model ${verdict.baseModelId}` : ""}
 								{verdict.disk
@@ -213,11 +223,22 @@ export const RepoCheck = React.forwardRef<RepoCheckHandle>(function RepoCheck(_,
 							) : null}
 							{importing ? (
 								<Stack spacing={1}>
-									<Typography color="text.secondary" role="status" variant="body2">
+									<Typography
+										role="status"
+										variant="body2"
+										sx={{
+											color: "text.secondary",
+										}}
+									>
 										{importing.stage} · {importing.percent.toFixed(1)}%{importing.bytes ? ` · ${importing.bytes}` : ""}
 									</Typography>
 									<LinearProgress aria-label="import progress" value={importing.percent} variant="determinate" />
-									<Typography color="text.secondary" variant="caption">
+									<Typography
+										variant="caption"
+										sx={{
+											color: "text.secondary",
+										}}
+									>
 										The import runs on the device and continues if you leave this page.
 									</Typography>
 									<div>

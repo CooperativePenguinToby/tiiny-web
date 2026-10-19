@@ -85,7 +85,12 @@ export function ConnectorsPanel(): React.JSX.Element {
 			{polled.error ? <Alert severity={polled.data ? "warning" : "error"}>{polled.error}</Alert> : null}
 			<Stack spacing={2}>
 				<Typography variant="h6">Services</Typography>
-				<Typography color="text.secondary" variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					Models use connected services in Task mode, within what you authorize. Connections live on the device and are
 					shared with TiinyOS.
 				</Typography>
@@ -111,10 +116,21 @@ export function ConnectorsPanel(): React.JSX.Element {
 														size="small"
 													/>
 												</Stack>
-												<Typography color="text.secondary" variant="caption">
+												<Typography
+													variant="caption"
+													sx={{
+														color: "text.secondary",
+													}}
+												>
 													{CATEGORY[connector.category]}
 												</Typography>
-												<Typography color="text.secondary" data-testid="connector-detail" variant="body2">
+												<Typography
+													data-testid="connector-detail"
+													variant="body2"
+													sx={{
+														color: "text.secondary",
+													}}
+												>
 													{connector.detail}
 												</Typography>
 												{waiting ? (

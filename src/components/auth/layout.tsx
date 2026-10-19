@@ -44,7 +44,15 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
 				}}
 			>
 				<Stack spacing={1}>
-					<Typography color="inherit" sx={{ fontSize: "24px", lineHeight: "32px", textAlign: "center" }} variant="h1">
+					<Typography
+						variant="h1"
+						sx={{
+							color: "inherit",
+							fontSize: "24px",
+							lineHeight: "32px",
+							textAlign: "center",
+						}}
+					>
 						Welcome to{" "}
 						<Box component="span" sx={{ color: "#15b79e" }}>
 							Tiiny

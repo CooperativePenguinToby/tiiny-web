@@ -57,7 +57,13 @@ export function ModelDetailsDialog({
 		<Dialog fullWidth maxWidth="sm" onClose={onClose} open={model !== null}>
 			<DialogTitle>{model?.name}</DialogTitle>
 			<DialogContent>
-				<Typography color="text.secondary" sx={{ mb: 2 }} variant="body2">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+						mb: 2,
+					}}
+				>
 					{model?.description}
 				</Typography>
 				<Table aria-label="Model details" size="small">
