@@ -1,3 +1,6 @@
+import { readdir } from "node:fs/promises";
+import path from "node:path";
+
 import { NextResponse } from "next/server";
 import { deviceJson } from "@/server/device";
 import { apiRoute } from "@/server/route";
@@ -16,7 +19,6 @@ interface CatalogApp {
 	app_id: string;
 	app_name: string;
 	app_desc?: string;
-	icon?: string;
 	default_model?: string[];
 	coming_soon?: boolean;
 	platforms: Platform[];
@@ -71,6 +73,18 @@ async function downloadStatus(appId: string): Promise<{ status: string; overall_
 	}
 }
 
+// Agent icons ship with the app (public/agents/<app id>.png), so the page loads nothing from the internet:
+// the catalog's icon URLs point at Tiiny's CDN. An agent without a bundled icon shows its initial.
+const ICON_DIRECTORY = path.join(process.cwd(), "public", "agents");
+
+async function bundledIcons(): Promise<Set<string>> {
+	try {
+		return new Set(await readdir(ICON_DIRECTORY));
+	} catch {
+		return new Set();
+	}
+}
+
 export const GET = apiRoute(async () => {
 	const [catalog, cloud, services, updates, usage] = await Promise.all([
 		deviceJson<{ app: CatalogApp[] }>("/api/services/apps/metadata"),
@@ -110,6 +124,7 @@ export const GET = apiRoute(async () => {
 		)
 	);
 
+	const icons = await bundledIcons();
 	const agents: Agent[] = await Promise.all(
 		catalog.app
 			.filter((app) => !app.coming_soon)
@@ -122,7 +137,7 @@ export const GET = apiRoute(async () => {
 					appId: app.app_id,
 					name: app.app_name,
 					description: app.app_desc ?? "",
-					iconUrl: app.icon ?? null,
+					iconUrl: icons.has(`${app.app_id}.png`) ? `/agents/${encodeURIComponent(app.app_id)}.png` : null,
 					kind: web ? "web" : "desktop",
 					recommendedModels: app.default_model ?? [],
 					downloads: web
