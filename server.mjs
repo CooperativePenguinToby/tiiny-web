@@ -112,9 +112,10 @@ const handle = app.getRequestHandler();
 const server = createServer({ cert: tls.cert, key: tls.key }, (request, response) => {
 	if (!handleAgentRequest(request, response)) void handle(request, response);
 });
-// Only agents use websockets on this port; anything else is refused as before.
+// Agent websockets go to the device; the rest (e.g. the dev server's HMR socket) go to Next.
+const upgrade = app.getUpgradeHandler();
 server.on("upgrade", (request, socket, head) => {
-	if (!handleAgentUpgrade(request, socket, head)) socket.destroy();
+	if (!handleAgentUpgrade(request, socket, head)) void upgrade(request, socket, head);
 });
 server.listen(port, host, () => {
 	console.log(

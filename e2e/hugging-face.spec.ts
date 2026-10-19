@@ -11,7 +11,8 @@ const NEEDS_BASE_BASE = process.env.E2E_HF_NEEDS_BASE_BASE ?? "black-forest-labs
 
 async function searchBase(page: Page, query: string): Promise<void> {
 	await signIn(page);
-	await page.getByRole("link", { name: "Hugging Face" }).click();
+	await page.getByRole("link", { name: "Models" }).click();
+	await page.getByRole("tab", { name: "Hugging Face" }).click();
 	await page.getByRole("combobox", { name: "Base model" }).click();
 	await page.getByRole("option", { name: new RegExp(String.raw`^${LORA_BASE}( \(on device\))?$`) }).click();
 	await page.getByRole("textbox", { name: "Search (optional)" }).fill(query);
@@ -82,7 +83,8 @@ test("#6 the compatibility list reuses recent verdicts", async ({ page }) => {
 
 test("#6 the base list holds every store model, grouped by the device's verdict", async ({ page }) => {
 	await signIn(page);
-	await page.getByRole("link", { name: "Hugging Face" }).click();
+	await page.getByRole("link", { name: "Models" }).click();
+	await page.getByRole("tab", { name: "Hugging Face" }).click();
 	const store = await deviceGet<{ model_id: string }[]>("/api/v1/models/online_models");
 	await page.getByRole("combobox", { name: "Base model" }).click();
 	const listbox = page.getByRole("listbox");
@@ -107,7 +109,8 @@ test("#5 a repo whose base model is not downloaded says which store model to get
 		`${NEEDS_BASE_BASE} must not be on the device (set E2E_HF_NEEDS_BASE / _BASE to another pair)`
 	).not.toContain(NEEDS_BASE_BASE);
 	await signIn(page);
-	await page.getByRole("link", { name: "Hugging Face" }).click();
+	await page.getByRole("link", { name: "Models" }).click();
+	await page.getByRole("tab", { name: "Hugging Face" }).click();
 	await page.getByRole("textbox", { name: "Hugging Face repo" }).fill(NEEDS_BASE_REPO);
 	await page.getByRole("button", { name: "Check" }).click();
 	const verdict = page.getByTestId("hf-verdict");
@@ -119,7 +122,8 @@ test("#5 a repo whose base model is not downloaded says which store model to get
 
 test("#5 an unsupported repo gets the device's reason", async ({ page }) => {
 	await signIn(page);
-	await page.getByRole("link", { name: "Hugging Face" }).click();
+	await page.getByRole("link", { name: "Models" }).click();
+	await page.getByRole("tab", { name: "Hugging Face" }).click();
 	await page.getByRole("textbox", { name: "Hugging Face repo" }).fill("https://huggingface.co/Qwen/Qwen3-0.6B");
 	await page.getByRole("button", { name: "Check" }).click();
 	const verdict = page.getByTestId("hf-verdict");
@@ -130,7 +134,8 @@ test("#5 an unsupported repo gets the device's reason", async ({ page }) => {
 
 test("#5 import starts with progress and Cancel stops it", async ({ page }) => {
 	await signIn(page);
-	await page.getByRole("link", { name: "Hugging Face" }).click();
+	await page.getByRole("link", { name: "Models" }).click();
+	await page.getByRole("tab", { name: "Hugging Face" }).click();
 	await page.getByRole("textbox", { name: "Hugging Face repo" }).fill(LORA_REPO);
 	await page.getByRole("button", { name: "Check" }).click();
 	const verdict = page.getByTestId("hf-verdict");

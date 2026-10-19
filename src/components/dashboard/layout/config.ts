@@ -3,9 +3,13 @@ import { paths } from "@/paths";
 
 export const navItems = [
 	{ key: "overview", title: "Overview", href: paths.dashboard.overview, icon: "chart-pie" },
-	{ key: "models", title: "Models", href: paths.dashboard.models, icon: "cpu" },
-	{ key: "store", title: "Store", href: paths.dashboard.store, icon: "storefront" },
-	{ key: "hugging-face", title: "Hugging Face", href: paths.dashboard.huggingFace, icon: "download" },
+	{
+		key: "models",
+		title: "Models",
+		href: paths.dashboard.models,
+		icon: "cpu",
+		matcher: { type: "startsWith", href: paths.dashboard.models },
+	},
 	{ key: "agents", title: "Agents", href: paths.dashboard.agents, icon: "robot" },
 	{ key: "chat", title: "Chat", href: paths.dashboard.chat, icon: "chat-circle-text" },
 	{ key: "history", title: "History", href: paths.dashboard.history, icon: "clock-counter-clockwise" },

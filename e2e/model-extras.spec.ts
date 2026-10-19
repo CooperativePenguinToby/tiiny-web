@@ -57,7 +57,8 @@ test("#20 the store shows a model's details", async ({ page }) => {
 	const text = online.find((model) => model.context_window && model.thinking.levels.length > 0)!;
 	const image = online.find((model) => model.image_size)!;
 	await signIn(page);
-	await page.getByRole("link", { name: "Store" }).click();
+	await page.getByRole("link", { name: "Models" }).click();
+	await page.getByRole("tab", { name: "Store" }).click();
 	await page.getByTestId(`store-${text.model_id}`).getByRole("button", { name: text.name, exact: true }).click();
 	const dialog = page.getByRole("dialog");
 	await expect(dialog.getByTestId("detail-Context window")).toContainText(
@@ -76,7 +77,8 @@ test("#20 a store download can be paused, resumed and cancelled", async ({ page 
 	test.setTimeout(5 * 60_000);
 	expect(await localStatus(), `${DOWNLOAD_MODEL} must not be on the device`).toBe("absent");
 	await signIn(page);
-	await page.getByRole("link", { name: "Store" }).click();
+	await page.getByRole("link", { name: "Models" }).click();
+	await page.getByRole("tab", { name: "Store" }).click();
 	const row = page.getByTestId(`store-${DOWNLOAD_MODEL}`);
 	try {
 		await row.getByRole("button", { name: "Download" }).click();

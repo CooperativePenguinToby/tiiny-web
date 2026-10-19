@@ -11,17 +11,14 @@ export const metadata = { title: `Store | ${config.site.name}` } satisfies Metad
 export default function Page(): React.JSX.Element {
 	return (
 		<Stack spacing={3}>
-			<div>
-				<Typography variant="h4">Store</Typography>
-				<Typography
-					variant="body2"
-					sx={{
-						color: "text.secondary",
-					}}
-				>
-					Models from the Tiiny store. Downloads go to the device; load them from the Models page.
-				</Typography>
-			</div>
+			<Typography
+				variant="body2"
+				sx={{
+					color: "text.secondary",
+				}}
+			>
+				Models from the Tiiny store. Downloads go to the device; load them from the Models tab.
+			</Typography>
 			<StoreTable />
 		</Stack>
 	);

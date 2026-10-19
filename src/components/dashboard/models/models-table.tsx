@@ -183,6 +183,7 @@ export function ModelsTable(): React.JSX.Element {
 									{data.models.map((model) => {
 										const active = operation?.modelId === model.modelId ? operation : null;
 										const isRunning = model.status === "running";
+										const isTooBigForNpu = !isRunning && model.npuUsage > data.npuAvailablePercent;
 										return (
 											<TableRow hover key={model.modelId} data-testid={`model-${model.modelId}`}>
 												<TableCell>
@@ -202,9 +203,14 @@ export function ModelsTable(): React.JSX.Element {
 												<TableCell align="right">{model.npuUsage}%</TableCell>
 												<TableCell>
 													<Chip
-														color={isRunning ? "success" : "default"}
-														label={isRunning ? "loaded" : "not loaded"}
+														color={isRunning ? "success" : isTooBigForNpu ? "warning" : "default"}
+														label={isRunning ? "loaded" : isTooBigForNpu ? "not enough free NPU" : "not loaded"}
 														size="small"
+														title={
+															isTooBigForNpu
+																? `Needs ${model.npuUsage}% of the NPU; ${data.npuAvailablePercent}% is free. Unload a model to make room.`
+																: undefined
+														}
 													/>
 												</TableCell>
 												<TableCell align="right">
@@ -253,7 +259,7 @@ export function ModelsTable(): React.JSX.Element {
 																Delete
 															</Button>
 															<Button
-																disabled={operation !== null}
+																disabled={operation !== null || isTooBigForNpu}
 																onClick={() => void run(model, "load")}
 																variant="contained"
 															>

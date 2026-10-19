@@ -11,17 +11,14 @@ export const metadata = { title: `Models | ${config.site.name}` } satisfies Meta
 export default function Page(): React.JSX.Element {
 	return (
 		<Stack spacing={3}>
-			<div>
-				<Typography variant="h4">Models</Typography>
-				<Typography
-					variant="body2"
-					sx={{
-						color: "text.secondary",
-					}}
-				>
-					Load a downloaded model into NPU memory, or unload it to free space.
-				</Typography>
-			</div>
+			<Typography
+				variant="body2"
+				sx={{
+					color: "text.secondary",
+				}}
+			>
+				Load a downloaded model into NPU memory, or unload it to free space.
+			</Typography>
 			<ModelsTable />
 		</Stack>
 	);

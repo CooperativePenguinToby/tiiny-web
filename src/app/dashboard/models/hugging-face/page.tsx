@@ -11,18 +11,15 @@ export const metadata = { title: `Hugging Face | ${config.site.name}` } satisfie
 export default function Page(): React.JSX.Element {
 	return (
 		<Stack spacing={3}>
-			<div>
-				<Typography variant="h4">Hugging Face</Typography>
-				<Typography
-					variant="body2"
-					sx={{
-						color: "text.secondary",
-					}}
-				>
-					Import custom models from Hugging Face. The device decides what it can import: typically fine-tunes and LoRA
-					adapters of models in its store, some only after that store model is downloaded.
-				</Typography>
-			</div>
+			<Typography
+				variant="body2"
+				sx={{
+					color: "text.secondary",
+				}}
+			>
+				Import custom models from Hugging Face. The device decides what it can import: typically fine-tunes and LoRA
+				adapters of models in its store, some only after that store model is downloaded.
+			</Typography>
 			<HuggingFacePanel />
 		</Stack>
 	);

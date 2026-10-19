@@ -18,7 +18,8 @@ test("#4 + xflow C: download from the store, load, unload, delete", async ({ pag
 	const runningBefore = await runningModelIds();
 
 	await signIn(page);
-	await page.getByRole("link", { name: "Store" }).click();
+	await page.getByRole("link", { name: "Models" }).click();
+	await page.getByRole("tab", { name: "Store" }).click();
 	await page.getByRole("textbox", { name: "Search store" }).fill(STORE_MODEL.split("/", 2)[1]);
 	const storeRow = page.getByTestId(`store-${STORE_MODEL}`);
 	const status = storeRow.locator(".MuiChip-label");
@@ -48,7 +49,8 @@ test("#4 + xflow C: download from the store, load, unload, delete", async ({ pag
 	expect(await deviceStatus()).toBeUndefined();
 	expect(await runningModelIds()).toEqual(runningBefore);
 
-	await page.getByRole("link", { name: "Store" }).click();
+	await page.getByRole("link", { name: "Models" }).click();
+	await page.getByRole("tab", { name: "Store" }).click();
 	await page.getByRole("textbox", { name: "Search store" }).fill(STORE_MODEL.split("/", 2)[1]);
 	await expect(status).toHaveText("not downloaded");
 	await expect(storeRow.getByRole("button", { name: "Download" })).toBeVisible();
