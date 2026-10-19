@@ -14,7 +14,7 @@ export const GET = apiRoute(async (request) => {
 		headers: {
 			"Content-Type": file.headers.get("content-type") ?? "application/octet-stream",
 			"Content-Disposition": file.headers.get("content-disposition") ?? `attachment; filename="${id}"`,
-			...(file.headers.get("content-length") ? { "Content-Length": file.headers.get("content-length")! } : {}),
+			...(file.headers.get("content-length") && { "Content-Length": file.headers.get("content-length")! }),
 		},
 	});
 });

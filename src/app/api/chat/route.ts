@@ -14,7 +14,13 @@ interface ChatRequest {
 // Streams an OpenAI-compatible chat completion from the device. Aborting the browser request
 // aborts the device request too.
 export const POST = apiRoute(async (request) => {
-	const { modelId, messages, thinking } = (await request.json().catch(() => ({}))) as ChatRequest;
+	let input: ChatRequest = {};
+	try {
+		input = (await request.json()) as ChatRequest;
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
+	const { modelId, messages, thinking } = input;
 	if (typeof modelId !== "string" || !Array.isArray(messages) || messages.length === 0) {
 		throw new DeviceError("Expected { modelId, messages: [{ role, content }] }", 400);
 	}
@@ -28,7 +34,7 @@ export const POST = apiRoute(async (request) => {
 		app_id: APP_ID,
 		task_type: "Replying",
 		thinking_enabled: setting !== "off",
-		...(setting === "off" ? {} : { reasoning_effort: setting }),
+		...(setting !== "off" && { reasoning_effort: setting }),
 	};
 	return sseResponse(await deviceStream("/v1/chat/completions", { method: "POST", body, signal: request.signal }));
 });

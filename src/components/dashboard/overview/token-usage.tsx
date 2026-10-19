@@ -40,6 +40,9 @@ interface Series {
 	models: string[];
 }
 
+// Orders strings by UTF-16 code units, exactly as `sort()` does without a compare function.
+const byCodeUnits = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
+
 function seriesFor(usage: WeekUsage): Series[] {
 	const totals = new Map<string, number>();
 	for (const day of usage.days) {
@@ -48,8 +51,8 @@ function seriesFor(usage: WeekUsage): Series[] {
 		}
 	}
 	// Order by name, not size, so a model keeps its color as the week changes.
-	const ranked = [...totals.entries()].sort((a, b) => b[1] - a[1]).map(([model]) => model);
-	const named = ranked.slice(0, SERIES.length).sort();
+	const ranked = [...totals].toSorted((a, b) => b[1] - a[1]).map(([model]) => model);
+	const named = ranked.slice(0, SERIES.length).toSorted(byCodeUnits);
 	const series: Series[] = named.map((model, index) => ({ name: model, color: SERIES[index], models: [model] }));
 	const rest = ranked.slice(SERIES.length);
 	if (rest.length > 0) series.push({ ...OTHER, models: rest });

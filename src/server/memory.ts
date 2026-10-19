@@ -21,7 +21,7 @@ export async function dailySummaries(): Promise<DailySummary[]> {
 					.trim(),
 			};
 		})
-		.sort((a, b) => b.day.localeCompare(a.day));
+		.toSorted((a, b) => b.day.localeCompare(a.day));
 }
 
 interface Schedule {
@@ -60,14 +60,14 @@ export async function memorySettings(): Promise<MemorySettings> {
 export async function saveMemorySettings(body: unknown): Promise<void> {
 	const { modelId, startHour, startMinute } = body as Record<string, unknown>;
 	if (typeof modelId !== "string") throw new DeviceError("modelId must be text", 400);
-	if (!Number.isInteger(startHour) || (startHour as number) < 0 || (startHour as number) > 23) {
+	if (!Number.isSafeInteger(startHour) || (startHour as number) < 0 || (startHour as number) > 23) {
 		throw new DeviceError("startHour must be 0-23", 400);
 	}
-	if (!Number.isInteger(startMinute) || (startMinute as number) < 0 || (startMinute as number) > 59) {
+	if (!Number.isSafeInteger(startMinute) || (startMinute as number) < 0 || (startMinute as number) > 59) {
 		throw new DeviceError("startMinute must be 0-59", 400);
 	}
 	const current = await memorySettings();
-	if (modelId && !current.models.some((model) => model.modelId === modelId)) {
+	if (modelId && current.models.every((model) => model.modelId !== modelId)) {
 		throw new DeviceError("Choose a downloaded text model", 400);
 	}
 	const headers = await kbHeaders();

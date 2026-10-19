@@ -11,11 +11,29 @@ export interface LoggerOptions {
 }
 
 export class Logger {
+	private levelNumber: number;
+
 	protected prefix: string;
 	protected level: keyof typeof LogLevel;
 	protected showLevel: boolean;
 
-	private levelNumber: number;
+	debug = (...arguments_: unknown[]): void => {
+		if (this.canWrite(LogLevel.DEBUG)) {
+			this.write(LogLevel.DEBUG, ...arguments_);
+		}
+	};
+
+	warn = (...arguments_: unknown[]): void => {
+		if (this.canWrite(LogLevel.WARN)) {
+			this.write(LogLevel.WARN, ...arguments_);
+		}
+	};
+
+	error = (...arguments_: unknown[]): void => {
+		if (this.canWrite(LogLevel.ERROR)) {
+			this.write(LogLevel.ERROR, ...arguments_);
+		}
+	};
 
 	constructor({ prefix = "", level = LogLevel.ALL, showLevel = true }: LoggerOptions) {
 		this.prefix = prefix;
@@ -24,29 +42,11 @@ export class Logger {
 		this.showLevel = showLevel;
 	}
 
-	debug = (...args: unknown[]): void => {
-		if (this.canWrite(LogLevel.DEBUG)) {
-			this.write(LogLevel.DEBUG, ...args);
-		}
-	};
-
-	warn = (...args: unknown[]): void => {
-		if (this.canWrite(LogLevel.WARN)) {
-			this.write(LogLevel.WARN, ...args);
-		}
-	};
-
-	error = (...args: unknown[]): void => {
-		if (this.canWrite(LogLevel.ERROR)) {
-			this.write(LogLevel.ERROR, ...args);
-		}
-	};
-
 	private canWrite(level: keyof typeof LogLevel): boolean {
 		return this.levelNumber >= LogLevelNumber[level];
 	}
 
-	private write(level: keyof typeof LogLevel, ...args: unknown[]): void {
+	private write(level: keyof typeof LogLevel, ...arguments_: unknown[]): void {
 		let prefix = this.prefix;
 
 		if (this.showLevel) {
@@ -54,9 +54,9 @@ export class Logger {
 		}
 
 		if (level === LogLevel.ERROR) {
-			console.error(prefix, ...args);
+			console.error(prefix, ...arguments_);
 		} else {
-			console.log(prefix, ...args);
+			console.log(prefix, ...arguments_);
 		}
 	}
 }

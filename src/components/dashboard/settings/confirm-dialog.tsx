@@ -8,7 +8,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-export interface ConfirmDialogProps {
+export interface ConfirmDialogProperties {
 	open: boolean;
 	title: string;
 	text: string;
@@ -24,7 +24,7 @@ export function ConfirmDialog({
 	confirmLabel,
 	onCancel,
 	onConfirm,
-}: ConfirmDialogProps): React.JSX.Element {
+}: ConfirmDialogProperties): React.JSX.Element {
 	return (
 		<Dialog onClose={onCancel} open={open}>
 			<DialogTitle>{title}</DialogTitle>

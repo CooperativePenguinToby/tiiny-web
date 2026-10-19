@@ -147,7 +147,7 @@ function NetworksTable({
 								) : null}
 							</TableCell>
 							<TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
-								{wifi.connected || wifiLink ? null : (
+								{wifiLink || wifi.connected ? null : (
 									<Button
 										disabled={busy}
 										onClick={() =>

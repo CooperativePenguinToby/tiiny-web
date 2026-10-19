@@ -6,7 +6,13 @@ export const GET = apiRoute(async () => NextResponse.json(await listMcpServers()
 
 // POST { config: { mcpServers: { … } } }: adds the servers (they run on the device).
 export const POST = apiRoute(async (request) => {
-	const { config } = (await request.json().catch(() => ({}))) as { config?: unknown };
+	let body: { config?: unknown } = {};
+	try {
+		body = (await request.json()) as { config?: unknown };
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
+	const { config } = body;
 	await importMcpServers(config);
 	return NextResponse.json(await listMcpServers());
 });

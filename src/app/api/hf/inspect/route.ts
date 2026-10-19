@@ -32,10 +32,15 @@ interface Inspection {
 // `{ cached: true }` (used by the compatibility list) may answer from a recent verdict; the default
 // always asks the device, since disk space and toolkit state change.
 export const POST = apiRoute(async (request) => {
-	const { cached } = (await request
-		.clone()
-		.json()
-		.catch(() => ({}))) as { cached?: unknown };
+	// Read from a copy: hfUrlFrom reads the request itself.
+	const copy = request.clone();
+	let options: { cached?: unknown } = {};
+	try {
+		options = (await copy.json()) as { cached?: unknown };
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
+	const { cached } = options;
 	const hfUrl = await hfUrlFrom(request);
 	if (cached === true) {
 		const hit = cachedVerdict<HfInspection>(hfUrl);
@@ -47,13 +52,13 @@ export const POST = apiRoute(async (request) => {
 	});
 	const support = result.import_support;
 	const toolkit = support?.candidates?.find((candidate) => candidate.toolkit_id === support.toolkit_id);
-	const supported = Boolean(support?.supported) && !result.error;
+	const isSupported = Boolean(support?.supported) && !result.error;
 	const requiredBase = result.error?.resolution === "install_base_model" ? result.error.required_base_model : undefined;
 	const body: HfInspection = {
 		repoId: result.hf?.repo_id ?? hfUrl.replace("https://huggingface.co/", ""),
-		verdict: supported ? "compatible" : requiredBase ? "needs-base-model" : "incompatible",
+		verdict: isSupported ? "compatible" : requiredBase ? "needs-base-model" : "incompatible",
 		requiredBaseModel: requiredBase ? { modelId: requiredBase.model_id, name: requiredBase.display_name } : null,
-		supported,
+		supported: isSupported,
 		reasonCode: result.error?.reason_code ?? support?.reason_code ?? null,
 		reason: result.error?.reason ?? support?.message ?? result.error?.message ?? null,
 		isLora: result.lora?.is_lora ?? false,

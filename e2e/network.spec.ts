@@ -39,7 +39,8 @@ test("#11 Network shows the device's Wi-Fi state, networks and interfaces", asyn
 	if (status.is_connected)
 		await expect(card.getByTestId("wifi-status")).toContainText(`Connected to ${status.connected_wifi_name}`);
 	// Networks in range come and go between scans; saved ones are always listed.
-	for (const wifi of wifis.filter((entry) => entry.is_paired)) {
+	for (const wifi of wifis) {
+		if (!wifi.is_paired) continue;
 		await expect(card.getByTestId(`wifi-${wifi.wifi_name}`)).toBeVisible(SCAN);
 	}
 	for (const entry of interfaces) {

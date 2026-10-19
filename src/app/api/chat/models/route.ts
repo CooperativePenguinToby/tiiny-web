@@ -46,6 +46,6 @@ export const GET = apiRoute(async () => {
 				},
 			} satisfies ChatModel;
 		})
-		.sort((a, b) => Number(b.loaded) - Number(a.loaded));
+		.toSorted((a, b) => Number(b.loaded) - Number(a.loaded));
 	return NextResponse.json(body);
 });

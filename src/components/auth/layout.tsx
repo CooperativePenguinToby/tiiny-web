@@ -9,11 +9,11 @@ import Typography from "@mui/material/Typography";
 import { paths } from "@/paths";
 import { DynamicLogo } from "@/components/core/logo";
 
-export interface LayoutProps {
+export interface LayoutProperties {
 	children: React.ReactNode;
 }
 
-export function Layout({ children }: LayoutProps): React.JSX.Element {
+export function Layout({ children }: LayoutProperties): React.JSX.Element {
 	return (
 		<Box
 			sx={{

@@ -36,8 +36,9 @@ export function usePolling<T>(url: string, intervalMs: number): Polled<T> {
 	}, [url, router]);
 
 	React.useEffect(() => {
-		void refresh();
-		const timer = setInterval(() => void refresh(), intervalMs);
+		const poll = (): void => void refresh();
+		poll();
+		const timer = setInterval(poll, intervalMs);
 		return () => {
 			clearInterval(timer);
 		};

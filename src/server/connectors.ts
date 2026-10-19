@@ -47,8 +47,12 @@ export async function listConnectors(): Promise<Connector[]> {
 		connector<{ channels: Record<string, ChannelStatus> }>("/v1/status"),
 		Promise.all(
 			Object.entries(OAUTH).map(async ([key, spec]) => {
-				const reply = await connector<OAuthStatus>(`/v1/${spec.path}/status`).catch(() => null);
-				return [key, reply] as const;
+				try {
+					const reply = await connector<OAuthStatus>(`/v1/${spec.path}/status`);
+					return [key, reply] as const;
+				} catch {
+					return [key, null] as const;
+				}
 			})
 		),
 	]);
@@ -246,12 +250,17 @@ export async function listMcpServers(): Promise<McpServer[]> {
 	const servers = await connector<RawServer[]>("/v1/mcp/servers");
 	return Promise.all(
 		servers.map(async (server) => {
-			const check = await connector<{ connected: boolean; detail?: string }>(
-				`/v1/mcp/servers/${encodeURIComponent(server.id)}/check`
-			).catch((error: unknown) => ({
-				connected: false,
-				detail: error instanceof Error ? error.message : String(error),
-			}));
+			let check: { connected: boolean; detail?: string };
+			try {
+				check = await connector<{ connected: boolean; detail?: string }>(
+					`/v1/mcp/servers/${encodeURIComponent(server.id)}/check`
+				);
+			} catch (error) {
+				check = {
+					connected: false,
+					detail: error instanceof Error ? error.message : String(error),
+				};
+			}
 			return {
 				id: server.id,
 				name: server.name,
@@ -303,14 +312,22 @@ export interface McpToolSpec {
 
 // Tools of every enabled MCP server the device can reach, for Task mode.
 export async function connectedMcpTools(): Promise<McpToolSpec[]> {
-	const servers = await listMcpServers().catch(() => []);
+	let servers: McpServer[] = [];
+	try {
+		servers = await listMcpServers();
+	} catch {
+		// The connector is unreachable: no MCP tools.
+	}
 	const lists = await Promise.all(
 		servers
 			.filter((server) => server.enabled && server.connected)
 			.map(async (server) => {
-				const tools = await connector<{ name: string; description?: string; input_schema?: Record<string, unknown> }[]>(
-					`/v1/mcp/servers/${encodeURIComponent(server.id)}/tools`
-				).catch(() => []);
+				let tools: { name: string; description?: string; input_schema?: Record<string, unknown> }[] = [];
+				try {
+					tools = await connector<typeof tools>(`/v1/mcp/servers/${encodeURIComponent(server.id)}/tools`);
+				} catch {
+					// The server's tools cannot be listed: it contributes none.
+				}
 				return tools.map((tool) => ({
 					serverId: server.id,
 					serverName: server.name,
@@ -329,14 +346,14 @@ interface ToolCallReply {
 	error?: string;
 }
 
-export async function callMcpTool(serverId: string, tool: string, args: unknown): Promise<string> {
+export async function callMcpTool(serverId: string, tool: string, arguments_: unknown): Promise<string> {
 	const reply = await deviceJson<ToolCallReply>(
 		`/v1/mcp/servers/${encodeURIComponent(serverId)}/tools/${encodeURIComponent(tool)}/call`,
 		{
 			method: "POST",
 			service: "connector",
 			headers: { "x-user-id": await deviceId() },
-			body: { arguments: args },
+			body: { arguments: arguments_ },
 			slow: true,
 		}
 	);

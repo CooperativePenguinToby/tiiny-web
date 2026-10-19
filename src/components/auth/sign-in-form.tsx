@@ -46,7 +46,13 @@ export function SignInForm(): React.JSX.Element {
 					body: JSON.stringify(values),
 				});
 				if (!response.ok) {
-					const { error } = (await response.json().catch(() => ({}))) as { error?: string };
+					let failure: { error?: string } = {};
+					try {
+						failure = (await response.json()) as { error?: string };
+					} catch {
+						// A missing or malformed body is handled like an empty one.
+					}
+					const { error } = failure;
 					setError("root", { type: "server", message: error ?? `Sign in failed (${response.status})` });
 					setIsPending(false);
 					return;

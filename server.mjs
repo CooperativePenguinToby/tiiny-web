@@ -8,14 +8,14 @@ import { hostname, networkInterfaces } from "node:os";
 import path from "node:path";
 
 import next from "next";
-import selfsigned from "selfsigned";
+import { generate } from "selfsigned";
 
 import { startAgentProxies } from "./src/server/shared/agent-proxy.mjs";
 
-const dev = process.argv.includes("--dev");
+const development = process.argv.includes("--dev");
 const host = process.env.HOST ?? "0.0.0.0";
 const port = Number(process.env.PORT ?? 8443);
-const dataDir = path.resolve(process.env.DATA_DIR ?? "data");
+const dataDirectory = path.resolve(process.env.DATA_DIR ?? "data");
 
 function fail(message) {
 	throw new Error(`tiiny-web: ${message}`);
@@ -39,7 +39,8 @@ function localAltNames() {
 		{ type: 7, ip: "::1" },
 	];
 	for (const addresses of Object.values(networkInterfaces())) {
-		for (const address of addresses ?? []) {
+		if (!addresses) continue;
+		for (const address of addresses) {
 			if (!address.internal && !address.address.startsWith("fe80")) names.push({ type: 7, ip: address.address });
 		}
 	}
@@ -54,14 +55,14 @@ async function loadTls() {
 		return { cert: await readFile(certFile), key: await readFile(keyFile), source: certFile };
 	}
 
-	const tlsDir = path.join(dataDir, "tls");
-	const certPath = path.join(tlsDir, "cert.pem");
-	const keyPath = path.join(tlsDir, "key.pem");
+	const tlsDirectory = path.join(dataDirectory, "tls");
+	const certPath = path.join(tlsDirectory, "cert.pem");
+	const keyPath = path.join(tlsDirectory, "key.pem");
 	if (!existsSync(certPath) || !existsSync(keyPath)) {
-		await mkdir(tlsDir, { recursive: true });
+		await mkdir(tlsDirectory, { recursive: true });
 		const notAfterDate = new Date();
 		notAfterDate.setFullYear(notAfterDate.getFullYear() + 2);
-		const pems = await selfsigned.generate([{ name: "commonName", value: hostname() }], {
+		const pems = await generate([{ name: "commonName", value: hostname() }], {
 			keyType: "ec",
 			curve: "P-256",
 			algorithm: "sha256",
@@ -82,19 +83,25 @@ async function loadTls() {
 
 if (!process.env.ADMIN_PASSWORD) fail("ADMIN_PASSWORD must be set (the password for signing in to the web UI)");
 
-await mkdir(dataDir, { recursive: true });
-await chmod(dataDir, 0o700);
-process.env.SESSION_SECRET ??= await readOrCreateSecret(path.join(dataDir, "session-secret"), () =>
+await mkdir(dataDirectory, { recursive: true });
+await chmod(dataDirectory, 0o700);
+process.env.SESSION_SECRET ??= await readOrCreateSecret(path.join(dataDirectory, "session-secret"), () =>
 	randomBytes(32).toString("hex")
 );
 
 const tls = await loadTls();
-const app = next({ dev, hostname: host, port });
+const app = next({ dev: development, hostname: host, port });
 await app.prepare();
 const handle = app.getRequestHandler();
 
-createServer({ cert: tls.cert, key: tls.key }, (req, res) => handle(req, res)).listen(port, host, () => {
-	console.log(`tiiny-web: listening on https://${host}:${port} (${dev ? "dev" : "production"}, cert ${tls.source})`);
-});
+createServer({ cert: tls.cert, key: tls.key }, (request, response) => handle(request, response)).listen(
+	port,
+	host,
+	() => {
+		console.log(
+			`tiiny-web: listening on https://${host}:${port} (${development ? "dev" : "production"}, cert ${tls.source})`
+		);
+	}
+);
 
 startAgentProxies({ tls, host, appPort: port });

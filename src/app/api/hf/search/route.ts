@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { DeviceError } from "@/server/device";
 import { apiRoute } from "@/server/route";
 
-import type { HfRepo } from "@/types/device";
+import type { HfRepository } from "@/types/device";
 
 interface HubModel {
 	id: string;
@@ -32,16 +32,16 @@ async function hubSearch(filter: string, query: string, limit: number): Promise<
 // Lists Hugging Face repos derived from a base model (LoRA adapters and fine-tunes). Whether the
 // device can import one is decided per repo by /api/hf/inspect.
 export const GET = apiRoute(async (request) => {
-	const params = new URL(request.url).searchParams;
-	const base = params.get("base") ?? "";
-	const query = (params.get("q") ?? "").trim();
-	const limit = Number(params.get("limit") ?? 40);
+	const parameters = new URL(request.url).searchParams;
+	const base = parameters.get("base") ?? "";
 	if (!/^[\w.-]+\/[\w.-]+$/.test(base)) throw new DeviceError("base must be a model id like Org/Name", 400);
-	if (!Number.isInteger(limit) || limit < 1 || limit > 100) throw new DeviceError("limit must be 1-100", 400);
+	const limit = Number(parameters.get("limit") ?? 40);
+	if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) throw new DeviceError("limit must be 1-100", 400);
+	const query = (parameters.get("q") ?? "").trim();
 	const results = await Promise.all(
 		RELATIONS.map(async (relation) => {
 			const models = await hubSearch(`base_model:${relation}:${base}`, query, limit);
-			return models.map((model): HfRepo => ({
+			return models.map((model): HfRepository => ({
 				repoId: model.id,
 				relation,
 				downloads: model.downloads ?? 0,
@@ -50,6 +50,6 @@ export const GET = apiRoute(async (request) => {
 			}));
 		})
 	);
-	const repos = results.flat().sort((a, b) => b.downloads - a.downloads);
+	const repos = results.flat().toSorted((a, b) => b.downloads - a.downloads);
 	return NextResponse.json(repos);
 });

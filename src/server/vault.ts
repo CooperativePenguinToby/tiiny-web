@@ -53,7 +53,7 @@ export async function listVaultFiles(): Promise<VaultFile[]> {
 			indexError: item.vectorize_error_message ?? null,
 			chunks: item.chunk_count ?? 0,
 		}))
-		.sort((a, b) => b.addedAt.localeCompare(a.addedAt));
+		.toSorted((a, b) => b.addedAt.localeCompare(a.addedAt));
 }
 
 export function sourceIdFrom(value: unknown): string {

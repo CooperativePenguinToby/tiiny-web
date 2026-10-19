@@ -49,14 +49,35 @@ type ProxyStates = Map<number, { listening: boolean; error: string | null }>;
 // Store web agents are named `wa-<cloud app id>`.
 const cloudId = (appId: string): string => appId.replace(/^wa-/, "");
 
+// An optional list: empty when the device cannot answer.
+async function listOrEmpty<T>(list: Promise<T[]>): Promise<T[]> {
+	try {
+		return await list;
+	} catch {
+		return [];
+	}
+}
+
+// The device's download status for a web agent, or null when it has none to report.
+async function downloadStatus(appId: string): Promise<{ status: string; overall_progress: number } | null> {
+	try {
+		return await deviceJson<{ status: string; overall_progress: number }>(
+			`/api/services/download/${encodeURIComponent(cloudId(appId))}/status`,
+			{ service: "agents" }
+		);
+	} catch {
+		return null;
+	}
+}
+
 export const GET = apiRoute(async () => {
 	const [catalog, cloud, services, updates, usage] = await Promise.all([
 		deviceJson<{ app: CatalogApp[] }>("/api/services/apps/metadata"),
 		deviceJson<CloudApp[]>("/api/services/cloud/apps"),
 		deviceJson<Service[]>("/api/services"),
 		// Both are extras: the list still loads if the device cannot answer them.
-		deviceJson<UpdateCheck[]>("/api/services/updates/check", { service: "agents" }).catch(() => []),
-		deviceJson<ResourceUsage[]>("/api/services/resource-usage", { service: "agents" }).catch(() => []),
+		listOrEmpty(deviceJson<UpdateCheck[]>("/api/services/updates/check", { service: "agents" })),
+		listOrEmpty(deviceJson<ResourceUsage[]>("/api/services/resource-usage", { service: "agents" })),
 	]);
 	const updateById = new Map(updates.map((entry) => [entry.service_id, entry]));
 	const usageById = new Map(usage.map((entry) => [entry.service_id, entry]));
@@ -72,10 +93,7 @@ export const GET = apiRoute(async () => {
 	const installs = new Map(
 		await Promise.all(
 			webApps.map(async (app) => {
-				const status = await deviceJson<{ status: string; overall_progress: number }>(
-					`/api/services/download/${encodeURIComponent(cloudId(app.app_id))}/status`,
-					{ service: "agents" }
-				).catch(() => null);
+				const status = await downloadStatus(app.app_id);
 				const active = status && (status.status === "running" || status.status === "paused");
 				return [
 					app.app_id,

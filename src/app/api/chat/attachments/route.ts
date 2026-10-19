@@ -21,7 +21,12 @@ interface Parsed {
 // POST multipart "file": an image is stored in the device's media store, a document is turned into text
 // by the device. Returns the Attachment to send with a message.
 export const POST = apiRoute(async (request) => {
-	const form = await request.formData().catch(() => null);
+	let form: FormData | null = null;
+	try {
+		form = await request.formData();
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
 	const file = form?.get("file");
 	if (!(file instanceof File)) throw new DeviceError("Choose a file", 400);
 	const body = new DeviceForm();

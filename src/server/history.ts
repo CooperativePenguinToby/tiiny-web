@@ -54,9 +54,9 @@ function attachmentOf(block: RawBlock): Attachment | null {
 			mimeType: meta.mime_type ?? "image/*",
 		};
 	}
-	if (block.block_type === "file")
-		return { kind: "document", name: meta.name ?? "file", text: block.content_text ?? "" };
-	return null;
+	return block.block_type === "file"
+		? { kind: "document", name: meta.name ?? "file", text: block.content_text ?? "" }
+		: null;
 }
 
 const summary = (raw: RawConversation): ConversationSummary => ({
@@ -95,7 +95,7 @@ async function messagesOf(conversationId: string): Promise<RawMessage[]> {
 		if (!page.next_cursor || page.items.length === 0) break;
 		cursor = page.next_cursor;
 	}
-	return messages.sort((a, b) => a.seq_in_conversation - b.seq_in_conversation);
+	return messages.toSorted((a, b) => a.seq_in_conversation - b.seq_in_conversation);
 }
 
 // Runs `task` over `items` with at most `limit` in flight.
@@ -120,7 +120,7 @@ export async function readConversation(conversationId: string): Promise<Conversa
 		const { items } = await history<{ items: RawBlock[] }>(
 			`/messages/${encodeURIComponent(message.message_id)}/blocks`
 		);
-		const blocks = items.sort((a, b) => a.position_in_message - b.position_in_message);
+		const blocks = items.toSorted((a, b) => a.position_in_message - b.position_in_message);
 		const text = (type: string): string =>
 			blocks
 				.filter((block) => block.block_type === type)
@@ -142,9 +142,9 @@ export async function readConversation(conversationId: string): Promise<Conversa
 		return {
 			role: message.role,
 			content: text("main_text"),
-			...(attachments.length > 0 ? { attachments } : {}),
-			...(steps.length > 0 ? { steps } : {}),
-			...(reasoning ? { reasoning } : {}),
+			...(attachments.length > 0 && { attachments }),
+			...(steps.length > 0 && { steps }),
+			...(reasoning && { reasoning }),
 			modelId: message.model_id,
 			status: message.status,
 		};
@@ -214,9 +214,12 @@ export async function saveTurn(turn: TurnToSave): Promise<string> {
 			conversation: {
 				conversation_id: conversationId,
 				assistant_id: ASSISTANT,
-				...(turn.conversationId
-					? {}
-					: { title: titleFor(turn.user), title_source: "default", is_title_manual: false, pinned: false }),
+				...(!turn.conversationId && {
+					title: titleFor(turn.user),
+					title_source: "default",
+					is_title_manual: false,
+					pinned: false,
+				}),
 				topic_prompt: null,
 			},
 			messages: [
@@ -278,6 +281,6 @@ export async function searchConversations(query: string): Promise<(ConversationS
 		const at = text.toLowerCase().indexOf(needle);
 		if (at === -1 && !conversation.title.toLowerCase().includes(needle)) return [];
 		const snippet = at === -1 ? "" : text.slice(Math.max(0, at - 60), at + needle.length + 60).replaceAll(/\s+/g, " ");
-		return [{ ...conversation, snippet }];
+		return { ...conversation, snippet };
 	});
 }

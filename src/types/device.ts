@@ -133,13 +133,15 @@ export interface HfInspection {
 	disk: { sufficient: boolean; requiredBytes: number; availableBytes: number } | null;
 }
 
-export interface HfRepo {
+export interface HfRepository {
 	repoId: string;
 	relation: "adapter" | "finetune";
 	downloads: number;
 	likes: number;
 	pipelineTag: string | null;
 }
+// Former name, still imported by the Hugging Face compatible-repos search.
+export type { HfRepository as HfRepo };
 
 // One parsed event from the device's import stream, as forwarded to the browser.
 export interface ImportEvent {

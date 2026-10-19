@@ -40,7 +40,7 @@ export function parseMessage(value: unknown): ChatMessage {
 		? message.attachments.map((item) => parseAttachment(item))
 		: [];
 	if (attachments.length > MAX_ATTACHMENTS) throw new DeviceError(`At most ${MAX_ATTACHMENTS} attachments`, 400);
-	return { role: message.role, content: message.content, ...(attachments.length > 0 ? { attachments } : {}) };
+	return { role: message.role, content: message.content, ...(attachments.length > 0 && { attachments }) };
 }
 
 // The OpenAI-style message the device expects: documents are put in front of the text, images

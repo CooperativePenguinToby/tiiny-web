@@ -21,7 +21,7 @@ export function usePopover<T = HTMLElement>(): PopoverController<T> {
 	}, []);
 
 	const handleToggle = React.useCallback(() => {
-		setOpen((prevState) => !prevState);
+		setOpen((previousState) => !previousState);
 	}, []);
 
 	return { anchorRef, handleClose, handleOpen, handleToggle, open };

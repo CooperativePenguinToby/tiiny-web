@@ -33,11 +33,11 @@ export const GET = apiRoute(async () => {
 				sizeBytes: model.size_bytes,
 				protected: model.model_id === VAULT_EMBEDDING_MODEL,
 			}))
-			.sort((a, b) => b.sizeBytes - a.sizeBytes),
+			.toSorted((a, b) => b.sizeBytes - a.sizeBytes),
 		// Agent containers are named `wa-<service id>`.
 		agents: agents.apps
 			.map((app) => ({ serviceId: app.name.replace(/^wa-/, ""), sizeBytes: app.size_bytes }))
-			.sort((a, b) => b.sizeBytes - a.sizeBytes),
+			.toSorted((a, b) => b.sizeBytes - a.sizeBytes),
 	};
 	return NextResponse.json(body);
 });

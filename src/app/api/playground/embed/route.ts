@@ -18,7 +18,12 @@ const cosine = (a: number[], b: number[]): number => {
 
 // { model, inputs: string[] } → { dimensions, preview (first values of each vector), similarity matrix }.
 export const POST = apiRoute(async (request) => {
-	const body = (await request.json().catch(() => ({}))) as { model?: unknown; inputs?: unknown };
+	let body: { model?: unknown; inputs?: unknown } = {};
+	try {
+		body = (await request.json()) as { model?: unknown; inputs?: unknown };
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
 	const model = modelIdOf(body.model);
 	if (!Array.isArray(body.inputs) || body.inputs.length === 0 || body.inputs.length > 16) {
 		throw new DeviceError("Give 1 to 16 texts", 400);

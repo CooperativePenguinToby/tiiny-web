@@ -18,7 +18,7 @@ const installStatus = async (): Promise<string> => {
 	const status = await deviceCall<{ status: string }>("agents", `/api/services/download/${PAUSE_AGENT}/status`);
 	return status.status;
 };
-const installed = async (): Promise<boolean> => {
+const isInstalled = async (): Promise<boolean> => {
 	const services = await deviceCall<{ id: string }[]>("agents", "/api/services");
 	return services.some((service) => service.id === PAUSE_AGENT);
 };
@@ -33,7 +33,8 @@ test("#21 installed agents show their CPU and memory use and whether an update e
 	const usage = await deviceCall<Usage[]>("agents", "/api/services/resource-usage");
 	const updates = await deviceCall<UpdateCheck[]>("agents", "/api/services/updates/check");
 	await openAgents(page);
-	for (const entry of usage.filter((item) => item.status === "running")) {
+	for (const entry of usage) {
+		if (entry.status !== "running") continue;
 		await expect(page.getByTestId(`agent-${entry.service_id}`).getByTestId("agent-usage")).toHaveText(
 			/^CPU \d+\.\d% · memory \d+(\.\d)? [KMG]?B$/
 		);
@@ -48,7 +49,7 @@ test("#21 installed agents show their CPU and memory use and whether an update e
 
 test("#21 an agent install can be paused, resumed and cancelled", async ({ page }) => {
 	test.setTimeout(10 * 60_000);
-	expect(await installed(), `${PAUSE_AGENT} must not be installed`).toBe(false);
+	expect(await isInstalled(), `${PAUSE_AGENT} must not be installed`).toBe(false);
 	await openAgents(page);
 	const store = page.getByTestId(`store-agent-wa-${PAUSE_AGENT}`);
 	try {
@@ -71,13 +72,17 @@ test("#21 an agent install can be paused, resumed and cancelled", async ({ page 
 		await expect(card.getByRole("button", { name: "Cancel install" })).toBeVisible({ timeout: 30_000 });
 		await card.getByRole("button", { name: "Cancel install" }).click();
 		await page.getByRole("dialog").getByRole("button", { name: "Delete" }).click();
-		await expect.poll(installed, { timeout: 2 * 60_000 }).toBe(false);
+		await expect.poll(isInstalled, { timeout: 2 * 60_000 }).toBe(false);
 	} finally {
-		if (await installed()) {
-			await deviceCall("agents", "/api/services/download/pause", {
-				method: "POST",
-				body: { app_id: PAUSE_AGENT },
-			}).catch(() => null);
+		if (await isInstalled()) {
+			try {
+				await deviceCall("agents", "/api/services/download/pause", {
+					method: "POST",
+					body: { app_id: PAUSE_AGENT },
+				});
+			} catch {
+				// Best effort: the install may already have stopped.
+			}
 			await deviceCall("agents", `/api/services/${PAUSE_AGENT}`, { method: "DELETE" });
 		}
 	}

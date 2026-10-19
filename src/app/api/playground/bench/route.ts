@@ -10,7 +10,12 @@ import { readSse } from "@/lib/sse";
 
 // Like `tiiny bench`: one generation of about `tokens` tokens, timed. { model, tokens } → BenchResult.
 export const POST = apiRoute(async (request) => {
-	const body = (await request.json().catch(() => ({}))) as { model?: unknown; tokens?: unknown };
+	let body: { model?: unknown; tokens?: unknown } = {};
+	try {
+		body = (await request.json()) as { model?: unknown; tokens?: unknown };
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
 	const model = modelIdOf(body.model);
 	const tokens = Math.min(2048, Math.max(32, Number(body.tokens) || 256));
 	const started = Date.now();
@@ -34,7 +39,8 @@ export const POST = apiRoute(async (request) => {
 			},
 		})
 	);
-	for await (const { data } of readSse(new Response(stream))) {
+	const events = readSse(new Response(stream));
+	for await (const { data } of events) {
 		if (data === "[DONE]") break;
 		const chunk = JSON.parse(data) as {
 			choices?: { delta?: { content?: string } }[];

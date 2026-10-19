@@ -203,7 +203,11 @@ function TextToSpeech({ model }: { model: string }): React.JSX.Element {
 
 function Ocr({ model }: { model: string }): React.JSX.Element {
 	const [file, setFile] = React.useState<File | null>(null);
-	const [result, setResult] = React.useState<{ text: string; lines: { text: string; score: number }[] } | null>(null);
+	// Each recognized line keeps its position in the reply as its id: a result is never reordered.
+	const [result, setResult] = React.useState<{
+		text: string;
+		lines: { id: number; text: string; score: number }[];
+	} | null>(null);
 	const { busy, error, run } = useRun();
 	return (
 		<Stack spacing={2}>
@@ -225,7 +229,11 @@ function Ocr({ model }: { model: string }): React.JSX.Element {
 						const form = new FormData();
 						form.append("model", model);
 						form.append("file", file!);
-						setResult(await postForm("/api/playground/ocr", form));
+						const reply = await postForm<{ text: string; lines: { text: string; score: number }[] }>(
+							"/api/playground/ocr",
+							form
+						);
+						setResult({ ...reply, lines: reply.lines.map((line, position) => ({ ...line, id: position })) });
 					})
 				}
 			/>
@@ -242,8 +250,8 @@ function Ocr({ model }: { model: string }): React.JSX.Element {
 				) : (
 					<Table aria-label="Recognized lines" data-testid="playground-result" size="small">
 						<TableBody>
-							{result.lines.map((line, index) => (
-								<TableRow key={index}>
+							{result.lines.map((line) => (
+								<TableRow key={line.id}>
 									<TableCell>{line.text}</TableCell>
 									<TableCell align="right" sx={{ color: "text.secondary", width: 100 }}>
 										{(line.score * 100).toFixed(0)}%
@@ -260,12 +268,17 @@ function Ocr({ model }: { model: string }): React.JSX.Element {
 
 function Embeddings({ model }: { model: string }): React.JSX.Element {
 	const [texts, setTexts] = React.useState("");
-	const [result, setResult] = React.useState<{ dimensions: number; similarity: number[][] } | null>(null);
+	// The similarity matrix, with each row and cell keeping its position as its id: a result is never reordered.
+	const [result, setResult] = React.useState<{
+		dimensions: number;
+		rows: { row: number; cells: { column: number; value: number }[] }[];
+	} | null>(null);
 	const { busy, error, run } = useRun();
 	const inputs = texts
 		.split("\n")
 		.map((line) => line.trim())
 		.filter(Boolean);
+	const columnNumbers = inputs.map((_text, index) => index + 1);
 	return (
 		<Stack spacing={2}>
 			<TextField
@@ -279,7 +292,21 @@ function Embeddings({ model }: { model: string }): React.JSX.Element {
 			<RunButton
 				busy={busy}
 				disabled={inputs.length === 0}
-				onClick={() => void run(async () => setResult(await postJson("/api/playground/embed", { model, inputs })))}
+				onClick={() =>
+					void run(async () => {
+						const reply = await postJson<{ dimensions: number; similarity: number[][] }>("/api/playground/embed", {
+							model,
+							inputs,
+						});
+						setResult({
+							dimensions: reply.dimensions,
+							rows: reply.similarity.map((values, row) => ({
+								row,
+								cells: values.map((value, column) => ({ column, value })),
+							})),
+						});
+					})
+				}
 			/>
 			{error ? <Alert severity="error">{error}</Alert> : null}
 			{result ? (
@@ -290,23 +317,23 @@ function Embeddings({ model }: { model: string }): React.JSX.Element {
 							<TableHead>
 								<TableRow>
 									<TableCell />
-									{inputs.map((_text, index) => (
-										<TableCell align="right" key={index}>
-											{index + 1}
+									{columnNumbers.map((columnNumber) => (
+										<TableCell align="right" key={columnNumber}>
+											{columnNumber}
 										</TableCell>
 									))}
 								</TableRow>
 							</TableHead>
 							<TableBody>
-								{result.similarity.map((row, index) => (
-									<TableRow key={index}>
+								{result.rows.map(({ row, cells }) => (
+									<TableRow key={row}>
 										<TableCell
 											sx={{ maxWidth: 260, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
 										>
-											{index + 1}. {inputs[index]}
+											{row + 1}. {inputs[row]}
 										</TableCell>
-										{row.map((value, column) => (
-											<TableCell align="right" data-testid={`similarity-${index}-${column}`} key={column}>
+										{cells.map(({ column, value }) => (
+											<TableCell align="right" data-testid={`similarity-${row}-${column}`} key={column}>
 												{value.toFixed(3)}
 											</TableCell>
 										))}
@@ -326,7 +353,7 @@ function Rerank({ model }: { model: string }): React.JSX.Element {
 	const [documents, setDocuments] = React.useState("");
 	const [results, setResults] = React.useState<{ index: number; document: string; score: number }[] | null>(null);
 	const { busy, error, run } = useRun();
-	const docs = documents
+	const documentLines = documents
 		.split("\n")
 		.map((line) => line.trim())
 		.filter(Boolean);
@@ -343,7 +370,7 @@ function Rerank({ model }: { model: string }): React.JSX.Element {
 			/>
 			<RunButton
 				busy={busy}
-				disabled={!query.trim() || docs.length < 2}
+				disabled={!query.trim() || documentLines.length < 2}
 				onClick={() =>
 					void run(async () => {
 						const reply = await postJson<{ results: { index: number; document: string; score: number }[] }>(
@@ -351,7 +378,7 @@ function Rerank({ model }: { model: string }): React.JSX.Element {
 							{
 								model,
 								query,
-								documents: docs,
+								documents: documentLines,
 							}
 						);
 						setResults(reply.results);
@@ -429,9 +456,10 @@ export function Playground(): React.JSX.Element {
 	const [chosen, setChosen] = React.useState<Partial<Record<PlaygroundKind, string>>>({});
 	const tab = TABS.find((entry) => entry.kind === kind)!;
 	const available = (models.data ?? []).filter((model) => model.kind === kind);
+	const chosenModel = chosen[kind];
 	const model =
-		chosen[kind] && available.some((entry) => entry.modelId === chosen[kind])
-			? chosen[kind]!
+		chosenModel && available.some((entry) => entry.modelId === chosenModel)
+			? chosenModel
 			: ((available.find((entry) => entry.loaded) ?? available[0])?.modelId ?? "");
 
 	return (

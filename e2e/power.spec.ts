@@ -2,8 +2,8 @@ import { expect, test } from "@playwright/test";
 
 import { deviceCall, deviceGet, signIn } from "./helpers";
 
-const setAutoPowerOn = (enabled: boolean): Promise<unknown> =>
-	deviceCall("main", "/api/v1/sys/ac_power/", { method: "POST", body: { switch: enabled ? 1 : 0 } });
+const setAutoPowerOn = (isEnabled: boolean): Promise<unknown> =>
+	deviceCall("main", "/api/v1/sys/ac_power/", { method: "POST", body: { switch: isEnabled ? 1 : 0 } });
 
 // The device confirms Auto power-on changes but always reads the setting back as off, so the device's own
 // confirmation is the evidence.
@@ -65,15 +65,15 @@ test("#12 Restart reboots the device and the page follows it back", async ({ pag
 	await expect(card.getByRole("alert")).toContainText("Restarting");
 
 	// Independent of the page: the device must really go away, then answer again.
-	let wentDown = false;
+	let isWentDown = false;
 	await expect
 		.poll(
 			async () => {
 				try {
 					await deviceGet("/api/v1/sys/status");
-					return wentDown ? "back" : "up";
+					return isWentDown ? "back" : "up";
 				} catch {
-					wentDown = true;
+					isWentDown = true;
 					return "down";
 				}
 			},

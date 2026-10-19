@@ -26,7 +26,7 @@ export const GET = apiRoute(async (request) => {
 		weekStart: week,
 		currentWeekStart,
 		days: Object.entries(days)
-			.sort(([a], [b]) => a.localeCompare(b))
+			.toSorted(([a], [b]) => a.localeCompare(b))
 			.map(([date, models]) => ({
 				date,
 				models: Object.fromEntries(
@@ -47,7 +47,7 @@ export const GET = apiRoute(async (request) => {
 				totalTokens: usage.total_tokens,
 				models: usage.models,
 			}))
-			.sort((a, b) => b.totalTokens - a.totalTokens),
+			.toSorted((a, b) => b.totalTokens - a.totalTokens),
 	};
 	return NextResponse.json(body);
 });

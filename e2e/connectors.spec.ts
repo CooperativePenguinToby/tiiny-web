@@ -116,7 +116,8 @@ test("#22 a custom MCP server is added on the device, lists its tools and is rem
 		await expect(row).toHaveCount(0, { timeout: 30_000 });
 		expect(await mcpNames()).not.toContain(name);
 	} finally {
-		for (const server of await mcpServers()) {
+		const servers = await mcpServers();
+		for (const server of servers) {
 			if (server.name === name) {
 				await deviceCall("connector", `/v1/mcp/servers/${server.id}`, { method: "DELETE", text: true });
 			}

@@ -106,7 +106,8 @@ test("xflow F: a fact uploaded to Vault is found by Task mode", async ({ page })
 		await expect(answer(page).getByTestId("message-content")).toContainText(/ultramarine/i);
 		await page.screenshot({ path: "test-results/task-vault.png", fullPage: true });
 	} finally {
-		for (const file of await vaultFiles()) {
+		const storedFiles = await vaultFiles();
+		for (const file of storedFiles) {
 			if (file.filename === name)
 				await kbCall("/kb/delete-memory", { method: "POST", body: { source_id: file.source_id } });
 		}
@@ -187,7 +188,8 @@ test("xflow H: Task mode uses a tool of an MCP server running on the device", as
 		await expect(answer(page).getByTestId("message-content")).toContainText(/React/i);
 		await page.screenshot({ path: "test-results/task-mcp.png", fullPage: true });
 	} finally {
-		for (const server of await servers()) {
+		const mcpServerList = await servers();
+		for (const server of mcpServerList) {
 			if (server.name === serverName) {
 				await deviceCall("connector", `/v1/mcp/servers/${server.id}`, { method: "DELETE", text: true });
 			}

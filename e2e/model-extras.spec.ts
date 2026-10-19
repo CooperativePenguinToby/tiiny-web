@@ -37,9 +37,10 @@ interface Local {
 	display_name: string;
 }
 
-async function localStatus(modelId: string): Promise<string> {
+// The status of DOWNLOAD_MODEL on the device, "absent" when it is not there.
+async function localStatus(): Promise<string> {
 	const list = await deviceGet<{ data: Local[] }>("/api/v1/models/?including_downloading=true");
-	return list.data.find((model) => model.model_id === modelId)?.status ?? "absent";
+	return list.data.find((model) => model.model_id === DOWNLOAD_MODEL)?.status ?? "absent";
 }
 
 async function displayName(modelId: string): Promise<string> {
@@ -73,31 +74,33 @@ test("#20 the store shows a model's details", async ({ page }) => {
 
 test("#20 a store download can be paused, resumed and cancelled", async ({ page }) => {
 	test.setTimeout(5 * 60_000);
-	expect(await localStatus(DOWNLOAD_MODEL), `${DOWNLOAD_MODEL} must not be on the device`).toBe("absent");
+	expect(await localStatus(), `${DOWNLOAD_MODEL} must not be on the device`).toBe("absent");
 	await signIn(page);
 	await page.getByRole("link", { name: "Store" }).click();
 	const row = page.getByTestId(`store-${DOWNLOAD_MODEL}`);
 	try {
 		await row.getByRole("button", { name: "Download" }).click();
-		await expect.poll(() => localStatus(DOWNLOAD_MODEL), { timeout: 60_000 }).toBe("downloading");
+		await expect.poll(localStatus, { timeout: 60_000 }).toBe("downloading");
 		await row.getByRole("button", { name: "Pause" }).click();
-		await expect.poll(() => localStatus(DOWNLOAD_MODEL), { timeout: 60_000 }).toBe("download_stop");
+		await expect.poll(localStatus, { timeout: 60_000 }).toBe("download_stop");
 		await expect(page.getByRole("alert").filter({ hasText: "paused. Resume it any time." })).toBeVisible();
 		await expect(row).toContainText(/paused \d+%/, { timeout: 30_000 });
 
 		await row.getByRole("button", { name: "Resume" }).click();
-		await expect.poll(() => localStatus(DOWNLOAD_MODEL), { timeout: 60_000 }).toBe("downloading");
+		await expect.poll(localStatus, { timeout: 60_000 }).toBe("downloading");
 		await row.getByRole("button", { name: "Pause" }).click();
 		await expect(row.getByRole("button", { name: "Cancel" })).toBeVisible({ timeout: 60_000 });
 		await row.getByRole("button", { name: "Cancel" }).click();
 		await expect(page.getByRole("alert").filter({ hasText: "cancelled" })).toBeVisible();
-		await expect.poll(() => localStatus(DOWNLOAD_MODEL), { timeout: 60_000 }).toBe("absent");
+		await expect.poll(localStatus, { timeout: 60_000 }).toBe("absent");
 	} finally {
 		// Never leave a partial download behind.
-		if ((await localStatus(DOWNLOAD_MODEL)) !== "absent") {
-			await devicePostJson(`/api/v1/models/${DOWNLOAD_MODEL}/pause_download`, { model_id: DOWNLOAD_MODEL }).catch(
-				() => ""
-			);
+		if ((await localStatus()) !== "absent") {
+			try {
+				await devicePostJson(`/api/v1/models/${DOWNLOAD_MODEL}/pause_download`, { model_id: DOWNLOAD_MODEL });
+			} catch {
+				// Best effort: the download may already have stopped.
+			}
 			await deviceDelete(`/api/v1/models/${DOWNLOAD_MODEL}`);
 		}
 	}

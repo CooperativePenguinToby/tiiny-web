@@ -30,8 +30,8 @@ import type { HfRepo, StoreModel } from "@/types/device";
 import { responseError } from "@/lib/sse";
 import { useDeviceChecks, type Check } from "@/hooks/use-device-checks";
 
-export interface CompatibleSearchProps {
-	onCheck: (repoId: string) => void;
+export interface CompatibleSearchProperties {
+	onCheck: (repositoryId: string) => void;
 }
 
 const LIMIT_OPTIONS = [20, 40, 100];
@@ -45,24 +45,43 @@ interface Settings {
 
 const DEFAULT_SETTINGS: Settings = { autoCheck: true, compatibleOnly: true, limit: 40 };
 
-function useSettings(): [Settings, (change: Partial<Settings>) => void] {
-	const [settings, setSettings] = React.useState<Settings>(DEFAULT_SETTINGS);
-	React.useEffect(() => {
-		try {
-			const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? "{}") as Partial<Settings>;
-			setSettings({ ...DEFAULT_SETTINGS, ...stored });
-		} catch {
-			// unreadable settings: keep the defaults
+// The settings live in localStorage, read as an external store: the server render and hydration use
+// the defaults, then the client switches to the stored settings.
+const settingsListeners = new Set<() => void>();
+// The last stored value read and its parsed settings: parsing once per stored value keeps the
+// snapshot referentially stable between renders.
+const settingsCache: { raw: string | null | undefined; settings: Settings } = {
+	raw: undefined,
+	settings: DEFAULT_SETTINGS,
+};
+
+function readSettings(): Settings {
+	try {
+		const raw = localStorage.getItem(SETTINGS_KEY);
+		if (settingsCache.raw !== raw) {
+			settingsCache.settings = { ...DEFAULT_SETTINGS, ...(JSON.parse(raw ?? "{}") as Partial<Settings>) };
+			settingsCache.raw = raw;
 		}
-	}, []);
-	const update = React.useCallback((change: Partial<Settings>) => {
-		setSettings((current) => {
-			const next = { ...current, ...change };
-			localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
-			return next;
-		});
-	}, []);
-	return [settings, update];
+		return settingsCache.settings;
+	} catch {
+		// unreadable settings: keep the defaults
+		return DEFAULT_SETTINGS;
+	}
+}
+
+function subscribeSettings(onChange: () => void): () => void {
+	settingsListeners.add(onChange);
+	return () => settingsListeners.delete(onChange);
+}
+
+function updateSettings(change: Partial<Settings>): void {
+	localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...readSettings(), ...change }));
+	for (const listener of settingsListeners) listener();
+}
+
+function useSettings(): [Settings, (change: Partial<Settings>) => void] {
+	const settings = React.useSyncExternalStore(subscribeSettings, readSettings, () => DEFAULT_SETTINGS);
+	return [settings, updateSettings];
 }
 
 // How a store model fares as a base for Hugging Face derivatives, judged by asking the device to
@@ -145,7 +164,7 @@ function VerdictCell({ check }: { check: Check | undefined }): React.JSX.Element
 	);
 }
 
-export function CompatibleSearch({ onCheck }: CompatibleSearchProps): React.JSX.Element {
+export function CompatibleSearch({ onCheck }: CompatibleSearchProperties): React.JSX.Element {
 	const [store, setStore] = React.useState<StoreModel[] | null>(null);
 	const [base, setBase] = React.useState<string>("");
 	const [query, setQuery] = React.useState<string>("");
@@ -156,8 +175,8 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProps): React.JSX.
 
 	const storeIds = React.useMemo(() => store?.map((model) => model.modelId) ?? null, [store]);
 	const baseChecks = useDeviceChecks(storeIds, true);
-	const repoIds = React.useMemo(() => repos?.map((repo) => repo.repoId) ?? null, [repos]);
-	const repoChecks = useDeviceChecks(repoIds, settings.autoCheck);
+	const repositoryIds = React.useMemo(() => repos?.map((repository) => repository.repoId) ?? null, [repos]);
+	const repositoryChecks = useDeviceChecks(repositoryIds, settings.autoCheck);
 
 	React.useEffect(() => {
 		void (async () => {
@@ -172,7 +191,8 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProps): React.JSX.
 
 	const grouped = React.useMemo(() => {
 		const groups = new Map<BaseGroup, StoreModel[]>(GROUP_ORDER.map((group) => [group, []]));
-		for (const model of store ?? []) groups.get(baseGroup(baseChecks[model.modelId]))!.push(model);
+		const models = store ?? [];
+		for (const model of models) groups.get(baseGroup(baseChecks[model.modelId]))!.push(model);
 		// Within importable bases, ones already on the device come first.
 		groups
 			.get("importable")!
@@ -180,19 +200,17 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProps): React.JSX.
 		return groups;
 	}, [store, baseChecks]);
 
-	// Default to the first importable base on the device once the checks find one.
-	React.useEffect(() => {
-		if (base) return;
-		const first = grouped.get("importable")![0];
-		if (first) setBase(first.modelId);
-	}, [base, grouped]);
+	// Default to the first importable base on the device once the checks find one (adjusted during
+	// render rather than in an effect, so there is no extra commit with no base selected).
+	const firstImportable = grouped.get("importable")![0];
+	if (!base && firstImportable) setBase(firstImportable.modelId);
 
 	const search = async (): Promise<void> => {
 		setSearching(true);
 		setError(null);
 		try {
-			const params = new URLSearchParams({ base, q: query, limit: String(settings.limit) });
-			const response = await fetch(`/api/hf/search?${params.toString()}`);
+			const parameters = new URLSearchParams({ base, q: query, limit: String(settings.limit) });
+			const response = await fetch(`/api/hf/search?${parameters.toString()}`);
 			if (!response.ok) throw new Error(await responseError(response));
 			setRepos((await response.json()) as HfRepo[]);
 		} catch (error_) {
@@ -312,7 +330,7 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProps): React.JSX.
 				</Alert>
 			) : null}
 			{repos && repos.length > 0 ? (
-				<CheckSummary checks={repoChecks} compatibleOnly={settings.compatibleOnly} repos={repos} />
+				<CheckSummary checks={repositoryChecks} compatibleOnly={settings.compatibleOnly} repos={repos} />
 			) : null}
 			{repos === null ? null : repos.length === 0 ? (
 				<Typography
@@ -337,27 +355,31 @@ export function CompatibleSearch({ onCheck }: CompatibleSearchProps): React.JSX.
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{visibleRepos(repos, repoChecks, settings.compatibleOnly).map((repo) => (
-								<TableRow hover key={`${repo.relation}:${repo.repoId}`} data-testid={`hf-${repo.repoId}`}>
+							{visibleRepos(repos, repositoryChecks, settings.compatibleOnly).map((repository) => (
+								<TableRow
+									hover
+									key={`${repository.relation}:${repository.repoId}`}
+									data-testid={`hf-${repository.repoId}`}
+								>
 									<TableCell>
 										<Link
-											href={`https://huggingface.co/${repo.repoId}`}
+											href={`https://huggingface.co/${repository.repoId}`}
 											rel="noreferrer"
 											target="_blank"
 											variant="subtitle2"
 										>
-											{repo.repoId}
+											{repository.repoId}
 										</Link>
 									</TableCell>
 									<TableCell>
-										<Chip label={repo.relation === "adapter" ? "LoRA adapter" : "fine-tune"} size="small" />
+										<Chip label={repository.relation === "adapter" ? "LoRA adapter" : "fine-tune"} size="small" />
 									</TableCell>
-									<TableCell align="right">{repo.downloads.toLocaleString()}</TableCell>
+									<TableCell align="right">{repository.downloads.toLocaleString()}</TableCell>
 									<TableCell data-testid="hf-verdict-cell">
-										<VerdictCell check={repoChecks[repo.repoId]} />
+										<VerdictCell check={repositoryChecks[repository.repoId]} />
 									</TableCell>
 									<TableCell align="right">
-										<Button onClick={() => onCheck(repo.repoId)} size="small">
+										<Button onClick={() => onCheck(repository.repoId)} size="small">
 											Details
 										</Button>
 									</TableCell>
@@ -376,8 +398,8 @@ const isIncompatible = (check: Check | undefined): boolean =>
 
 // "Compatible only" hides repos the device has said it cannot import; unchecked ones, and ones that
 // only need a base model downloaded, stay visible.
-function visibleRepos(repos: HfRepo[], checks: Record<string, Check>, compatibleOnly: boolean): HfRepo[] {
-	return compatibleOnly ? repos.filter((repo) => !isIncompatible(checks[repo.repoId])) : repos;
+function visibleRepos(repos: HfRepo[], checks: Record<string, Check>, isCompatibleOnly: boolean): HfRepo[] {
+	return isCompatibleOnly ? repos.filter((repository) => !isIncompatible(checks[repository.repoId])) : repos;
 }
 
 function CheckSummary({
@@ -389,14 +411,14 @@ function CheckSummary({
 	checks: Record<string, Check>;
 	compatibleOnly: boolean;
 }): React.JSX.Element {
-	const ids = [...new Set(repos.map((repo) => repo.repoId))];
+	const ids = [...new Set(repos.map((repository) => repository.repoId))];
 	const finished = ids.filter((id) => checks[id]?.state === "done" || checks[id]?.state === "error").length;
 	const count = (verdict: string): number =>
 		ids.filter((id) => {
 			const check = checks[id];
 			return check?.state === "done" && check.result.verdict === verdict;
 		}).length;
-	const checking = ids.some((id) => checks[id]?.state === "checking");
+	const isChecking = ids.some((id) => checks[id]?.state === "checking");
 	const hidden = repos.length - visibleRepos(repos, checks, compatibleOnly).length;
 	const needsBase = count("needs-base-model");
 	return (
@@ -413,7 +435,7 @@ function CheckSummary({
 				{needsBase > 0 ? ` · ${needsBase} need a base model` : ""}
 				{hidden > 0 ? ` · ${hidden} incompatible hidden` : ""}
 			</Typography>
-			{checking ? (
+			{isChecking ? (
 				<LinearProgress
 					aria-label="Checking compatibility"
 					value={(finished / ids.length) * 100}

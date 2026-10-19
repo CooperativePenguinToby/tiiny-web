@@ -21,6 +21,16 @@ const FIELDS: { key: keyof Personalization; label: string; limit: number; multil
 	{ key: "recentFocus", label: "Recent focus", limit: 1000, multiline: true, hint: "What you are working on." },
 ];
 
+type Loaded = { profile: Personalization } | { error: string };
+
+// Fetches the saved profile, or the device's reason it could not.
+async function loadProfile(): Promise<Loaded> {
+	const response = await fetch("/api/personalization", { cache: "no-store" });
+	return response.ok
+		? { profile: (await response.json()) as Personalization }
+		: { error: await responseError(response) };
+}
+
 export function PersonalizationCard(): React.JSX.Element {
 	const [saved, setSaved] = React.useState<Personalization | null>(null);
 	const [draft, setDraft] = React.useState<Personalization | null>(null);
@@ -28,21 +38,25 @@ export function PersonalizationCard(): React.JSX.Element {
 	const [saving, setSaving] = React.useState(false);
 	const [notice, setNotice] = React.useState<string | null>(null);
 
-	const load = React.useCallback(async (): Promise<void> => {
-		setError(null);
-		const response = await fetch("/api/personalization", { cache: "no-store" });
-		if (!response.ok) {
-			setError(await responseError(response));
+	const showLoaded = (loaded: Loaded): void => {
+		if ("error" in loaded) {
+			setError(loaded.error);
 			return;
 		}
-		const profile = (await response.json()) as Personalization;
-		setSaved(profile);
-		setDraft(profile);
-	}, []);
+		setSaved(loaded.profile);
+		setDraft(loaded.profile);
+	};
 
 	React.useEffect(() => {
-		void load();
-	}, [load]);
+		void (async () => {
+			showLoaded(await loadProfile());
+		})();
+	}, []);
+
+	const retry = async (): Promise<void> => {
+		setError(null);
+		showLoaded(await loadProfile());
+	};
 
 	const save = async (): Promise<void> => {
 		if (!draft) return;
@@ -67,8 +81,8 @@ export function PersonalizationCard(): React.JSX.Element {
 		}
 	};
 
-	const changed = draft !== null && saved !== null && FIELDS.some(({ key }) => draft[key] !== saved[key]);
-	const invalid = draft !== null && FIELDS.some(({ key, limit }) => draft[key].length > limit);
+	const isChanged = draft !== null && saved !== null && FIELDS.some(({ key }) => draft[key] !== saved[key]);
+	const isInvalid = draft !== null && FIELDS.some(({ key, limit }) => draft[key].length > limit);
 
 	return (
 		<Card data-testid="settings-personalization">
@@ -97,10 +111,10 @@ export function PersonalizationCard(): React.JSX.Element {
 							</Alert>
 						) : null}
 						<Stack direction="row" spacing={1}>
-							<Button disabled={!changed || invalid || saving} onClick={() => void save()} variant="contained">
+							<Button disabled={!isChanged || isInvalid || saving} onClick={() => void save()} variant="contained">
 								{saving ? "Saving…" : "Save"}
 							</Button>
-							<Button disabled={!changed || saving} onClick={() => setDraft(saved)}>
+							<Button disabled={!isChanged || saving} onClick={() => setDraft(saved)}>
 								Discard changes
 							</Button>
 						</Stack>
@@ -108,7 +122,7 @@ export function PersonalizationCard(): React.JSX.Element {
 				) : error ? (
 					<Alert
 						action={
-							<Button color="inherit" onClick={() => void load()} size="small">
+							<Button color="inherit" onClick={() => void retry()} size="small">
 								Retry
 							</Button>
 						}

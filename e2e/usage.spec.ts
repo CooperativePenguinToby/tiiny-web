@@ -34,9 +34,8 @@ test("#13 the overview shows this week's token usage as the device recorded it",
 	await signIn(page);
 	const card = page.getByTestId("token-usage");
 	// The week the device is in, by its own clock (which may be ahead of this computer's).
-	await expect(card.getByTestId("usage-week")).toHaveText(
-		new RegExp(`^${dayjs(await deviceWeekStart()).format("D MMM")} – `)
-	);
+	const weekStart = dayjs(await deviceWeekStart()).format("D MMM");
+	await expect(card.getByTestId("usage-week")).toHaveText(new RegExp(`^${weekStart} – `));
 	for (const date of Object.keys(days)) await expect(card.getByTestId(`usage-day-${date}`)).toBeAttached();
 	await page.screenshot({ path: "test-results/usage-chart.png", fullPage: true });
 

@@ -5,10 +5,16 @@ import { apiRoute } from "@/server/route";
 // POST { key, …credentials }. Account connectors answer { url } (the sign-in page to open); the others
 // connect once the device accepts the credentials (WhatsApp answers { qr } to scan).
 export const POST = apiRoute(async (request) => {
-	const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
-	const key = connectorKeyFrom(body.key);
-	if (["gmail", "google-calendar", "outlook-mail", "outlook-calendar"].includes(key)) {
-		return NextResponse.json({ url: await authUrl(key) });
+	let body: Record<string, unknown> = {};
+	try {
+		body = (await request.json()) as Record<string, unknown>;
+	} catch {
+		// A missing or malformed body is handled like an empty one.
 	}
-	return NextResponse.json(await connect(key, body));
+	const key = connectorKeyFrom(body.key);
+	return NextResponse.json(
+		["gmail", "google-calendar", "outlook-mail", "outlook-calendar"].includes(key)
+			? { url: await authUrl(key) }
+			: await connect(key, body)
+	);
 });

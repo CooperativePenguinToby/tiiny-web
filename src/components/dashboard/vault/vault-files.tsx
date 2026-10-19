@@ -186,14 +186,14 @@ function VaultSearch(): React.JSX.Element {
 
 export function VaultFiles(): React.JSX.Element {
 	const polled = usePolling<VaultFile[]>("/api/vault", 15_000);
-	const input = React.useRef<HTMLInputElement>(null);
+	const inputRef = React.useRef<HTMLInputElement>(null);
 	const [progress, setProgress] = React.useState<Progress | null>(null);
 	const [outcome, setOutcome] = React.useState<{ severity: "success" | "error"; message: string } | null>(null);
 	const [renaming, setRenaming] = React.useState<VaultFile | null>(null);
 	const [deleting, setDeleting] = React.useState<VaultFile | null>(null);
-	const busy = progress !== null;
+	const isBusy = progress !== null;
 
-	const index = async (sourceId: string, label: string, retried = false): Promise<void> => {
+	const index = async (sourceId: string, label: string, isRetry = false): Promise<void> => {
 		setProgress({ label, message: "Indexing…", percent: null });
 		const response = await fetch("/api/vault/index", {
 			method: "POST",
@@ -209,7 +209,7 @@ export function VaultFiles(): React.JSX.Element {
 			});
 		} catch (error) {
 			// The device's embedding server now and then fails a request outright; a second try succeeds.
-			if (retried || !/upstream model server failed/i.test(errorMessage(error))) throw error;
+			if (isRetry || !/upstream model server failed/i.test(errorMessage(error))) throw error;
 			setProgress({ label, message: "Indexing failed on the device, trying again…", percent: null });
 			await new Promise((resolve) => setTimeout(resolve, 5000));
 			await index(sourceId, label, true);
@@ -258,8 +258,8 @@ export function VaultFiles(): React.JSX.Element {
 				<CardHeader
 					action={
 						<Button
-							disabled={busy}
-							onClick={() => input.current?.click()}
+							disabled={isBusy}
+							onClick={() => inputRef.current?.click()}
 							startIcon={<UploadSimpleIcon />}
 							variant="contained"
 						>
@@ -279,7 +279,7 @@ export function VaultFiles(): React.JSX.Element {
 						event.target.value = "";
 						if (files.length > 0) void upload(files);
 					}}
-					ref={input}
+					ref={inputRef}
 					type="file"
 				/>
 				<Divider />
@@ -355,7 +355,7 @@ export function VaultFiles(): React.JSX.Element {
 												<TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
 													{file.indexed ? null : (
 														<Button
-															disabled={busy}
+															disabled={isBusy}
 															onClick={() =>
 																void act(
 																	() => index(file.sourceId, file.filename),
@@ -375,10 +375,10 @@ export function VaultFiles(): React.JSX.Element {
 													>
 														Download
 													</Button>
-													<Button disabled={busy} onClick={() => setRenaming(file)} size="small">
+													<Button disabled={isBusy} onClick={() => setRenaming(file)} size="small">
 														Rename
 													</Button>
-													<Button color="error" disabled={busy} onClick={() => setDeleting(file)} size="small">
+													<Button color="error" disabled={isBusy} onClick={() => setDeleting(file)} size="small">
 														Delete
 													</Button>
 												</TableCell>

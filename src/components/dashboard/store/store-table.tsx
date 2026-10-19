@@ -59,21 +59,26 @@ async function downloadModel(
 		if (event === "error" || update.error || update.status === "failed" || update.status === "error") {
 			throw new Error(update.error || update.message || `Device reported ${update.status ?? event}`);
 		}
-		if (update.status === "downloaded" || event === "done") return "downloaded";
+		if (event === "done" || update.status === "downloaded") return "downloaded";
 		if (update.status === "download_stop") return "paused";
 		onProgress(STAGE_LABELS[update.stage ?? ""] ?? "Starting", update.progress ?? null);
 	}
 	throw new Error("The download stream ended before the model was downloaded");
 }
 
+// Orders strings by UTF-16 code units, exactly as `sort()` does without a compare function.
+const byCodeUnits = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
+
 const statusChip = (model: StoreModel): React.JSX.Element => {
 	if (model.status === "running") return <Chip color="success" label="loaded" size="small" />;
 	if (model.status === "downloaded") return <Chip color="info" label="downloaded" size="small" />;
 	if (model.status === "download_stop")
 		return <Chip color="warning" label={`paused ${model.progress.toFixed(0)}%`} size="small" />;
-	if (model.status === "downloading")
-		return <Chip color="warning" label={`downloading ${model.progress.toFixed(0)}%`} size="small" />;
-	return <Chip label="not downloaded" size="small" />;
+	return model.status === "downloading" ? (
+		<Chip color="warning" label={`downloading ${model.progress.toFixed(0)}%`} size="small" />
+	) : (
+		<Chip label="not downloaded" size="small" />
+	);
 };
 
 export function StoreTable(): React.JSX.Element {
@@ -84,7 +89,10 @@ export function StoreTable(): React.JSX.Element {
 	const [outcome, setOutcome] = React.useState<{ severity: "success" | "error"; message: string } | null>(null);
 	const [shown, setShown] = React.useState<StoreModel | null>(null);
 
-	const types = React.useMemo(() => [...new Set((data ?? []).map((model) => model.type))].sort(), [data]);
+	const types = React.useMemo(
+		() => [...new Set((data ?? []).map((model) => model.type))].toSorted(byCodeUnits),
+		[data]
+	);
 	const visible = React.useMemo(() => {
 		const needle = query.trim().toLowerCase();
 		return (data ?? []).filter(
@@ -94,6 +102,14 @@ export function StoreTable(): React.JSX.Element {
 		);
 	}, [data, query, type]);
 
+	if (isLoading) {
+		return (
+			<Stack sx={{ alignItems: "center", py: 8 }}>
+				<CircularProgress aria-label="Loading store" />
+			</Stack>
+		);
+	}
+
 	const download = async (model: StoreModel): Promise<void> => {
 		setOutcome(null);
 		setProgress({ modelId: model.modelId, stage: "Starting", percent: null });
@@ -101,11 +117,13 @@ export function StoreTable(): React.JSX.Element {
 			const result = await downloadModel(model.modelId, (stage, percent) =>
 				setProgress({ modelId: model.modelId, stage, percent })
 			);
-			setOutcome(
-				result === "paused"
-					? { severity: "success", message: `${model.name} paused. Resume it any time.` }
-					: { severity: "success", message: `${model.name} downloaded. Load it from the Models page.` }
-			);
+			setOutcome({
+				severity: "success",
+				message:
+					result === "paused"
+						? `${model.name} paused. Resume it any time.`
+						: `${model.name} downloaded. Load it from the Models page.`,
+			});
 		} catch (error_) {
 			const reason = error_ instanceof Error ? error_.message : String(error_);
 			setOutcome({ severity: "error", message: `Could not download ${model.name}: ${reason}` });
@@ -140,14 +158,6 @@ export function StoreTable(): React.JSX.Element {
 			await refresh();
 		}
 	};
-
-	if (isLoading) {
-		return (
-			<Stack sx={{ alignItems: "center", py: 8 }}>
-				<CircularProgress aria-label="Loading store" />
-			</Stack>
-		);
-	}
 
 	return (
 		<Stack spacing={3}>

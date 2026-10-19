@@ -29,10 +29,12 @@ interface OnlineModel {
 
 // Store descriptions are HTML snippets; the UI shows plain text.
 const plainText = (html: string | null): string =>
-	(html ?? "")
-		.replaceAll(/<[^>]*>/g, " ")
-		.replaceAll(/\s+/g, " ")
-		.trim();
+	html
+		? html
+				.replaceAll(/<[^>]*>/g, " ")
+				.replaceAll(/\s+/g, " ")
+				.trim()
+		: "";
 
 interface LocalModel {
 	model_id: string;

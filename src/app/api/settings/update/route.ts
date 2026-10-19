@@ -8,7 +8,13 @@ export const GET = apiRoute(async () => NextResponse.json(await updateStatus()))
 
 // POST { action: "check" | "download" | "install" }.
 export const POST = apiRoute(async (request) => {
-	const { action } = (await request.json().catch(() => ({}))) as { action?: unknown };
+	let body: { action?: unknown } = {};
+	try {
+		body = (await request.json()) as { action?: unknown };
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
+	const { action } = body;
 	switch (action) {
 		case "check": {
 			return NextResponse.json(await checkForUpdate());

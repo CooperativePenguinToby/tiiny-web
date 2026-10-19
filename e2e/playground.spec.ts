@@ -15,15 +15,24 @@ const RUN = { timeout: 5 * 60_000 };
 
 // The playground loads models on first use; each test unloads the ones it caused to load (Vault's
 // embedding model aside, which the device keeps for itself).
-let before: string[] = [];
-test.beforeEach(async () => {
-	before = await runningModelIds();
-});
-test.afterEach(async () => {
-	for (const modelId of await runningModelIds()) {
-		if (!before.includes(modelId) && modelId !== EMBEDDING_MODEL) await devicePost(`/api/v1/models/${modelId}/stop`);
-	}
-});
+function unloadNewModels(): { before: () => Promise<void>; after: () => Promise<void> } {
+	let running: string[] = [];
+	return {
+		before: async () => {
+			running = await runningModelIds();
+		},
+		after: async () => {
+			const modelIds = await runningModelIds();
+			for (const modelId of modelIds) {
+				if (modelId !== EMBEDDING_MODEL && !running.includes(modelId))
+					await devicePost(`/api/v1/models/${modelId}/stop`);
+			}
+		},
+	};
+}
+const newModels = unloadNewModels();
+test.beforeEach(newModels.before);
+test.afterEach(newModels.after);
 
 async function openTab(page: Page, tab: string, model: string): Promise<void> {
 	await signIn(page);
@@ -81,7 +90,7 @@ test("#24 speech to text refuses audio the device cannot read", async ({ page })
 			file: {
 				name: "song.mp3",
 				mimeType: "audio/mpeg",
-				buffer: Buffer.from("ID3\u0004\u0000\u0000\u0000\u0000\u0000\u0000"),
+				buffer: Buffer.from("ID3\u{4}\0\0\0\0\0\0"),
 			},
 		},
 	});
@@ -132,13 +141,13 @@ test("#24 rerank puts the relevant document first", async ({ page }) => {
 
 test("#24 benchmark measures a text model's speed", async ({ page }) => {
 	test.setTimeout(10 * 60_000);
-	const name = CHAT_MODEL.split("/")[1];
+	const name = CHAT_MODEL.split("/", 2)[1];
 	await openTab(page, "Benchmark", name);
 	await page.getByLabel("Tokens to generate").fill("64");
 	await page.getByRole("button", { name: "Run" }).click();
 	await expect(page.getByTestId("bench-speed")).toBeVisible(RUN);
 	const speedText = await page.getByTestId("bench-speed").textContent();
-	const speed = Number(speedText?.split(" ")[0]);
+	const speed = Number(speedText?.split(" ", 1)[0]);
 	expect(speed).toBeGreaterThan(0);
 	expect(await runningModelIds()).toContain(CHAT_MODEL);
 });

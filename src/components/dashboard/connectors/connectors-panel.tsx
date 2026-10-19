@@ -40,29 +40,24 @@ export function ConnectorsPanel(): React.JSX.Element {
 		try {
 			const { url } = await postJson<{ url: string }>("/api/connectors/connect", { key: connector.key });
 			setSignIn({ key: connector.key, url });
-			globalThis.open(url, "_blank", "noopener");
+			open(url, "_blank", "noopener");
 		} catch (error) {
 			setOutcome({ severity: "error", message: `${connector.name}: ${errorMessage(error)}` });
 		}
 	};
 
-	React.useEffect(() => {
-		if (!signIn) return;
-		const connector = polled.data?.find((entry) => entry.key === signIn.key);
-		if (connector?.connected) {
-			setSignIn(null);
-			setOutcome({ severity: "success", message: `${connector.name} connected: ${connector.detail}.` });
-		}
-	}, [polled.data, signIn]);
+	// (Both checks adjust state while rendering, as soon as a poll shows the connection.)
+	const signedIn = signIn ? polled.data?.find((entry) => entry.key === signIn.key) : undefined;
+	if (signedIn?.connected) {
+		setSignIn(null);
+		setOutcome({ severity: "success", message: `${signedIn.name} connected: ${signedIn.detail}.` });
+	}
 
 	// WhatsApp connects when the QR code is scanned on the phone.
-	React.useEffect(() => {
-		if (connecting?.key !== "whatsapp") return;
-		if (polled.data?.find((entry) => entry.key === "whatsapp")?.connected) {
-			setConnecting(null);
-			setOutcome({ severity: "success", message: "WhatsApp connected." });
-		}
-	}, [polled.data, connecting]);
+	if (connecting?.key === "whatsapp" && polled.data?.find((entry) => entry.key === "whatsapp")?.connected) {
+		setConnecting(null);
+		setOutcome({ severity: "success", message: "WhatsApp connected." });
+	}
 
 	const disconnect = async (connector: Connector): Promise<void> => {
 		setDisconnecting(null);
@@ -101,7 +96,7 @@ export function ConnectorsPanel(): React.JSX.Element {
 				) : (
 					<Grid container spacing={3}>
 						{polled.data.map((connector) => {
-							const waiting = signIn?.key === connector.key;
+							const isWaiting = signIn?.key === connector.key;
 							return (
 								<Grid key={connector.key} size={{ lg: 4, md: 6, xs: 12 }}>
 									<Card data-testid={`connector-${connector.key}`} sx={CARD_SX}>
@@ -133,7 +128,7 @@ export function ConnectorsPanel(): React.JSX.Element {
 												>
 													{connector.detail}
 												</Typography>
-												{waiting ? (
+												{isWaiting ? (
 													<Typography role="status" variant="body2">
 														Waiting for you to finish signing in…{" "}
 														<Link href={signIn.url} rel="noreferrer" target="_blank">
@@ -158,7 +153,7 @@ export function ConnectorsPanel(): React.JSX.Element {
 													Connect
 												</Button>
 											)}
-											{waiting ? <Button onClick={() => setSignIn(null)}>Cancel</Button> : null}
+											{isWaiting ? <Button onClick={() => setSignIn(null)}>Cancel</Button> : null}
 										</CardActions>
 									</Card>
 								</Grid>

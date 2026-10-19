@@ -91,6 +91,14 @@ export function ModelsTable(): React.JSX.Element {
 	const [confirmUnloadAll, setConfirmUnloadAll] = React.useState(false);
 	const [bulk, setBulk] = React.useState(false);
 
+	if (isLoading) {
+		return (
+			<Stack sx={{ alignItems: "center", py: 8 }}>
+				<CircularProgress aria-label="Loading models" />
+			</Stack>
+		);
+	}
+
 	const unloadAll = async (): Promise<void> => {
 		setConfirmUnloadAll(false);
 		setBulk(true);
@@ -122,14 +130,6 @@ export function ModelsTable(): React.JSX.Element {
 		}
 	};
 
-	if (isLoading) {
-		return (
-			<Stack sx={{ alignItems: "center", py: 8 }}>
-				<CircularProgress aria-label="Loading models" />
-			</Stack>
-		);
-	}
-
 	return (
 		<Stack spacing={3}>
 			{error ? <Alert severity={data ? "warning" : "error"}>{error}</Alert> : null}
@@ -144,7 +144,7 @@ export function ModelsTable(): React.JSX.Element {
 						action={
 							<Button
 								color="error"
-								disabled={operation !== null || bulk || !data.models.some((model) => model.status === "running")}
+								disabled={operation !== null || bulk || data.models.every((model) => model.status !== "running")}
 								onClick={() => setConfirmUnloadAll(true)}
 							>
 								{bulk ? "Unloading…" : "Unload all"}
@@ -182,7 +182,7 @@ export function ModelsTable(): React.JSX.Element {
 								<TableBody>
 									{data.models.map((model) => {
 										const active = operation?.modelId === model.modelId ? operation : null;
-										const running = model.status === "running";
+										const isRunning = model.status === "running";
 										return (
 											<TableRow hover key={model.modelId} data-testid={`model-${model.modelId}`}>
 												<TableCell>
@@ -202,8 +202,8 @@ export function ModelsTable(): React.JSX.Element {
 												<TableCell align="right">{model.npuUsage}%</TableCell>
 												<TableCell>
 													<Chip
-														color={running ? "success" : "default"}
-														label={running ? "loaded" : "not loaded"}
+														color={isRunning ? "success" : "default"}
+														label={isRunning ? "loaded" : "not loaded"}
 														size="small"
 													/>
 												</TableCell>
@@ -225,7 +225,7 @@ export function ModelsTable(): React.JSX.Element {
 																variant={active.progress === null ? "indeterminate" : "determinate"}
 															/>
 														</Stack>
-													) : running ? (
+													) : isRunning ? (
 														<Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end" }}>
 															<Button
 																disabled={operation !== null || bulk}

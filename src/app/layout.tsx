@@ -7,11 +7,11 @@ import { ThemeProvider } from "@/components/core/theme-provider/theme-provider";
 
 export const viewport = { width: "device-width", initialScale: 1 } satisfies Viewport;
 
-interface LayoutProps {
+interface LayoutProperties {
 	children: React.ReactNode;
 }
 
-export default function Layout({ children }: LayoutProps): React.JSX.Element {
+export default function Layout({ children }: LayoutProperties): React.JSX.Element {
 	return (
 		<html lang="en">
 			<body>

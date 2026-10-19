@@ -7,7 +7,13 @@ const stamp = (date: Date): string =>
 // { services } → the backup archive, named as TiinyOS names it. Categories the device could not back up
 // are listed in X-Backup-Failures.
 export const POST = apiRoute(async (request) => {
-	const { services } = (await request.json().catch(() => ({}))) as { services?: unknown };
+	let body: { services?: unknown } = {};
+	try {
+		body = (await request.json()) as { services?: unknown };
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
+	const { services } = body;
 	const { archive, failures } = await exportBackup(await servicesFrom(services));
 	return new Response(new Uint8Array(archive), {
 		headers: {

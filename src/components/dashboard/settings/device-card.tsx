@@ -39,7 +39,7 @@ function NameEditor({ name, onSaved }: { name: string; onSaved: () => Promise<vo
 		);
 	}
 	const trimmed = value.trim();
-	const invalid = trimmed.length === 0 || trimmed.length > MAX_NAME;
+	const isInvalid = trimmed.length === 0 || trimmed.length > MAX_NAME;
 	const save = async (): Promise<void> => {
 		setSaving(true);
 		setError(null);
@@ -57,14 +57,14 @@ function NameEditor({ name, onSaved }: { name: string; onSaved: () => Promise<vo
 		<Stack spacing={1}>
 			<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
 				<TextField
-					error={invalid}
+					error={isInvalid}
 					helperText={`${trimmed.length}/${MAX_NAME}`}
 					label="Device name"
 					onChange={(event) => setValue(event.target.value)}
 					size="small"
 					value={value}
 				/>
-				<Button disabled={invalid || saving} onClick={() => void save()} variant="contained">
+				<Button disabled={isInvalid || saving} onClick={() => void save()} variant="contained">
 					Save
 				</Button>
 				<Button disabled={saving} onClick={() => setValue(null)}>

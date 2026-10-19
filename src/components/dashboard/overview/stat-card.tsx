@@ -7,7 +7,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import type { Icon } from "@phosphor-icons/react/dist/lib/types";
 
-export interface StatCardProps {
+export interface StatCardProperties {
 	title: string;
 	value: string;
 	caption: string;
@@ -23,7 +23,7 @@ export function StatCard({
 	percent,
 	icon: IconComponent,
 	color,
-}: StatCardProps): React.JSX.Element {
+}: StatCardProperties): React.JSX.Element {
 	return (
 		<Card sx={{ height: "100%" }} data-testid={`stat-${title}`}>
 			<CardContent>

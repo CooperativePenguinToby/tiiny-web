@@ -73,7 +73,7 @@ function AddServerDialog({
 		}
 	};
 
-	const valid = mode === "json" ? json.trim().length > 0 : name.trim().length > 0 && /^https?:\/\//.test(url.trim());
+	const isValid = mode === "json" ? json.trim().length > 0 : name.trim().length > 0 && /^https?:\/\//.test(url.trim());
 	return (
 		<Dialog fullWidth maxWidth="sm" onClose={onClose} open={open}>
 			<DialogTitle>Add an MCP server</DialogTitle>
@@ -114,7 +114,7 @@ function AddServerDialog({
 			</DialogContent>
 			<DialogActions>
 				<Button onClick={onClose}>Cancel</Button>
-				<Button disabled={!valid || busy} onClick={() => void add()} variant="contained">
+				<Button disabled={!isValid || busy} onClick={() => void add()} variant="contained">
 					{busy ? "Adding…" : "Add"}
 				</Button>
 			</DialogActions>
@@ -126,12 +126,16 @@ function ServerTools({ id }: { id: string }): React.JSX.Element {
 	const [tools, setTools] = React.useState<McpTool[] | null>(null);
 	const [error, setError] = React.useState<string | null>(null);
 	React.useEffect(() => {
-		void fetch(`/api/mcp/tools?id=${encodeURIComponent(id)}`)
+		const controller = new AbortController();
+		void fetch(`/api/mcp/tools?id=${encodeURIComponent(id)}`, { signal: controller.signal })
 			.then(async (response) => {
 				if (!response.ok) throw new Error(await responseError(response));
 				setTools((await response.json()) as McpTool[]);
 			})
-			.catch((error_: unknown) => setError(errorMessage(error_)));
+			.catch((error_: unknown) => {
+				if (!controller.signal.aborted) setError(errorMessage(error_));
+			});
+		return () => controller.abort();
 	}, [id]);
 	if (error) return <Alert severity="error">{error}</Alert>;
 	if (!tools) return <CircularProgress aria-label="Loading tools" size={18} />;
@@ -148,7 +152,7 @@ function ServerTools({ id }: { id: string }): React.JSX.Element {
 							color: "text.secondary",
 						}}
 					>
-						{tool.description.split("\n")[0]}
+						{tool.description.split("\n", 1)[0]}
 					</Typography>
 				</div>
 			))}

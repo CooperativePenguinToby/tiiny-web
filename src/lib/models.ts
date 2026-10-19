@@ -20,6 +20,6 @@ export async function loadModel(
 		}
 		const progress = update.progress ?? update.result?.progress ?? null;
 		onProgress(update.startup_message || update.result?.message || update.status || event, progress);
-		if (update.status === "running" && progress === 100) return;
+		if (progress === 100 && update.status === "running") return;
 	}
 }

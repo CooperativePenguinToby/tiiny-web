@@ -5,8 +5,14 @@ import { apiRoute } from "@/server/route";
 
 // Multipart "file": what a backup archive contains and whether it was made on this device.
 export const POST = apiRoute(async (request) => {
-	const form = await request.formData().catch(() => null);
+	let form: FormData | null = null;
+	try {
+		form = await request.formData();
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
 	const file = form?.get("file");
 	if (!(file instanceof File)) throw new DeviceError("Choose a backup file", 400);
-	return NextResponse.json(await inspectArchive(Buffer.from(await file.arrayBuffer())));
+	const archive = Buffer.from(await file.arrayBuffer());
+	return NextResponse.json(await inspectArchive(archive));
 });

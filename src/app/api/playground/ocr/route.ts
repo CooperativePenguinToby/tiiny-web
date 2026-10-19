@@ -10,7 +10,12 @@ interface OcrReply {
 
 // Multipart: model, file (image). Returns { text, lines: [{ text, score }] }.
 export const POST = apiRoute(async (request) => {
-	const form = await request.formData().catch(() => null);
+	let form: FormData | null = null;
+	try {
+		form = await request.formData();
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
 	const model = modelIdOf(form?.get("model"));
 	const file = form?.get("file");
 	if (!(file instanceof File) || !file.type.startsWith("image/")) throw new DeviceError("Choose an image", 400);

@@ -32,6 +32,14 @@ function BackupSection(): React.JSX.Element {
 	const selected =
 		chosen ?? new Set((categories.data ?? []).filter((category) => category.ready).map((category) => category.service));
 
+	if (!categories.data) {
+		return categories.error ? (
+			<Alert severity="error">{categories.error}</Alert>
+		) : (
+			<CircularProgress aria-label="Loading backup" />
+		);
+	}
+
 	const download = async (): Promise<void> => {
 		setBusy(true);
 		setOutcome(null);
@@ -70,13 +78,6 @@ function BackupSection(): React.JSX.Element {
 		}
 	};
 
-	if (!categories.data) {
-		return categories.error ? (
-			<Alert severity="error">{categories.error}</Alert>
-		) : (
-			<CircularProgress aria-label="Loading backup" />
-		);
-	}
 	return (
 		<Stack spacing={1.5}>
 			<Typography variant="subtitle2">Back up</Typography>
@@ -115,11 +116,12 @@ function BackupSection(): React.JSX.Element {
 function RestoreSection(): React.JSX.Element {
 	const [file, setFile] = React.useState<File | null>(null);
 	const [archive, setArchive] = React.useState<BackupArchive | null>(null);
-	const [chosen, setChosen] = React.useState<Set<string>>(new Set());
+	const [chosen, setChosen] = React.useState<Set<string>>(() => new Set());
 	const [confirm, setConfirm] = React.useState(false);
 	const [busy, setBusy] = React.useState(false);
 	const [error, setError] = React.useState<string | null>(null);
-	const [results, setResults] = React.useState<RestoreEvent[]>([]);
+	// Each result keeps its arrival order as its id: results are only ever appended.
+	const [results, setResults] = React.useState<(RestoreEvent & { sequence: number })[]>([]);
 
 	const choose = async (picked: File): Promise<void> => {
 		setFile(picked);
@@ -153,7 +155,7 @@ function RestoreSection(): React.JSX.Element {
 			for await (const { event, data } of readSse(response)) {
 				const update = JSON.parse(data) as RestoreEvent;
 				if (event === "error") throw new Error(update.message ?? "The device could not restore the backup");
-				setResults((current) => [...current, update]);
+				setResults((current) => [...current, { ...update, sequence: current.length }]);
 			}
 		} catch (error_) {
 			setError(errorMessage(error_));
@@ -220,8 +222,8 @@ function RestoreSection(): React.JSX.Element {
 			) : null}
 			{results.length > 0 ? (
 				<Stack data-testid="restore-results" spacing={0.5}>
-					{results.map((result, index) => (
-						<Alert key={index} severity={result.code && result.code !== "ok" ? "error" : "success"}>
+					{results.map((result) => (
+						<Alert key={result.sequence} severity={result.code && result.code !== "ok" ? "error" : "success"}>
 							{names.get(result.service ?? "") ?? result.service}: {result.message ?? "restored"}
 						</Alert>
 					))}

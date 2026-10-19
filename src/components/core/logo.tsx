@@ -8,12 +8,12 @@ import { NoSsr } from "@/components/core/no-ssr";
 
 type Color = "dark" | "light";
 
-export interface LogoProps {
+export interface LogoProperties {
 	color?: Color;
 	height?: number;
 }
 
-export function Logo({ color = "dark", height = 32 }: LogoProps): React.JSX.Element {
+export function Logo({ color = "dark", height = 32 }: LogoProperties): React.JSX.Element {
 	return (
 		<Typography
 			component="span"
@@ -33,7 +33,7 @@ export function Logo({ color = "dark", height = 32 }: LogoProps): React.JSX.Elem
 	);
 }
 
-export interface DynamicLogoProps {
+export interface DynamicLogoProperties {
 	colorDark?: Color;
 	colorLight?: Color;
 	height?: number;
@@ -43,7 +43,7 @@ export function DynamicLogo({
 	colorDark = "light",
 	colorLight = "dark",
 	height = 32,
-}: DynamicLogoProps): React.JSX.Element {
+}: DynamicLogoProperties): React.JSX.Element {
 	const { colorScheme } = useColorScheme();
 	const color = colorScheme === "dark" ? colorDark : colorLight;
 

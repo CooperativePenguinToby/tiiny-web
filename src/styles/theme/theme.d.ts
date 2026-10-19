@@ -1,3 +1,5 @@
+// The empty import makes this file a module, so the block below augments MUI's types instead of replacing them.
+// eslint-disable-next-line unicorn/require-module-specifiers
 import type {} from "@mui/material/styles";
 
 declare module "@mui/material/styles" {

@@ -86,7 +86,7 @@ export async function deviceCall<T>(
 		dispatcher: serviceAgent,
 		headers: {
 			Authorization: `Bearer ${authKey}`,
-			...(init.body === undefined ? {} : { "Content-Type": "application/json" }),
+			...(init.body !== undefined && { "Content-Type": "application/json" }),
 			...init.headers,
 		},
 		body: init.body === undefined ? undefined : JSON.stringify(init.body),
@@ -187,7 +187,7 @@ export async function storedMessages(conversationId: string): Promise<(StoredMes
 	const { items } = await historyCall<{ items: (StoredMessage & { seq_in_conversation: number })[] }>(
 		`/conversations/${conversationId}/messages?limit=100&include_deleted=false`
 	);
-	const sorted = items.sort((a, b) => a.seq_in_conversation - b.seq_in_conversation);
+	const sorted = items.toSorted((a, b) => a.seq_in_conversation - b.seq_in_conversation);
 	return Promise.all(
 		sorted.map(async (message) => {
 			const blocks = await historyCall<{ items: { block_type: string; content_text: string }[] }>(
@@ -215,7 +215,8 @@ export function forgetNewConversations(): { before: () => Promise<void>; after: 
 			known = new Set(await conversationIds());
 		},
 		after: async () => {
-			for (const id of await conversationIds()) {
+			const ids = await conversationIds();
+			for (const id of ids) {
 				if (!known.has(id)) await historyCall(`/conversations/${id}`, { method: "DELETE" });
 			}
 		},

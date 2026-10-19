@@ -27,15 +27,20 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
 // it answers after a grace period).
 async function waitForRestart(): Promise<void> {
 	const started = Date.now();
-	let wentDown = false;
+	let isWentDown = false;
 	while (Date.now() - started < 10 * 60_000) {
 		await sleep(3000);
-		const response = await fetch("/api/settings/device", { cache: "no-store" }).catch(() => null);
+		let response: Response | null;
+		try {
+			response = await fetch("/api/settings/device", { cache: "no-store" });
+		} catch {
+			response = null;
+		}
 		if (!response?.ok) {
-			wentDown = true;
+			isWentDown = true;
 			continue;
 		}
-		if (wentDown || Date.now() - started > 60_000) return;
+		if (isWentDown || Date.now() - started > 60_000) return;
 	}
 	throw new Error("The device has not come back after 10 minutes");
 }
@@ -43,11 +48,11 @@ async function waitForRestart(): Promise<void> {
 function AutoPowerOn(): React.JSX.Element {
 	const [saving, setSaving] = React.useState(false);
 	const [outcome, setOutcome] = React.useState<Outcome | null>(null);
-	const set = async (autoPowerOn: boolean): Promise<void> => {
+	const set = async (isEnabled: boolean): Promise<void> => {
 		setSaving(true);
 		setOutcome(null);
 		try {
-			const { message } = await postJson<{ message: string }>("/api/settings/power", { autoPowerOn });
+			const { message } = await postJson<{ message: string }>("/api/settings/power", { autoPowerOn: isEnabled });
 			setOutcome({ severity: "success", message: `Device: ${message}` });
 		} catch (error) {
 			setOutcome({ severity: "error", message: errorMessage(error) });
@@ -105,7 +110,7 @@ function UpdateSection({ onRestarting }: { onRestarting: (message: string) => Pr
 
 	const update = checked ?? status.data;
 	const state = status.data?.state ?? "idle";
-	const working = !["idle", "success", "failed", "prepared"].includes(state);
+	const isWorking = !["idle", "success", "failed", "prepared"].includes(state);
 
 	return (
 		<Stack spacing={1.5}>
@@ -135,7 +140,7 @@ function UpdateSection({ onRestarting }: { onRestarting: (message: string) => Pr
 					{checked.notes}
 				</Typography>
 			) : null}
-			{working ? (
+			{isWorking ? (
 				<Stack spacing={0.5}>
 					<Typography variant="body2">Update {state}…</Typography>
 					<LinearProgress aria-label="Update progress" value={status.data?.progress ?? 0} variant="determinate" />
@@ -145,7 +150,7 @@ function UpdateSection({ onRestarting }: { onRestarting: (message: string) => Pr
 			{error ? <Alert severity="error">{error}</Alert> : null}
 			<Stack direction="row" spacing={1}>
 				<Button
-					disabled={busy !== null || working}
+					disabled={busy !== null || isWorking}
 					onClick={() =>
 						void run("check", async () => {
 							setChecked(await postJson<SystemUpdate>("/api/settings/update", { action: "check" }));
@@ -155,9 +160,9 @@ function UpdateSection({ onRestarting }: { onRestarting: (message: string) => Pr
 				>
 					{busy === "check" ? "Checking…" : "Check for updates"}
 				</Button>
-				{checked?.updateAvailable && state !== "prepared" ? (
+				{state !== "prepared" && checked?.updateAvailable ? (
 					<Button
-						disabled={busy !== null || working}
+						disabled={busy !== null || isWorking}
 						onClick={() =>
 							void run("download", async () => {
 								await postJson("/api/settings/update", { action: "download" });

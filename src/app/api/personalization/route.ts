@@ -8,7 +8,13 @@ export const GET = apiRoute(async () => {
 });
 
 export const PUT = apiRoute(async (request) => {
-	const profile = parsePersonalization(await request.json().catch(() => ({})));
+	let body: unknown = {};
+	try {
+		body = await request.json();
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
+	const profile = parsePersonalization(body);
 	await writePersonalization(profile);
 	const saved = await readUserContext();
 	return NextResponse.json(saved.profile);

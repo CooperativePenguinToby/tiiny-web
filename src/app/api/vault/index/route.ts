@@ -5,7 +5,13 @@ import { kbHeaders, sourceIdFrom } from "@/server/vault";
 // Indexes (embeds) an uploaded file and streams the device's progress. The device loads its embedding
 // model if needed.
 export const POST = apiRoute(async (request) => {
-	const { sourceId } = (await request.json().catch(() => ({}))) as { sourceId?: unknown };
+	let input: { sourceId?: unknown } = {};
+	try {
+		input = (await request.json()) as { sourceId?: unknown };
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
+	const { sourceId } = input;
 	return sseResponse(
 		await deviceStream("/kb/finalize/stream", {
 			method: "POST",

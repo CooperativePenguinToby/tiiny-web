@@ -38,7 +38,7 @@ export async function servicesFrom(value: unknown): Promise<string[]> {
 	if (
 		!Array.isArray(value) ||
 		value.length === 0 ||
-		!value.every((item) => typeof item === "string" && known.has(item))
+		value.some((item) => !(typeof item === "string" && known.has(item)))
 	) {
 		throw new DeviceError("Choose at least one category the device offers", 400);
 	}
@@ -61,7 +61,7 @@ export async function exportBackup(
 	const body = Buffer.from(await response.arrayBuffer());
 	if (type.startsWith("application/zip")) return { archive: body, failures: {} };
 	const boundary = /boundary=(?:"([^"]+)"|([^;]+))/i.exec(type);
-	if (!type.startsWith("multipart/mixed") || !boundary)
+	if (!boundary || !type.startsWith("multipart/mixed"))
 		throw new DeviceError(`Unexpected backup reply (${type || "no type"})`, 502);
 	let archive: Buffer | null = null;
 	let failures: Record<string, unknown> = {};
@@ -117,7 +117,7 @@ export async function restoreBackup(
 	const inspected = await inspectArchive(archive);
 	if (!inspected.sameDevice)
 		throw new DeviceError("This backup was made on another device; it can only be restored there", 400);
-	const missing = services.filter((service) => !inspected.categories.some((category) => category.service === service));
+	const missing = services.filter((service) => inspected.categories.every((category) => category.service !== service));
 	if (missing.length > 0) throw new DeviceError(`The backup does not contain ${missing.join(", ")}`, 400);
 	const boundary = "tiiny-restore-boundary";
 	const body = Buffer.concat([

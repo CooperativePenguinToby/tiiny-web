@@ -14,7 +14,7 @@ test("#25 a backup is downloaded and chat history is restored from it", async ({
 	test.setTimeout(10 * 60_000);
 	const device = await serial();
 	const ids = await conversationIds();
-	const before = ids.toSorted();
+	const before = ids.toSorted((a, b) => a.localeCompare(b));
 	await signIn(page);
 	await page.goto("/dashboard/settings");
 	const card = page.getByTestId("settings-backup");
@@ -62,7 +62,7 @@ test("#25 a backup is downloaded and chat history is restored from it", async ({
 	);
 	await page.screenshot({ path: "test-results/backup.png", fullPage: true });
 	const idsAfter = await conversationIds();
-	const after = idsAfter.toSorted();
+	const after = idsAfter.toSorted((a, b) => a.localeCompare(b));
 	expect(after).toEqual(before);
 });
 
@@ -74,7 +74,10 @@ test("#25 a backup from another device is refused", async ({ page }) => {
 	// Same length, different serial; the reader does not check checksums.
 	const other = `${device.slice(0, -4)}0000` === device ? `${device.slice(0, -4)}1111` : `${device.slice(0, -4)}0000`;
 	const original = await response.body();
-	const forged = Buffer.from(original.toString("latin1").replaceAll(device, other), "latin1");
+	const forged = Buffer.from(
+		original.toString("latin1").replaceAll(device, () => other),
+		"latin1"
+	);
 	await page.goto("/dashboard/settings");
 	const card = page.getByTestId("settings-backup");
 	await card

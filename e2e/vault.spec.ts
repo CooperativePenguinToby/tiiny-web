@@ -63,7 +63,8 @@ test("#15 a file goes into Vault, is indexed, found, downloaded, renamed and del
 		expect(afterDelete.some((file) => file.source_id === stored?.source_id)).toBe(false);
 		await page.screenshot({ path: "test-results/vault.png", fullPage: true });
 	} finally {
-		for (const file of await vaultFiles()) {
+		const storedFiles = await vaultFiles();
+		for (const file of storedFiles) {
 			if (file.filename.startsWith(`vault-e2e-${stamp}`)) {
 				await kbCall("/kb/delete-memory", { method: "POST", body: { source_id: file.source_id } });
 			}

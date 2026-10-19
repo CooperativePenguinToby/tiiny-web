@@ -11,7 +11,7 @@ const MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
 
 const digest = (value: string): Buffer => createHash("sha256").update(value).digest();
 
-export function passwordMatches(candidate: string): boolean {
+export function isCorrectPassword(candidate: string): boolean {
 	const expected = process.env.ADMIN_PASSWORD;
 	return Boolean(expected) && timingSafeEqual(digest(candidate), digest(expected!));
 }

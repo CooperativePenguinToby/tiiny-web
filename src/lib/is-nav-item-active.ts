@@ -12,15 +12,9 @@ export function isNavItemActive({
 	}
 
 	if (matcher) {
-		if (matcher.type === "startsWith") {
-			return pathname.startsWith(matcher.href);
-		}
-
-		if (matcher.type === "equals") {
-			return pathname === matcher.href;
-		}
-
-		return false;
+		return matcher.type === "startsWith"
+			? pathname.startsWith(matcher.href)
+			: matcher.type === "equals" && pathname === matcher.href;
 	}
 
 	return pathname === href;

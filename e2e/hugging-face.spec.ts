@@ -13,14 +13,14 @@ async function searchBase(page: Page, query: string): Promise<void> {
 	await signIn(page);
 	await page.getByRole("link", { name: "Hugging Face" }).click();
 	await page.getByRole("combobox", { name: "Base model" }).click();
-	await page.getByRole("option", { name: new RegExp(`^${LORA_BASE}( \\(on device\\))?$`) }).click();
+	await page.getByRole("option", { name: new RegExp(String.raw`^${LORA_BASE}( \(on device\))?$`) }).click();
 	await page.getByRole("textbox", { name: "Search (optional)" }).fill(query);
 	await page.getByRole("button", { name: "Search Hugging Face" }).click();
 }
 
-async function setSwitch(page: Page, label: string, on: boolean): Promise<void> {
+async function setSwitch(page: Page, label: string, isOn: boolean): Promise<void> {
 	const toggle = page.getByRole("switch", { name: label });
-	if ((await toggle.isChecked()) !== on) await toggle.click();
+	if ((await toggle.isChecked()) !== isOn) await toggle.click();
 }
 
 test("#6 search results are checked against the device automatically", async ({ page }) => {

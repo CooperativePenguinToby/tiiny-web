@@ -72,7 +72,8 @@ test("whole app (parity): device settings → Vault file → Task mode answers f
 		await picture.scrollIntoViewIfNeeded();
 		await page.screenshot({ path: "test-results/whole-app-parity.png", fullPage: true });
 	} finally {
-		for (const file of await vaultFiles()) {
+		const storedFiles = await vaultFiles();
+		for (const file of storedFiles) {
 			if (file.filename === name)
 				await kbCall("/kb/delete-memory", { method: "POST", body: { source_id: file.source_id } });
 		}

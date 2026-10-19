@@ -4,18 +4,18 @@ import * as React from "react";
 import Stack from "@mui/material/Stack";
 
 import { CompatibleSearch } from "./compatible-search";
-import { RepoCheck, type RepoCheckHandle } from "./repo-check";
+import { RepositoryCheck, type RepositoryCheckHandle } from "./repository-check";
 
 export function HuggingFacePanel(): React.JSX.Element {
-	const checkRef = React.useRef<RepoCheckHandle>(null);
+	const checkRef = React.useRef<RepositoryCheckHandle>(null);
 
 	return (
 		<Stack spacing={3}>
-			<RepoCheck ref={checkRef} />
+			<RepositoryCheck ref={checkRef} />
 			<CompatibleSearch
-				onCheck={(repoId) => {
-					checkRef.current?.check(repoId);
-					globalThis.scrollTo({ top: 0, behavior: "smooth" });
+				onCheck={(repositoryId) => {
+					checkRef.current?.check(repositoryId);
+					scrollTo({ top: 0, behavior: "smooth" });
 				}}
 			/>
 		</Stack>

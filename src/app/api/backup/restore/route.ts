@@ -5,7 +5,12 @@ import { apiRoute, sseResponse } from "@/server/route";
 // Multipart: file (a backup archive), services (JSON list). Replaces those categories on the device with
 // the backup's contents and streams the device's per-category results.
 export const POST = apiRoute(async (request) => {
-	const form = await request.formData().catch(() => null);
+	let form: FormData | null = null;
+	try {
+		form = await request.formData();
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
 	const file = form?.get("file");
 	if (!(file instanceof File)) throw new DeviceError("Choose a backup file", 400);
 	let services: unknown;
@@ -14,7 +19,6 @@ export const POST = apiRoute(async (request) => {
 	} catch {
 		throw new DeviceError("services must be a JSON list", 400);
 	}
-	return sseResponse(
-		await restoreBackup(Buffer.from(await file.arrayBuffer()), await servicesFrom(services), request.signal)
-	);
+	const archive = Buffer.from(await file.arrayBuffer());
+	return sseResponse(await restoreBackup(archive, await servicesFrom(services), request.signal));
 });

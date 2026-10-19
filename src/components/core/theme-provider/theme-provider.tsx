@@ -8,11 +8,11 @@ import { createTheme } from "@/styles/theme/create-theme";
 
 import EmotionCache from "./emotion-cache";
 
-export interface ThemeProviderProps {
+export interface ThemeProviderProperties {
 	children: React.ReactNode;
 }
 
-function CustomThemeProvider({ children }: ThemeProviderProps): React.JSX.Element {
+function CustomThemeProvider({ children }: ThemeProviderProperties): React.JSX.Element {
 	const theme = createTheme();
 
 	return (

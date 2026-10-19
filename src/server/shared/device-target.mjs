@@ -13,12 +13,13 @@ function readCliConfig() {
 	}
 }
 
-/** @returns {{ baseUrl: string; authKey: string } | null} */
+/**
+@returns {{ baseUrl: string; authKey: string } | null}
+*/
 export function resolveDeviceTarget() {
 	const cli = readCliConfig();
 	const address = cli.deviceAddress?.includes(":") ? `[${cli.deviceAddress}]` : cli.deviceAddress;
 	const baseUrl = process.env.TIINY_DEVICE_URL ?? (address ? `http://${address}` : undefined);
 	const authKey = process.env.TIINY_AUTH_KEY ?? cli.account?.authKey;
-	if (!baseUrl || !authKey) return null;
-	return { baseUrl: baseUrl.replace(/\/$/, ""), authKey };
+	return baseUrl && authKey ? { baseUrl: baseUrl.replace(/\/$/, ""), authKey } : null;
 }

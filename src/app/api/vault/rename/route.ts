@@ -4,7 +4,13 @@ import { apiRoute } from "@/server/route";
 import { kbHeaders, sourceIdFrom } from "@/server/vault";
 
 export const POST = apiRoute(async (request) => {
-	const { sourceId, filename } = (await request.json().catch(() => ({}))) as { sourceId?: unknown; filename?: unknown };
+	let input: { sourceId?: unknown; filename?: unknown } = {};
+	try {
+		input = (await request.json()) as { sourceId?: unknown; filename?: unknown };
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
+	const { sourceId, filename } = input;
 	const id = sourceIdFrom(sourceId);
 	const name = typeof filename === "string" ? filename.trim() : "";
 	if (!name || name.length > 255 || /[\\/]/.test(name)) throw new DeviceError("Enter a file name without slashes", 400);

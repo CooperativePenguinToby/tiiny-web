@@ -9,13 +9,13 @@ import { paths } from "@/paths";
 import { MainNav } from "@/components/dashboard/layout/main-nav";
 import { SideNav } from "@/components/dashboard/layout/side-nav";
 
-interface LayoutProps {
+interface LayoutProperties {
 	children: React.ReactNode;
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function Layout({ children }: LayoutProps): Promise<React.JSX.Element> {
+export default async function Layout({ children }: LayoutProperties): Promise<React.JSX.Element> {
 	if (!(await hasSession())) redirect(paths.auth.signIn);
 
 	return (

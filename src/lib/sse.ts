@@ -30,6 +30,11 @@ export async function* readSse(response: Response): AsyncGenerator<SseEvent> {
 
 // Error message from a non-OK API response (`{ error }` JSON) or a fallback.
 export async function responseError(response: Response): Promise<string> {
-	const body = (await response.json().catch(() => ({}))) as { error?: string };
+	let body: { error?: string } = {};
+	try {
+		body = (await response.json()) as { error?: string };
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
 	return body.error ?? `Request failed (${response.status})`;
 }

@@ -32,12 +32,16 @@ const FAILED_STATUSES = new Set(["failed", "error", "cancelled", "canceled", "ca
 const errorText = (event: ImportEvent): string =>
 	typeof event.error === "string" ? event.error : (event.error?.message ?? event.message ?? "Import failed");
 
-export interface RepoCheckHandle {
-	check: (repo: string) => void;
+export interface RepositoryCheckHandle {
+	check: (repository: string) => void;
 }
 
-export const RepoCheck = React.forwardRef<RepoCheckHandle>(function RepoCheck(_, ref): React.JSX.Element {
-	const [repo, setRepo] = React.useState<string>("");
+export interface RepositoryCheckProperties {
+	ref?: React.Ref<RepositoryCheckHandle>;
+}
+
+export function RepositoryCheck({ ref }: RepositoryCheckProperties): React.JSX.Element {
+	const [repository, setRepository] = React.useState<string>("");
 	const [checking, setChecking] = React.useState<boolean>(false);
 	const [verdict, setVerdict] = React.useState<HfInspection | null>(null);
 	const [error, setError] = React.useState<string | null>(null);
@@ -47,7 +51,7 @@ export const RepoCheck = React.forwardRef<RepoCheckHandle>(function RepoCheck(_,
 	);
 
 	const check = React.useCallback(async (value: string): Promise<void> => {
-		setRepo(value);
+		setRepository(value);
 		setVerdict(null);
 		setError(null);
 		setOutcome(null);
@@ -132,7 +136,7 @@ export const RepoCheck = React.forwardRef<RepoCheckHandle>(function RepoCheck(_,
 						direction={{ xs: "column", sm: "row" }}
 						onSubmit={(event) => {
 							event.preventDefault();
-							void check(repo);
+							void check(repository);
 						}}
 						spacing={2}
 					>
@@ -140,12 +144,12 @@ export const RepoCheck = React.forwardRef<RepoCheckHandle>(function RepoCheck(_,
 							disabled={checking || importing !== null}
 							fullWidth
 							label="Hugging Face repo"
-							onChange={(event) => setRepo(event.target.value)}
+							onChange={(event) => setRepository(event.target.value)}
 							placeholder="org/name or https://huggingface.co/org/name"
-							value={repo}
+							value={repository}
 						/>
 						<Button
-							disabled={!repo.trim() || checking || importing !== null}
+							disabled={!repository.trim() || checking || importing !== null}
 							sx={{ flexShrink: 0 }}
 							type="submit"
 							variant="contained"
@@ -274,4 +278,4 @@ export const RepoCheck = React.forwardRef<RepoCheckHandle>(function RepoCheck(_,
 			</CardContent>
 		</Card>
 	);
-});
+}

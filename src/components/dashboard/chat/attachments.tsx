@@ -15,6 +15,18 @@ export const DOCUMENT_ACCEPT = ".doc,.docx,.txt,.csv,.xlsx,.pdf,.html,.md";
 const thumbnail = (attachment: Extract<Attachment, { kind: "image" }>): string =>
 	`/api/chat/media/${encodeURIComponent(attachment.mediaId)}`;
 
+// React keys for a list of attachments: images by their media id, documents by name (they have no id),
+// numbered when the same one appears more than once.
+const attachmentKeys = (attachments: Attachment[]): string[] => {
+	const seen = new Map<string, number>();
+	return attachments.map((attachment) => {
+		const base = attachment.kind === "image" ? `image-${attachment.mediaId}` : `document-${attachment.name}`;
+		const count = seen.get(base) ?? 0;
+		seen.set(base, count + 1);
+		return count === 0 ? base : `${base}-${count + 1}`;
+	});
+};
+
 // Files attached to the message being written: uploaded (images) or read by the device (documents) as
 // soon as they are picked.
 export function useAttachments(): {
@@ -70,13 +82,14 @@ export function AttachmentChips({
 	onRemove?: (index: number) => void;
 }): React.JSX.Element | null {
 	if (attachments.length === 0 && uploading.length === 0) return null;
+	const keys = attachmentKeys(attachments);
 	return (
 		<Stack data-testid="attachments" direction="row" spacing={1} sx={{ flexWrap: "wrap", rowGap: 1 }}>
 			{attachments.map((attachment, index) =>
 				attachment.kind === "image" ? (
 					<Chip
 						avatar={<Box alt="" component="img" src={thumbnail(attachment)} sx={{ objectFit: "cover" }} />}
-						key={`${attachment.mediaId}-${index}`}
+						key={keys[index]}
 						label={attachment.name}
 						onDelete={onRemove ? () => onRemove(index) : undefined}
 						variant="outlined"
@@ -84,7 +97,7 @@ export function AttachmentChips({
 				) : (
 					<Chip
 						icon={<FileTextIcon />}
-						key={`${attachment.name}-${index}`}
+						key={keys[index]}
 						label={attachment.name}
 						onDelete={onRemove ? () => onRemove(index) : undefined}
 						title={`${attachment.text.length.toLocaleString()} characters read by the device`}

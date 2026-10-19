@@ -56,6 +56,8 @@ import { AttachmentChips, DOCUMENT_ACCEPT, MessageAttachments, useAttachments } 
 import { TaskSteps } from "./task-steps";
 
 interface Turn extends ChatMessage {
+	// Identifies the turn on screen for as long as it is shown.
+	id: string;
 	reasoning?: string;
 	note?: string;
 	steps?: TaskStep[];
@@ -71,7 +73,37 @@ interface TaskTools {
 }
 const TOOLS_KEY = "tiiny-task-tools";
 
+// Mode and tools are kept in localStorage, read as an external store: the server render and hydration
+// use the defaults, then the client switches to the saved choices.
+const preferenceListeners = new Set<() => void>();
+const subscribePreferences = (onChange: () => void): (() => void) => {
+	preferenceListeners.add(onChange);
+	return () => {
+		preferenceListeners.delete(onChange);
+	};
+};
+const savePreference = (key: string, value: string): void => {
+	localStorage.setItem(key, value);
+	for (const listener of preferenceListeners) listener();
+};
+const readMode = (): Mode => (localStorage.getItem(MODE_KEY) === "task" ? "task" : "chat");
+const readSavedTools = (): string => localStorage.getItem(TOOLS_KEY) ?? "{}";
+const parseTaskTools = (saved: string): TaskTools => {
+	try {
+		const tools = JSON.parse(saved) as Partial<TaskTools>;
+		return { vault: tools.vault !== false, web: tools.web !== false };
+	} catch {
+		// keep both on
+		return { vault: true, web: true };
+	}
+};
+const chooseMode = (next: Mode): void => {
+	savePreference(MODE_KEY, next);
+};
+
 type Phase = "idle" | "waiting" | "streaming";
+// How a Task-mode reply ended.
+type TaskOutcome = "done" | "interrupted";
 
 interface ChunkDelta {
 	choices?: { delta?: { content?: string | null; reasoning_content?: string | null } }[];
@@ -94,8 +126,8 @@ interface Reply {
 // The ?c= conversation id: chats are stored in the device's chat history as they happen.
 function useConversationId(): [string | null, (id: string | null) => void] {
 	const router = useRouter();
-	const params = useSearchParams();
-	const id = params.get("c");
+	const parameters = useSearchParams();
+	const id = parameters.get("c");
 	const setId = React.useCallback(
 		(next: string | null) =>
 			router.replace(next ? `${paths.dashboard.chat}?c=${encodeURIComponent(next)}` : paths.dashboard.chat),
@@ -104,17 +136,22 @@ function useConversationId(): [string | null, (id: string | null) => void] {
 	return [id, setId];
 }
 
-function useElapsedSeconds(running: boolean): number {
+function useElapsedSeconds(isRunning: boolean): number {
 	const [seconds, setSeconds] = React.useState(0);
+	// Counting starts from zero each time the wait starts.
+	const [wasRunning, setWasRunning] = React.useState(isRunning);
+	if (isRunning !== wasRunning) {
+		setWasRunning(isRunning);
+		if (isRunning) setSeconds(0);
+	}
 	React.useEffect(() => {
-		if (!running) return;
-		setSeconds(0);
+		if (!isRunning) return;
 		const started = Date.now();
 		const timer = setInterval(() => setSeconds(Math.floor((Date.now() - started) / 1000)), 1000);
 		return () => {
 			clearInterval(timer);
 		};
-	}, [running]);
+	}, [isRunning]);
 	return seconds;
 }
 
@@ -205,66 +242,73 @@ export function ChatPanel(): React.JSX.Element {
 	const elapsed = useElapsedSeconds(phase === "waiting");
 	const [conversationId, setConversationId] = useConversationId();
 	// The conversation whose turns are on screen; differs from conversationId while one is being opened.
-	const shownRef = React.useRef<string | null>(null);
-	const [opening, setOpening] = React.useState(false);
+	// The ref mirrors it for code that runs after awaits.
+	const [shownId, setShownId] = React.useState<string | null>(null);
+	const shownIdRef = React.useRef<string | null>(null);
+	React.useEffect(() => {
+		shownIdRef.current = shownId;
+	}, [shownId]);
+	const [previousConversationId, setPreviousConversationId] = React.useState<string | null>(null);
+	// The conversation being fetched to be shown.
+	const [openingId, setOpeningId] = React.useState<string | null>(null);
+	const nextTurnIdRef = React.useRef(0);
+	const newTurnId = React.useCallback((): string => {
+		nextTurnIdRef.current += 1;
+		return `turn-${nextTurnIdRef.current}`;
+	}, []);
 	const [saveError, setSaveError] = React.useState<string | null>(null);
 	const files = useAttachments();
 	const [imageSize, setImageSize] = React.useState<string>(IMAGE_SIZES[0]);
 	const [imageSteps, setImageSteps] = React.useState(9);
-	const [mode, setMode] = React.useState<Mode>("chat");
-	const [taskTools, setTaskTools] = React.useState<TaskTools>({ vault: true, web: true });
-	React.useEffect(() => {
-		if (globalThis.localStorage.getItem(MODE_KEY) === "task") setMode("task");
-		try {
-			const saved = JSON.parse(globalThis.localStorage.getItem(TOOLS_KEY) ?? "{}") as Partial<TaskTools>;
-			setTaskTools({ vault: saved.vault !== false, web: saved.web !== false });
-		} catch {
-			// keep both on
-		}
-	}, []);
+	const mode = React.useSyncExternalStore(subscribePreferences, readMode, (): Mode => "chat");
+	const taskTools = parseTaskTools(React.useSyncExternalStore(subscribePreferences, readSavedTools, () => "{}"));
 	const toggleTool = (tool: keyof TaskTools): void => {
-		const next = { ...taskTools, [tool]: !taskTools[tool] };
-		setTaskTools(next);
-		globalThis.localStorage.setItem(TOOLS_KEY, JSON.stringify(next));
+		const isOn = taskTools[tool];
+		savePreference(TOOLS_KEY, JSON.stringify({ ...taskTools, [tool]: !isOn }));
 	};
-	const chooseMode = (next: Mode): void => {
-		setMode(next);
-		globalThis.localStorage.setItem(MODE_KEY, next);
-	};
-	const fileInput = React.useRef<HTMLInputElement>(null);
+	const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+	// When ?c= changes to a conversation other than the one on screen, show that one instead.
+	if (conversationId !== previousConversationId) {
+		setPreviousConversationId(conversationId);
+		if (conversationId !== shownId) {
+			setShownId(conversationId);
+			setError(null);
+			setSaveError(null);
+			if (conversationId) setOpeningId(conversationId);
+			else setTurns([]);
+		}
+	}
 
 	React.useEffect(() => {
-		if (conversationId === shownRef.current) return;
-		shownRef.current = conversationId;
-		setError(null);
-		setSaveError(null);
-		if (!conversationId) {
-			setTurns([]);
-			return;
-		}
-		setOpening(true);
-		void fetch(`/api/history/${encodeURIComponent(conversationId)}`, { cache: "no-store" })
+		if (!openingId) return;
+		const controller = new AbortController();
+		void fetch(`/api/history/${encodeURIComponent(openingId)}`, { cache: "no-store", signal: controller.signal })
 			.then(async (response) => {
 				if (!response.ok) throw new Error(await responseError(response));
 				const conversation = (await response.json()) as Conversation;
 				setTurns(
 					conversation.turns.map((turn) => ({
+						id: newTurnId(),
 						role: turn.role,
 						content: turn.content,
-						...(turn.attachments ? { attachments: turn.attachments } : {}),
-						...(turn.steps ? { steps: turn.steps } : {}),
-						...(turn.reasoning ? { reasoning: turn.reasoning } : {}),
-						...(turn.status === "paused" ? { note: "Stopped." } : {}),
+						...(turn.attachments && { attachments: turn.attachments }),
+						...(turn.steps && { steps: turn.steps }),
+						...(turn.reasoning && { reasoning: turn.reasoning }),
+						...(turn.status === "paused" && { note: "Stopped." }),
 					}))
 				);
 			})
-			.catch((error_: unknown) =>
-				setError(`Could not open the conversation: ${error_ instanceof Error ? error_.message : String(error_)}`)
-			)
-			.finally(() => setOpening(false));
-	}, [conversationId]);
-
-	const model = models.data?.find((candidate) => candidate.modelId === modelId) ?? null;
+			.catch((error_: unknown) => {
+				if (controller.signal.aborted) return;
+				setError(`Could not open the conversation: ${error_ instanceof Error ? error_.message : String(error_)}`);
+			})
+			.finally(() => {
+				// Unless a newer conversation is being opened instead.
+				if (!controller.signal.aborted) setOpeningId(null);
+			});
+		return () => controller.abort();
+	}, [openingId, newTurnId]);
 
 	const [loading, setLoading] = React.useState<{ name: string; message: string; progress: number | null } | null>(null);
 	const [makeRoom, setMakeRoom] = React.useState<{
@@ -273,61 +317,56 @@ export function ChatPanel(): React.JSX.Element {
 	} | null>(null);
 
 	// Loads a model chosen in chat, first unloading the ones the device says must make room (as agreed).
-	const load = React.useCallback(
-		async (next: ChatModel, unloadFirst: { modelId: string; name: string }[]): Promise<void> => {
-			setError(null);
-			setLoading({ name: next.name, message: "Starting", progress: null });
-			try {
-				for (const other of unloadFirst) {
-					setLoading({ name: next.name, message: `Unloading ${other.name}`, progress: null });
-					await postJson("/api/models/unload", { modelId: other.modelId });
-				}
-				await loadModel(next.modelId, (message, progress) => setLoading({ name: next.name, message, progress }));
-			} catch (error_) {
-				setError(`Could not load ${next.name}: ${error_ instanceof Error ? error_.message : String(error_)}`);
-			} finally {
-				setLoading(null);
-				await models.refresh();
+	const load = async (next: ChatModel, unloadFirst: { modelId: string; name: string }[]): Promise<void> => {
+		setError(null);
+		setLoading({ name: next.name, message: "Starting", progress: null });
+		try {
+			for (const other of unloadFirst) {
+				setLoading({ name: next.name, message: `Unloading ${other.name}`, progress: null });
+				await postJson("/api/models/unload", { modelId: other.modelId });
 			}
-		},
-		[models]
-	);
+			await loadModel(next.modelId, (message, progress) => setLoading({ name: next.name, message, progress }));
+		} catch (error_) {
+			setError(`Could not load ${next.name}: ${error_ instanceof Error ? error_.message : String(error_)}`);
+		} finally {
+			setLoading(null);
+			await models.refresh();
+		}
+	};
 
-	const ensureLoaded = React.useCallback(
-		async (next: ChatModel): Promise<void> => {
-			try {
-				const response = await fetch(`/api/models/unload-candidate?modelId=${encodeURIComponent(next.modelId)}`);
-				if (!response.ok) throw new Error(await responseError(response));
-				const plan = (await response.json()) as {
-					unloadRequired: boolean;
-					unload: { modelId: string; name: string }[];
-				};
-				if (plan.unloadRequired) setMakeRoom({ model: next, unload: plan.unload });
-				else await load(next, []);
-			} catch (error_) {
-				setError(`Could not load ${next.name}: ${error_ instanceof Error ? error_.message : String(error_)}`);
-			}
-		},
-		[load]
-	);
+	const ensureLoaded = async (next: ChatModel): Promise<void> => {
+		try {
+			const response = await fetch(`/api/models/unload-candidate?modelId=${encodeURIComponent(next.modelId)}`);
+			if (!response.ok) throw new Error(await responseError(response));
+			const plan = (await response.json()) as {
+				unloadRequired: boolean;
+				unload: { modelId: string; name: string }[];
+			};
+			if (plan.unloadRequired) setMakeRoom({ model: next, unload: plan.unload });
+			else await load(next, []);
+		} catch (error_) {
+			setError(`Could not load ${next.name}: ${error_ instanceof Error ? error_.message : String(error_)}`);
+		}
+	};
 
-	const chooseModel = React.useCallback(
-		(next: ChatModel | undefined, loadIt: boolean): void => {
-			setModelId(next?.modelId ?? "");
-			setThinking(next && !next.thinking.toggleable && next.thinking.defaultLevel ? next.thinking.defaultLevel : "off");
-			if (next && !next.loaded && loadIt) void ensureLoaded(next);
-		},
-		[ensureLoaded]
-	);
+	const chooseModel = (next: ChatModel | undefined, shouldLoad: boolean): void => {
+		setModelId(next?.modelId ?? "");
+		setThinking(next && !next.thinking.toggleable && next.thinking.defaultLevel ? next.thinking.defaultLevel : "off");
+		if (shouldLoad && next && !next.loaded) void ensureLoaded(next);
+	};
 
-	// Starts on a loaded model; with none loaded nothing is preselected, so picking one loads it.
-	React.useEffect(() => {
-		if (!models.data || models.data.some((candidate) => candidate.modelId === modelId)) return;
-		chooseModel(
-			models.data.find((candidate) => candidate.loaded),
-			false
-		);
-	}, [models.data, modelId, chooseModel]);
+	// Starts on a loaded model; with none loaded nothing is preselected, so picking one loads it. (Nothing
+	// to change when nothing is chosen and nothing is loaded.)
+	const firstLoaded = models.data?.find((candidate) => candidate.loaded);
+	if (
+		models.data &&
+		(firstLoaded?.modelId ?? "") !== modelId &&
+		models.data.every((candidate) => candidate.modelId !== modelId)
+	) {
+		chooseModel(firstLoaded, false);
+	}
+
+	const model = models.data?.find((candidate) => candidate.modelId === modelId) ?? null;
 
 	const updateLast = (update: (turn: Turn) => Turn): void => {
 		setTurns((current) => [...current.slice(0, -1), update(current.at(-1)!)]);
@@ -337,31 +376,31 @@ export function ChatPanel(): React.JSX.Element {
 		const text = draft.trim();
 		const attachments = files.attachments;
 		if (
+			loading !== null ||
+			phase !== "idle" ||
 			(!text && attachments.length === 0) ||
 			files.uploading.length > 0 ||
-			!model?.loaded ||
-			loading !== null ||
-			phase !== "idle"
+			!model?.loaded
 		) {
 			return;
 		}
-		const history: ChatMessage[] = [
-			// Pictures a model drew are not sent back to text models.
-			...turns.map(({ role, content, attachments: sent }) => ({
-				role,
-				content,
-				...(sent && role === "user" ? { attachments: sent } : {}),
-			})),
-			{ role: "user", content: text, ...(attachments.length > 0 ? { attachments } : {}) },
-		];
-		setTurns([...history, { role: "assistant", content: "" }]);
+		// Pictures a model drew are not sent back to text models.
+		const earlier: Turn[] = turns.map(({ id, role, content, attachments: sent }) => ({
+			id,
+			role,
+			content,
+			...(sent && role === "user" && { attachments: sent }),
+		}));
+		const message: ChatMessage = { role: "user", content: text, ...(attachments.length > 0 && { attachments }) };
+		const history: ChatMessage[] = [...earlier.map(({ id: _id, ...earlierMessage }) => earlierMessage), message];
+		setTurns([...earlier, { id: newTurnId(), ...message }, { id: newTurnId(), role: "assistant", content: "" }]);
 		setDraft("");
 		files.clear();
 		setError(null);
 		setPhase("waiting");
 		const controller = new AbortController();
 		abortRef.current = controller;
-		let interrupted = false;
+		let isInterrupted = false;
 		const reply: Reply = {
 			content: "",
 			reasoning: "",
@@ -377,7 +416,7 @@ export function ChatPanel(): React.JSX.Element {
 				return;
 			}
 			if (mode === "task") {
-				interrupted = await work(history, controller.signal, reply);
+				isInterrupted = (await runTask(history, controller.signal, reply)) === "interrupted";
 				return;
 			}
 			const response = await fetch("/api/chat", {
@@ -392,7 +431,7 @@ export function ChatPanel(): React.JSX.Element {
 				const chunk = JSON.parse(data) as ChunkDelta;
 				// Someone interrupted the model (Models page, tiiny interrupt): keep what arrived, like a Stop.
 				if (chunk.error?.type === "interrupted") {
-					interrupted = true;
+					isInterrupted = true;
 					break;
 				}
 				if (chunk.error) {
@@ -430,16 +469,16 @@ export function ChatPanel(): React.JSX.Element {
 		} finally {
 			abortRef.current = null;
 			// Saved before the next message can be sent, so that one joins the same conversation.
-			if (interrupted) updateLast((turn) => ({ ...turn, note: "Interrupted." }));
+			if (isInterrupted) updateLast((turn) => ({ ...turn, note: "Interrupted." }));
 			if (reply.content.trim() || reply.attachments.length > 0) {
-				await remember(text, attachments, reply, controller.signal.aborted || interrupted);
+				await remember(text, attachments, reply, controller.signal.aborted || isInterrupted);
 			}
 			setPhase("idle");
 		}
 	};
 
-	// Task mode: streams the reply and each tool step; resolves true if the model was interrupted.
-	const work = async (history: ChatMessage[], signal: AbortSignal, reply: Reply): Promise<boolean> => {
+	// Task mode: streams the reply and each tool step; resolves "interrupted" if the model was interrupted.
+	const runTask = async (history: ChatMessage[], signal: AbortSignal, reply: Reply): Promise<TaskOutcome> => {
 		const response = await fetch("/api/chat/task", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -448,8 +487,8 @@ export function ChatPanel(): React.JSX.Element {
 		});
 		if (!response.ok) throw new Error(await responseError(response));
 		const showSteps = (): void => updateLast((turn) => ({ ...turn, steps: [...reply.steps] }));
-		for await (const { data } of readSse(response)) {
-			const event = JSON.parse(data) as TaskEvent;
+		// Applies one streamed event; returns how the task ended once it has.
+		const apply = (event: TaskEvent): TaskOutcome | undefined => {
 			switch (event.type) {
 				case "delta": {
 					reply.content += event.content ?? "";
@@ -480,15 +519,20 @@ export function ChatPanel(): React.JSX.Element {
 					break;
 				}
 				case "error": {
-					if (event.message === "Interrupted.") return true;
+					if (event.message === "Interrupted.") return "interrupted";
 					throw new Error(event.message);
 				}
 				case "done": {
-					return false;
+					return "done";
 				}
 			}
+			return undefined;
+		};
+		for await (const { data } of readSse(response)) {
+			const outcome = apply(JSON.parse(data) as TaskEvent);
+			if (outcome) return outcome;
 		}
-		return false;
+		return "done";
 	};
 
 	// Draws the prompt with an image model, then keeps the picture in the device's media store so the
@@ -530,27 +574,33 @@ export function ChatPanel(): React.JSX.Element {
 		}));
 	};
 
-	const remember = async (user: string, attachments: Attachment[], reply: Reply, stopped: boolean): Promise<void> => {
+	const remember = async (
+		user: string,
+		attachments: Attachment[],
+		reply: Reply,
+		wasStopped: boolean
+	): Promise<void> => {
 		const turn: TurnToSave = {
-			conversationId: shownRef.current,
+			conversationId: shownIdRef.current,
 			modelId,
 			user,
-			...(attachments.length > 0 ? { attachments } : {}),
+			...(attachments.length > 0 && { attachments }),
 			assistant: {
 				content: reply.content,
-				stopped,
-				...(reply.reasoning ? { reasoning: reply.reasoning } : {}),
-				...(reply.thinkingMs ? { thinkingMs: reply.thinkingMs } : {}),
-				...(reply.attachments.length > 0 ? { attachments: reply.attachments } : {}),
-				...(reply.steps.length > 0 ? { steps: reply.steps } : {}),
+				stopped: wasStopped,
+				...(reply.reasoning && { reasoning: reply.reasoning }),
+				...(reply.thinkingMs && { thinkingMs: reply.thinkingMs }),
+				...(reply.attachments.length > 0 && { attachments: reply.attachments }),
+				...(reply.steps.length > 0 && { steps: reply.steps }),
 			},
-			...(reply.usage ? { usage: reply.usage } : {}),
+			...(reply.usage && { usage: reply.usage }),
 		};
 		try {
 			const saved = await postJson<{ conversationId: string }>("/api/history/turn", turn);
 			setSaveError(null);
-			if (saved.conversationId !== shownRef.current) {
-				shownRef.current = saved.conversationId;
+			if (saved.conversationId !== shownIdRef.current) {
+				shownIdRef.current = saved.conversationId;
+				setShownId(saved.conversationId);
 				setConversationId(saved.conversationId);
 			}
 		} catch (error_) {
@@ -581,7 +631,7 @@ export function ChatPanel(): React.JSX.Element {
 		);
 	}
 
-	const busy = phase !== "idle" || loading !== null;
+	const isBusy = phase !== "idle" || loading !== null;
 	const others = model?.activeRequests ?? 0;
 
 	return (
@@ -594,7 +644,7 @@ export function ChatPanel(): React.JSX.Element {
 					<Select
 						displayEmpty
 						notched
-						disabled={busy}
+						disabled={isBusy}
 						label="Model"
 						labelId="chat-model-label"
 						onChange={(event) =>
@@ -623,7 +673,7 @@ export function ChatPanel(): React.JSX.Element {
 				{model?.kind === "chat" ? (
 					<ToggleButtonGroup
 						aria-label="Mode"
-						disabled={busy}
+						disabled={isBusy}
 						exclusive
 						onChange={(_event, next: Mode | null) => next && chooseMode(next)}
 						size="small"
@@ -638,18 +688,18 @@ export function ChatPanel(): React.JSX.Element {
 						</ToggleButton>
 					</ToggleButtonGroup>
 				) : null}
-				{model?.kind === "chat" && mode === "task" ? (
+				{mode === "task" && model?.kind === "chat" ? (
 					<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
 						<FormControlLabel
 							control={
-								<Switch checked={taskTools.vault} disabled={busy} onChange={() => toggleTool("vault")} size="small" />
+								<Switch checked={taskTools.vault} disabled={isBusy} onChange={() => toggleTool("vault")} size="small" />
 							}
 							label="Vault"
 							title="Let the model search your Vault files and chat summaries"
 						/>
 						<FormControlLabel
 							control={
-								<Switch checked={taskTools.web} disabled={busy} onChange={() => toggleTool("web")} size="small" />
+								<Switch checked={taskTools.web} disabled={isBusy} onChange={() => toggleTool("web")} size="small" />
 							}
 							label="Web"
 							title="Let the model read web pages"
@@ -661,7 +711,7 @@ export function ChatPanel(): React.JSX.Element {
 						<FormControl sx={{ minWidth: 160 }}>
 							<InputLabel id="image-size-label">Size</InputLabel>
 							<Select
-								disabled={busy}
+								disabled={isBusy}
 								label="Size"
 								labelId="image-size-label"
 								onChange={(event) => setImageSize(event.target.value)}
@@ -675,9 +725,12 @@ export function ChatPanel(): React.JSX.Element {
 							</Select>
 						</FormControl>
 						<TextField
-							disabled={busy}
+							disabled={isBusy}
 							label="Steps"
-							onChange={(event) => setImageSteps(Math.min(50, Math.max(1, Number(event.target.value) || 1)))}
+							onChange={(event) => {
+								const steps = Number(event.target.value) || 1;
+								setImageSteps(Math.min(50, Math.max(1, steps)));
+							}}
 							slotProps={{ htmlInput: { min: 1, max: 50 } }}
 							sx={{ width: 100 }}
 							type="number"
@@ -689,7 +742,7 @@ export function ChatPanel(): React.JSX.Element {
 					<FormControl sx={{ minWidth: 180 }}>
 						<InputLabel id="chat-thinking-label">Thinking</InputLabel>
 						<Select
-							disabled={busy}
+							disabled={isBusy}
 							label="Thinking"
 							labelId="chat-thinking-label"
 							onChange={(event) => setThinking(event.target.value)}
@@ -706,9 +759,10 @@ export function ChatPanel(): React.JSX.Element {
 				) : null}
 				<Box sx={{ flex: "1 1 auto" }} />
 				<Button
-					disabled={busy || (turns.length === 0 && !conversationId)}
+					disabled={isBusy || (turns.length === 0 && !conversationId)}
 					onClick={() => {
-						shownRef.current = null;
+						shownIdRef.current = null;
+						setShownId(null);
 						setTurns([]);
 						setError(null);
 						setSaveError(null);
@@ -767,7 +821,7 @@ export function ChatPanel(): React.JSX.Element {
 			<Card>
 				<CardContent>
 					<Stack spacing={2} sx={{ minHeight: 240 }}>
-						{opening ? (
+						{openingId ? (
 							<CircularProgress aria-label="Opening the conversation" sx={{ m: "auto" }} />
 						) : turns.length === 0 ? (
 							<Typography
@@ -780,7 +834,7 @@ export function ChatPanel(): React.JSX.Element {
 								Send a message to start chatting with {model?.name ?? "the model"}.
 							</Typography>
 						) : (
-							turns.map((turn, index) => <MessageBubble key={index} turn={turn} />)
+							turns.map((turn) => <MessageBubble key={turn.id} turn={turn} />)
 						)}
 						{phase === "waiting" ? (
 							<Stack direction="row" spacing={1} sx={{ alignItems: "center" }} role="status">
@@ -823,7 +877,7 @@ export function ChatPanel(): React.JSX.Element {
 					event.target.value = "";
 					if (picked.length > 0) void files.add(picked);
 				}}
-				ref={fileInput}
+				ref={fileInputRef}
 				type="file"
 			/>
 			<Stack
@@ -838,8 +892,8 @@ export function ChatPanel(): React.JSX.Element {
 			>
 				<Button
 					aria-label={model?.supportsVision ? "Attach images or documents" : "Attach documents"}
-					disabled={busy || model?.kind === "image"}
-					onClick={() => fileInput.current?.click()}
+					disabled={isBusy || model?.kind === "image"}
+					onClick={() => fileInputRef.current?.click()}
 					sx={{ flexShrink: 0, minWidth: 0, px: 1.5 }}
 					title={model?.supportsVision ? "Attach images or documents" : "Attach documents"}
 					variant="outlined"
@@ -847,22 +901,24 @@ export function ChatPanel(): React.JSX.Element {
 					<PaperclipIcon />
 				</Button>
 				<TextField
-					disabled={busy}
+					disabled={isBusy}
 					fullWidth
 					label="Message"
 					maxRows={8}
 					multiline
 					onChange={(event) => setDraft(event.target.value)}
 					onKeyDown={(event) => {
-						if (event.key === "Enter" && !event.shiftKey) {
-							event.preventDefault();
-							void send();
+						if (event.key !== "Enter" || event.shiftKey) {
+							return;
 						}
+
+						event.preventDefault();
+						void send();
 					}}
 					placeholder="Enter to send, Shift+Enter for a new line"
 					value={draft}
 				/>
-				{busy ? (
+				{isBusy ? (
 					<Button
 						color="error"
 						onClick={() => abortRef.current?.abort()}

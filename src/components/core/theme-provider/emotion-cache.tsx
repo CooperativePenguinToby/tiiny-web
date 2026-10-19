@@ -9,40 +9,44 @@ import { CacheProvider as DefaultCacheProvider } from "@emotion/react";
 
 // https://github.com/garronej/tss-react/blob/main/src/next/appDir.tsx
 
-export type EmotionCacheProviderProps = {
-	/** This is the options passed to createCache() from 'import createCache from "@emotion/cache"' */
+export type EmotionCacheProviderProperties = {
+	/**
+	This is the options passed to createCache() from 'import createCache from "@emotion/cache"'
+	*/
 	options: Omit<OptionsOfCreateCache, "insertionPoint"> & {
 		prepend?: boolean;
 	};
-	/** By default <CacheProvider /> from 'import { CacheProvider } from "@emotion/react"' */
+	/**
+	By default <CacheProvider /> from 'import { CacheProvider } from "@emotion/react"'
+	*/
 	CacheProvider?: React.Provider<EmotionCache>;
 	children: ReactNode;
 };
 
-export function EmotionCacheProvider(props: EmotionCacheProviderProps) {
-	const { options: optionsWithPrepend, CacheProvider = DefaultCacheProvider, children } = props;
+export function EmotionCacheProvider(properties: EmotionCacheProviderProperties) {
+	const { options: optionsWithPrepend, CacheProvider = DefaultCacheProvider, children } = properties;
 
 	const { prepend = false, ...options } = optionsWithPrepend;
 
 	const [{ cache, flush }] = React.useState(() => {
 		const cache = createCache(options);
 		cache.compat = true;
-		const prevInsert = cache.insert;
+		const previousInsert = cache.insert;
 		let inserted: { name: string; isGlobal: boolean }[] = [];
-		cache.insert = (...args) => {
-			const [selector, serialized] = args;
+		cache.insert = (...arguments_) => {
+			const [selector, serialized] = arguments_;
 			if (cache.inserted[serialized.name] === undefined) {
 				inserted.push({
 					name: serialized.name,
 					isGlobal: selector === "",
 				});
 			}
-			return prevInsert(...args);
+			return previousInsert(...arguments_);
 		};
 		const flush = () => {
-			const prevInserted = inserted;
+			const previousInserted = inserted;
 			inserted = [];
-			return prevInserted;
+			return previousInserted;
 		};
 		return { cache, flush };
 	});
@@ -81,21 +85,14 @@ export function EmotionCacheProvider(props: EmotionCacheProviderProps) {
 		return (
 			<>
 				{globals.map(({ name, style }) => (
-					<style
-						nonce={options.nonce}
-						key={name}
-						data-emotion={`${cache.key}-global ${name}`}
-						dangerouslySetInnerHTML={{ __html: get__Html(style) }}
-					/>
+					<style nonce={options.nonce} key={name} data-emotion={`${cache.key}-global ${name}`}>
+						{get__Html(style)}
+					</style>
 				))}
 				{styles !== "" && (
-					<style
-						nonce={options.nonce}
-						data-emotion={dataEmotionAttribute}
-						dangerouslySetInnerHTML={{
-							__html: get__Html(styles),
-						}}
-					/>
+					<style nonce={options.nonce} data-emotion={dataEmotionAttribute}>
+						{get__Html(styles)}
+					</style>
 				)}
 			</>
 		);

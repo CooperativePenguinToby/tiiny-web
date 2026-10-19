@@ -12,7 +12,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import QRCode from "qrcode";
+import { toDataURL } from "qrcode";
 
 import type { Connector } from "@/types/device";
 import { postJson } from "@/lib/api";
@@ -58,7 +58,7 @@ const MAIL_PRESETS = [
 function QrCode({ text }: { text: string }): React.JSX.Element {
 	const [image, setImage] = React.useState<string | null>(null);
 	React.useEffect(() => {
-		void QRCode.toDataURL(text, { margin: 1, width: 240 }).then(setImage);
+		void toDataURL(text, { margin: 1, width: 240 }).then(setImage);
 	}, [text]);
 	return image ? (
 		<Box
@@ -73,7 +73,7 @@ function QrCode({ text }: { text: string }): React.JSX.Element {
 	);
 }
 
-export interface ConnectDialogProps {
+export interface ConnectDialogProperties {
 	connector: Connector | null;
 	onClose: () => void;
 	onConnected: (message: string) => void;
@@ -81,35 +81,40 @@ export interface ConnectDialogProps {
 
 // Collects credentials for a token, login or mail connector, or shows WhatsApp's QR code; the device
 // checks them before anything is saved.
-export function ConnectDialog({ connector, onClose, onConnected }: ConnectDialogProps): React.JSX.Element {
+export function ConnectDialog({ connector, onClose, onConnected }: ConnectDialogProperties): React.JSX.Element {
 	const [values, setValues] = React.useState<Record<string, string>>({});
 	const [preset, setPreset] = React.useState(MAIL_PRESETS[0].name);
 	const [qr, setQr] = React.useState<string | null>(null);
-	const [busy, setBusy] = React.useState(false);
-	const [error, setError] = React.useState<string | null>(null);
 	const key = connector?.key;
+	// WhatsApp asks the device for its QR code as soon as the dialog opens (below), so it starts busy.
+	const [busy, setBusy] = React.useState(key === "whatsapp");
+	const [error, setError] = React.useState<string | null>(null);
 
-	const submit = async (): Promise<void> => {
+	// Settles in callbacks, so it can also run straight from the effect below.
+	const send = (): void => {
+		if (!key) return;
+		const mail = MAIL_PRESETS.find((entry) => entry.name === preset)!;
+		const body = key === "email" ? { key, imapHost: mail.imap, smtpHost: mail.smtp, ...values } : { key, ...values };
+		void postJson<{ detail: string; qr?: string }>("/api/connectors/connect", body)
+			.then((reply) => {
+				if (reply.qr) setQr(reply.qr);
+				else onConnected(`${connector.name} connected: ${reply.detail}.`);
+			})
+			.catch((error_: unknown) => setError(error_ instanceof Error ? error_.message : String(error_)))
+			.finally(() => setBusy(false));
+	};
+
+	const submit = (): void => {
 		if (!key) return;
 		setBusy(true);
 		setError(null);
-		try {
-			const mail = MAIL_PRESETS.find((entry) => entry.name === preset)!;
-			const body = key === "email" ? { key, imapHost: mail.imap, smtpHost: mail.smtp, ...values } : { key, ...values };
-			const reply = await postJson<{ detail: string; qr?: string }>("/api/connectors/connect", body);
-			if (reply.qr) setQr(reply.qr);
-			else onConnected(`${connector.name} connected: ${reply.detail}.`);
-		} catch (error_) {
-			setError(error_ instanceof Error ? error_.message : String(error_));
-		} finally {
-			setBusy(false);
-		}
+		send();
 	};
 
 	// WhatsApp: show the device's QR code right away.
+	const requestQr = React.useEffectEvent(send);
 	React.useEffect(() => {
-		if (key === "whatsapp" && !qr && !busy && !error) void submit();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		if (key === "whatsapp") requestQr();
 	}, [key]);
 
 	const spec = key ? FIELDS[key] : undefined;
@@ -196,11 +201,11 @@ export function ConnectDialog({ connector, onClose, onConnected }: ConnectDialog
 			<DialogActions>
 				<Button onClick={onClose}>{key === "whatsapp" ? "Close" : "Cancel"}</Button>
 				{key === "whatsapp" ? (
-					<Button disabled={busy} onClick={() => void submit()}>
+					<Button disabled={busy} onClick={submit}>
 						New code
 					</Button>
 				) : (
-					<Button disabled={busy} onClick={() => void submit()} variant="contained">
+					<Button disabled={busy} onClick={submit} variant="contained">
 						{busy ? "Checking…" : "Connect"}
 					</Button>
 				)}

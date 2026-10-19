@@ -46,9 +46,9 @@ async function post(path: string, body: Record<string, string>): Promise<void> {
 async function installAgent(
 	appId: string,
 	onProgress: (message: string, percent: number | null) => void,
-	resume = false
+	shouldResume = false
 ): Promise<"done" | "paused"> {
-	const response = await fetch(resume ? "/api/agents/install/resume" : "/api/agents/install", {
+	const response = await fetch(shouldResume ? "/api/agents/install/resume" : "/api/agents/install", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ appId }),
@@ -67,7 +67,7 @@ async function followAgentStream(
 		const failure =
 			typeof update.error === "string" ? update.error : (update.error?.message ?? (event === "error" ? data : null));
 		if (failure || update.status === "failed" || update.status === "error") throw new Error(failure ?? "Failed");
-		if (update.status === "completed" || event === "done") return "done";
+		if (event === "done" || update.status === "completed") return "done";
 		if (event === "paused") return "paused";
 		onProgress(update.message || update.phase || update.status || "Working", update.overall_progress ?? null);
 	}
@@ -98,7 +98,7 @@ const STATUS_COLORS: Record<string, "success" | "warning" | "error"> = {
 };
 const STOPPABLE = new Set(["running", "starting", "error"]);
 
-const agentUrl = (port: number): string => `https://${globalThis.location.hostname}:${port}/`;
+const agentUrl = (port: number): string => `https://${location.hostname}:${port}/`;
 
 function AgentIcon({ agent }: { agent: Agent }): React.JSX.Element {
 	return (
@@ -128,16 +128,24 @@ export function AgentsPanel(): React.JSX.Element {
 	const [outcome, setOutcome] = React.useState<{ severity: "success" | "error"; message: string } | null>(null);
 	const [confirmDelete, setConfirmDelete] = React.useState<Agent | null>(null);
 
+	if (isLoading) {
+		return (
+			<Stack sx={{ alignItems: "center", py: 8 }}>
+				<CircularProgress aria-label="Loading agents" />
+			</Stack>
+		);
+	}
+
 	// `action` may resolve "paused" (an install that was paused), reported instead of `done`.
 	const run = async (
 		agent: Agent,
 		label: string,
 		action: () => Promise<unknown>,
 		done: string,
-		installing = false
+		isInstall = false
 	): Promise<void> => {
 		setOutcome(null);
-		setBusy({ appId: agent.appId, message: label, percent: null, installing });
+		setBusy({ appId: agent.appId, message: label, percent: null, installing: isInstall });
 		try {
 			const result = await action();
 			setOutcome({ severity: "success", message: `${agent.name} ${result === "paused" ? "install paused" : done}.` });
@@ -151,14 +159,6 @@ export function AgentsPanel(): React.JSX.Element {
 			await refresh();
 		}
 	};
-
-	if (isLoading) {
-		return (
-			<Stack sx={{ alignItems: "center", py: 8 }}>
-				<CircularProgress aria-label="Loading agents" />
-			</Stack>
-		);
-	}
 
 	const agents = data ?? [];
 	const installed = agents.filter((agent) => agent.service);
@@ -176,15 +176,15 @@ export function AgentsPanel(): React.JSX.Element {
 		}
 	};
 
-	const install = (agent: Agent, resume: boolean): Promise<void> =>
+	const install = (agent: Agent, shouldResume: boolean): Promise<void> =>
 		run(
 			agent,
-			resume ? "Resuming install…" : "Starting install…",
+			shouldResume ? "Resuming install…" : "Starting install…",
 			() =>
 				installAgent(
 					agent.appId,
 					(message, percent) => setBusy({ appId: agent.appId, message, percent, installing: true }),
-					resume
+					shouldResume
 				),
 			"installed",
 			true
@@ -272,8 +272,8 @@ export function AgentsPanel(): React.JSX.Element {
 					<Grid container spacing={3}>
 						{installed.map((agent) => {
 							const service = agent.service!;
-							const running = service.status === "running";
-							const canOpen = running && service.port !== null && service.proxy?.listening;
+							const isRunning = service.status === "running";
+							const canOpen = isRunning && service.port !== null && service.proxy?.listening;
 							return (
 								<Grid key={agent.appId} size={{ md: 6, xs: 12 }}>
 									<Card data-testid={`agent-${service.id}`} sx={CARD_SX}>
@@ -306,7 +306,7 @@ export function AgentsPanel(): React.JSX.Element {
 														Version {service.version ?? "unknown"}
 														{service.update ? ` · ${service.update.latestVersion} available` : ""}
 													</Typography>
-													{service.usage && running ? (
+													{isRunning && service.usage ? (
 														<Typography
 															data-testid="agent-usage"
 															variant="caption"
@@ -381,7 +381,7 @@ export function AgentsPanel(): React.JSX.Element {
 															Stop
 														</Button>
 													) : null}
-													{running || service.status === "starting" ? null : (
+													{isRunning || service.status === "starting" ? null : (
 														<Button
 															disabled={busy !== null}
 															onClick={() =>
@@ -544,11 +544,10 @@ export function AgentsPanel(): React.JSX.Element {
 						onClick={() => {
 							const agent = confirmDelete;
 							setConfirmDelete(null);
-							if (agent) {
-								// An install paused before the device listed the agent is removed by its store id.
-								const serviceId = agent.service?.id ?? agent.appId.replace(/^wa-/, "");
-								void run(agent, "Deleting…", () => post("/api/agents/delete", { serviceId }), "deleted");
-							}
+							if (!agent) return;
+							// An install paused before the device listed the agent is removed by its store id.
+							const serviceId = agent.service?.id ?? agent.appId.replace(/^wa-/, "");
+							void run(agent, "Deleting…", () => post("/api/agents/delete", { serviceId }), "deleted");
 						}}
 						variant="contained"
 					>

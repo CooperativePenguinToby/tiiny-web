@@ -9,7 +9,12 @@ const MAX_AUDIO_BYTES = 100 * 1024 * 1024;
 
 // Multipart: model, file (audio), language (optional). Returns { text }.
 export const POST = apiRoute(async (request) => {
-	const form = await request.formData().catch(() => null);
+	let form: FormData | null = null;
+	try {
+		form = await request.formData();
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
 	const model = modelIdOf(form?.get("model"));
 	const file = form?.get("file");
 	if (!(file instanceof File) || file.size === 0) throw new DeviceError("Choose or record some audio", 400);

@@ -10,26 +10,28 @@ function secret() {
 	return value;
 }
 
-/** @param {number} expires */
+/**
+@param {number} expires
+*/
 const sign = (expires) => createHmac("sha256", secret()).update(`v1.${expires}`).digest("hex");
 
 /**
- * @param {number} maxAgeSeconds
- * @returns {string}
- */
+@param {number} maxAgeSeconds
+@returns {string}
+*/
 export function createSessionToken(maxAgeSeconds) {
 	const expires = Math.floor(Date.now() / 1000) + maxAgeSeconds;
 	return `${expires}.${sign(expires)}`;
 }
 
 /**
- * @param {string | undefined} token
- * @returns {boolean}
- */
+@param {string | undefined} token
+@returns {boolean}
+*/
 export function isValidSessionToken(token) {
 	const [expiresText, mac] = token?.split(".") ?? [];
 	const expires = Number(expiresText);
-	if (!mac || !Number.isInteger(expires) || expires < Date.now() / 1000) return false;
+	if (!mac || !Number.isSafeInteger(expires) || expires < Date.now() / 1000) return false;
 	const expected = Buffer.from(sign(expires));
 	const given = Buffer.from(mac);
 	return given.length === expected.length && timingSafeEqual(given, expected);

@@ -14,11 +14,11 @@ import type { TaskStep } from "@/types/device";
 
 function Step({ step }: { step: TaskStep }): React.JSX.Element {
 	const [open, setOpen] = React.useState(false);
-	const done = step.ok !== undefined;
+	const isDone = step.ok !== undefined;
 	return (
 		<Box data-testid="task-step">
 			<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-				{done ? (
+				{isDone ? (
 					step.ok ? (
 						<CheckCircleIcon color="var(--mui-palette-success-main)" fontSize="var(--icon-fontSize-md)" />
 					) : (
@@ -28,7 +28,7 @@ function Step({ step }: { step: TaskStep }): React.JSX.Element {
 					<CircularProgress aria-label={`${step.label} running`} size={14} />
 				)}
 				<Typography variant="body2">{step.label}</Typography>
-				{done && step.result ? (
+				{isDone && step.result ? (
 					<Link component="button" onClick={() => setOpen(!open)} type="button" variant="caption">
 						{open ? "Hide" : "Show"} result
 					</Link>

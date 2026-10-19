@@ -2,21 +2,24 @@ import { deviceJson } from "./device";
 
 // The device keeps its own time zone (token usage is counted per day of the device's calendar), which can
 // differ from this server's and the browser's. Its UTC offset shows in the timestamps it writes.
-let offsetPromise: Promise<number> | null = null;
+// Asked once per process; a failed ask is asked again on the next call.
+const cache: { offset: Promise<number> | null } = { offset: null };
+
+async function readDeviceUtcOffsetMinutes(): Promise<number> {
+	const context = await deviceJson<{ created_at?: string }>("/kb/user-context", { service: "kb" });
+	const match = /([+-])(\d{2}):(\d{2})$/.exec(context.created_at ?? "");
+	if (!match) return 0;
+	return (match[1] === "-" ? -1 : 1) * (Number(match[2]) * 60 + Number(match[3]));
+}
 
 export async function deviceUtcOffsetMinutes(): Promise<number> {
-	offsetPromise ??= deviceJson<{ created_at?: string }>("/kb/user-context", { service: "kb" }).then(
-		(context) => {
-			const match = /([+-])(\d{2}):(\d{2})$/.exec(context.created_at ?? "");
-			if (!match) return 0;
-			return (match[1] === "-" ? -1 : 1) * (Number(match[2]) * 60 + Number(match[3]));
-		},
-		(error: unknown) => {
-			offsetPromise = null;
-			throw error;
-		}
-	);
-	return offsetPromise;
+	const offset = (cache.offset ??= readDeviceUtcOffsetMinutes());
+	try {
+		return await offset;
+	} catch (error) {
+		if (cache.offset === offset) cache.offset = null;
+		throw error;
+	}
 }
 
 // Monday of the device's current week, as YYYY-MM-DD.

@@ -17,13 +17,13 @@ import { Logo } from "@/components/core/logo";
 import { navItems } from "./config";
 import { navIcons } from "./nav-icons";
 
-export interface MobileNavProps {
+export interface MobileNavProperties {
 	onClose?: () => void;
 	open?: boolean;
 	items?: NavItemConfig[];
 }
 
-export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element {
+export function MobileNav({ open, onClose }: MobileNavProperties): React.JSX.Element {
 	const pathname = usePathname();
 
 	return (
@@ -70,12 +70,12 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
 }
 
 function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
-	const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
-		const { key, ...item } = curr;
+	const children = items.reduce((accumulator: React.ReactNode[], current: NavItemConfig): React.ReactNode[] => {
+		const { key, ...item } = current;
 
-		acc.push(<NavItem key={key} pathname={pathname} {...item} />);
+		accumulator.push(<NavItem key={key} pathname={pathname} {...item} />);
 
-		return acc;
+		return accumulator;
 	}, []);
 
 	return (
@@ -85,11 +85,11 @@ function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pat
 	);
 }
 
-interface NavItemProps extends Omit<NavItemConfig, "items"> {
+interface NavItemProperties extends Omit<NavItemConfig, "items"> {
 	pathname: string;
 }
 
-function NavItem({ disabled, external, href, icon, matcher, pathname, title }: NavItemProps): React.JSX.Element {
+function NavItem({ disabled, external, href, icon, matcher, pathname, title }: NavItemProperties): React.JSX.Element {
 	const active = isNavItemActive({ disabled, external, href, matcher, pathname });
 	const Icon = icon ? navIcons[icon] : null;
 

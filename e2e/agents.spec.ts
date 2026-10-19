@@ -28,10 +28,12 @@ test("#7 the agent store lists every agent: web agents to install, desktop agent
 	// The device answers the agent catalogue slowly at times.
 	await expect(page.getByRole("heading", { name: "On this device" })).toBeVisible({ timeout: 60_000 });
 
-	for (const app of cloud.filter((entry) => !entry.installed)) {
+	for (const app of cloud) {
+		if (app.installed) continue;
 		await expect(page.getByTestId(`store-agent-wa-${app.app_id}`)).toContainText("Install on device");
 	}
-	for (const service of await services()) {
+	const deviceServices = await services();
+	for (const service of deviceServices) {
 		await expect(page.getByTestId(`agent-${service.id}`)).toBeVisible();
 	}
 	const kilo = page.getByTestId("desktop-agent-KiloCode-Tiiny");

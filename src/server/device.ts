@@ -28,7 +28,7 @@ function resolveTarget(): { baseUrl: string; authKey: string } {
 	return target;
 }
 
-const msEnv = (name: string, fallback: number): number => Number(process.env[name] ?? fallback);
+const msEnvironment = (name: string, fallback: number): number => Number(process.env[name] ?? fallback);
 
 // The device gateway routes by host name to its services (fetch will not send a Host header of its
 // own), so requests name the service in the URL and every name resolves to the device's address.
@@ -41,8 +41,8 @@ const connect = { lookup: deviceLookup };
 // until their turn, so streams need a long wait for headers but a bounded gap between chunks.
 const streamAgent = new Agent({
 	connect,
-	headersTimeout: msEnv("TIINY_STREAM_WAIT_MS", 15 * 60_000),
-	bodyTimeout: msEnv("TIINY_STREAM_IDLE_MS", 5 * 60_000),
+	headersTimeout: msEnvironment("TIINY_STREAM_WAIT_MS", 15 * 60_000),
+	bodyTimeout: msEnvironment("TIINY_STREAM_IDLE_MS", 5 * 60_000),
 });
 const requestAgent = new Agent({ connect, headersTimeout: 15_000, bodyTimeout: 15_000 });
 // Container start/stop/delete on the device answer only once the operation is under way (~20 s).
@@ -53,7 +53,7 @@ async function deviceErrorFrom(response: Response): Promise<DeviceError> {
 	let message = text;
 	try {
 		const body = JSON.parse(text) as { message?: string; detail?: unknown; error?: unknown };
-		const detail = body.detail as { message?: string } | string | undefined;
+		const detail = body.detail as string | { message?: string } | undefined;
 		message =
 			body.message ??
 			(typeof detail === "string" ? detail : detail?.message) ??
@@ -86,11 +86,17 @@ export interface DeviceRequest {
 	method?: string;
 	service?: DeviceService;
 	headers?: Record<string, string>;
-	/** JSON body. */
+	/**
+	JSON body.
+	*/
 	body?: unknown;
-	/** Multipart body; mutually exclusive with `body`. */
+	/**
+	Multipart body; mutually exclusive with `body`.
+	*/
 	form?: FormData;
-	/** A body sent as is (its Content-Type goes in `headers`). */
+	/**
+	A body sent as is (its Content-Type goes in `headers`).
+	*/
 	raw?: Buffer;
 	signal?: AbortSignal;
 	stream?: boolean;
@@ -108,7 +114,7 @@ async function request(pathname: string, init: DeviceRequest = {}): Promise<Resp
 			method: init.method ?? "GET",
 			headers: {
 				Authorization: `Bearer ${authKey}`,
-				...(init.body === undefined ? {} : { "Content-Type": "application/json" }),
+				...(init.body !== undefined && { "Content-Type": "application/json" }),
 				...init.headers,
 			},
 			body: init.raw ?? init.form ?? (init.body === undefined ? undefined : JSON.stringify(init.body)),
@@ -151,18 +157,22 @@ export async function deviceResponse(pathname: string, init?: DeviceRequest): Pr
 }
 
 // The device's serial number, which some services expect as `X-Device-Id`. Asked once per process.
-let deviceIdPromise: Promise<string> | null = null;
-export function deviceId(): Promise<string> {
-	deviceIdPromise ??= deviceJson<{ device_id: string }>("/api/v1/connect", {
+// A failed ask is asked again on the next call.
+const deviceIdCache: { promise: Promise<string> | null } = { promise: null };
+async function readDeviceId(): Promise<string> {
+	const body = await deviceJson<{ device_id: string }>("/api/v1/connect", {
 		method: "POST",
 		service: "auth",
 		body: {},
-	}).then(
-		(body) => body.device_id,
-		(error: unknown) => {
-			deviceIdPromise = null;
-			throw error;
-		}
-	);
-	return deviceIdPromise;
+	});
+	return body.device_id;
+}
+export async function deviceId(): Promise<string> {
+	const promise = (deviceIdCache.promise ??= readDeviceId());
+	try {
+		return await promise;
+	} catch (error) {
+		if (deviceIdCache.promise === promise) deviceIdCache.promise = null;
+		throw error;
+	}
 }

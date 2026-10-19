@@ -23,7 +23,7 @@ function parse(body: unknown): WifiAction {
 				return {
 					action: "connect",
 					ssid,
-					...(typeof value.password === "string" && value.password ? { password: value.password } : {}),
+					...(typeof value.password === "string" && value.password && { password: value.password }),
 				};
 			}
 			break;
@@ -47,7 +47,13 @@ export const GET = apiRoute(async () => NextResponse.json(await wifiNetworks()))
 
 // Applies a Wi-Fi change on the device, refusing changes that would drop the link this app uses.
 export const POST = apiRoute(async (request) => {
-	const action = parse(await request.json().catch(() => ({})));
+	let body: unknown = {};
+	try {
+		body = await request.json();
+	} catch {
+		// A missing or malformed body is handled like an empty one.
+	}
+	const action = parse(body);
 	const overview = await networkOverview();
 	const current = overview.wifi.ssid;
 	const dropsLink =

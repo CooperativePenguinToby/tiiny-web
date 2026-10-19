@@ -1,14 +1,13 @@
-import { FlatCompat } from "@eslint/eslintrc";
+import pluginReact from "@eslint-react/eslint-plugin";
 import js from "@eslint/js";
 import pluginNext from "@next/eslint-plugin-next";
 import configPrettier from "eslint-config-prettier";
-import pluginImport from "eslint-plugin-import";
-import pluginReact from "eslint-plugin-react";
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import { importX } from "eslint-plugin-import-x";
+import pluginReactHooks from "eslint-plugin-react-hooks";
 import pluginUnicorn from "eslint-plugin-unicorn";
 import globals from "globals";
 import ts from "typescript-eslint";
-
-const compat = new FlatCompat();
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -38,40 +37,28 @@ export default [
 		},
 	},
 	configPrettier,
-	pluginImport.flatConfigs.recommended,
-	...compat.extends("plugin:import/typescript"),
+	importX.flatConfigs.recommended,
+	importX.flatConfigs.typescript,
 	{
 		settings: {
-			"import/resolver": {
-				typescript: true,
-				node: true,
-				alias: {
-					map: [["@", "./src"]],
-					extensions: [".js", ".jsx"],
-				},
-			},
+			// Resolves the tsconfig "@/*" path alias as well as node_modules.
+			"import-x/resolver-next": [createTypeScriptImportResolver()],
 		},
 	},
-	pluginUnicorn.configs["flat/recommended"],
+	pluginUnicorn.configs.recommended,
 	{
 		rules: {
-			"unicorn/prevent-abbreviations": "off",
+			// Renamed from unicorn/prevent-abbreviations, which this project has always kept off.
+			"unicorn/name-replacements": "off",
 			"unicorn/no-null": "off",
 			"unicorn/no-nested-ternary": "off",
 			"unicorn/no-array-reduce": "off",
 		},
 	},
-	pluginReact.configs.flat.recommended,
 	{
-		settings: {
-			react: {
-				version: "detect",
-			},
-		},
-		rules: {
-			"react/prop-types": "off",
-		},
+		files: ["**/*.{ts,tsx}"],
+		...pluginReact.configs["recommended-typescript"],
 	},
-	...compat.extends("plugin:react-hooks/recommended"),
+	pluginReactHooks.configs.flat.recommended,
 	pluginNext.configs.recommended,
 ];

@@ -11,8 +11,7 @@ function isPrivate(address: string): boolean {
 	if (isIP(address) === 6) {
 		const lower = address.toLowerCase();
 		if (lower === "::1" || lower === "::") return true;
-		if (lower.startsWith("::ffff:")) return isPrivate(lower.slice(7));
-		return /^(fc|fd|fe8|fe9|fea|feb)/.test(lower);
+		return lower.startsWith("::ffff:") ? isPrivate(lower.slice(7)) : /^(fc|fd|fe8|fe9|fea|feb)/.test(lower);
 	}
 	const [a, b] = address.split(".").map(Number);
 	return (
@@ -40,7 +39,8 @@ const publicLookup: LookupFunction = (hostname, options, callback) => {
 			callback(new Error("That address is not on the public internet"), "", 0);
 			return;
 		}
-		if ((options as { all?: boolean }).all) (callback as unknown as (e: null, a: typeof list) => void)(null, list);
+		if ((options as { all?: boolean }).all)
+			(callback as unknown as (error: null, all: typeof list) => void)(null, list);
 		else callback(null, list[0].address, list[0].family);
 	});
 };
@@ -67,31 +67,37 @@ function htmlToText(html: string): { title: string; text: string } {
 // Reads a public web page for Task mode (TiinyOS reads pages on the user's computer). Only http(s) URLs
 // on public addresses: the model must not reach this server's network or the device.
 export async function fetchPage(rawUrl: string, signal?: AbortSignal): Promise<string> {
+	let pageUrl = rawUrl;
 	let url: URL;
-	try {
-		url = new URL(rawUrl);
-	} catch {
-		throw new Error(`Not a URL: ${rawUrl}`);
-	}
-	if (url.protocol !== "http:" && url.protocol !== "https:") throw new Error("Only http and https pages can be read");
-	const host = url.hostname.replaceAll(/^\[|\]$/g, "");
-	if (isIP(host) && isPrivate(host)) throw new Error("That address is not on the public internet");
 	let response: Awaited<ReturnType<typeof fetch>>;
-	try {
-		response = await fetch(url, {
-			dispatcher: publicAgent,
-			redirect: "manual",
-			signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(20_000)]) : AbortSignal.timeout(20_000),
-			headers: { "User-Agent": "tiiny-web task mode", Accept: "text/html,text/plain,application/json;q=0.9,*/*;q=0.5" },
-		});
-	} catch (error) {
-		const cause = (error as { cause?: Error }).cause;
-		throw new Error(cause?.message ?? (error instanceof Error ? error.message : String(error)));
-	}
-	if (response.status >= 300 && response.status < 400) {
+	// Redirects are followed one by one, each target checked like the first URL.
+	for (;;) {
+		try {
+			url = new URL(pageUrl);
+		} catch {
+			throw new Error(`Not a URL: ${pageUrl}`);
+		}
+		if (url.protocol !== "http:" && url.protocol !== "https:") throw new Error("Only http and https pages can be read");
+		const host = url.hostname.replaceAll(/^\[|\]$/g, "");
+		if (isIP(host) && isPrivate(host)) throw new Error("That address is not on the public internet");
+		try {
+			response = await fetch(url, {
+				dispatcher: publicAgent,
+				redirect: "manual",
+				signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(20_000)]) : AbortSignal.timeout(20_000),
+				headers: {
+					"User-Agent": "tiiny-web task mode",
+					Accept: "text/html,text/plain,application/json;q=0.9,*/*;q=0.5",
+				},
+			});
+		} catch (error) {
+			const cause = (error as { cause?: Error }).cause;
+			throw new Error(cause?.message ?? (error instanceof Error ? error.message : String(error)), { cause: error });
+		}
+		if (response.status < 300 || response.status >= 400) break;
 		const location = response.headers.get("location");
 		if (!location) throw new Error(`Redirect without a location (${response.status})`);
-		return fetchPage(new URL(location, url).toString(), signal);
+		pageUrl = new URL(location, url).href;
 	}
 	if (!response.ok) throw new Error(`The page answered ${response.status}`);
 	const reader = response.body?.getReader();
@@ -111,5 +117,5 @@ export async function fetchPage(rawUrl: string, signal?: AbortSignal): Promise<s
 	const type = response.headers.get("content-type") ?? "";
 	const { title, text } = type.includes("html") ? htmlToText(body) : { title: "", text: body };
 	const clipped = text.length > MAX_TEXT ? `${text.slice(0, MAX_TEXT)}\n…(truncated)` : text;
-	return `${title ? `Title: ${title}\n` : ""}URL: ${url.toString()}\n\n${clipped}`;
+	return `${title ? `Title: ${title}\n` : ""}URL: ${url.href}\n\n${clipped}`;
 }
