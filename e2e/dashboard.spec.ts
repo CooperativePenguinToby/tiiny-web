@@ -4,6 +4,8 @@ import { deviceGet, runningModelIds, signIn } from "./helpers";
 
 test("wrong password is rejected and the dashboard stays locked", async ({ page }) => {
 	await page.goto("/auth/sign-in");
+	await page.getByRole("button", { name: "Sign in" }).click();
+	await expect(page.getByText("Password is required")).toBeVisible();
 	await page.getByRole("textbox", { name: "Password" }).fill("definitely-not-the-password");
 	await page.getByRole("button", { name: "Sign in" }).click();
 	await expect(page.getByText("Incorrect password")).toBeVisible();

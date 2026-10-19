@@ -20,7 +20,7 @@ import { z as zod } from "zod";
 
 import { paths } from "@/paths";
 
-const schema = zod.object({ password: zod.string().min(1, { message: "Password is required" }) });
+const schema = zod.object({ password: zod.string().min(1, { error: "Password is required" }) });
 
 type Values = zod.infer<typeof schema>;
 
