@@ -87,3 +87,4 @@ regression 2026-10-18 18:54: full e2e 66 passed, 2 opt-in skipped, after #24 and
 change 2026-10-18 (user: "make the daily summary configurable on the history page (On/Off and Time)"): summary on/off, time and model moved from Vault to History; time shown in the browser's zone, converted from the device's UTC+8 · e2e/vault-memory.spec.ts 2 passed
 regression 2026-10-18 19:24: full e2e 68 passed, 2 opt-in skipped, after #25 and the summary move
 regression 2026-10-18 20:13: whole-app + vault specs 3 passed after the indexing retry
+regression 2026-10-18 23:52: full e2e 70 passed, 2 opt-in skipped, after upgrading to Next 16, MUI 9, ESLint 10, TypeScript 7 and zod 4
