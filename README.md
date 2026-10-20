@@ -214,7 +214,7 @@ keeps both in `~/.local/tiiny/config.json`; TiinyOS shows the key too.
 
 ### Docker (prebuilt image)
 
-Images for `linux/amd64` and `linux/arm64` are published to `ghcr.io/CooperativePenguinToby/tiiny-web`: `main` follows the
+Images for `linux/amd64` and `linux/arm64` are published to `ghcr.io/cooperativepenguintoby/tiiny-web`: `main` follows the
 main branch, and each release `vX.Y.Z` is tagged `X.Y.Z`, `X.Y` and `latest`. The image is built on
 `dhi.io/node:26-alpine3.23` and runs as a non-root user with no shell.
 
@@ -225,7 +225,7 @@ docker run -d --name tiiny-web --restart unless-stopped \
   -e TIINY_DEVICE_URL=http://10.11.0.11 \
   -e TIINY_AUTH_KEY='the device API key' \
   -v tiiny-data:/data \
-  ghcr.io/CooperativePenguinToby/tiiny-web:main
+  ghcr.io/cooperativepenguintoby/tiiny-web:main
 ```
 
 Add `-p <port>:<port>` for each agent you install (e.g. `9891` for Open WebUI, `7866` for SillyTavern, `18880`
@@ -234,7 +234,7 @@ for Tiiny Music), unless you use `AGENT_DOMAIN`.
 ### Docker Compose
 
 `compose.yaml` builds the image from this repo; to use the prebuilt image instead, replace `build: .` with
-`image: ghcr.io/CooperativePenguinToby/tiiny-web:main`.
+`image: ghcr.io/cooperativepenguintoby/tiiny-web:main`.
 
 ```sh
 cp .env.example .env   # fill in ADMIN_PASSWORD, TIINY_DEVICE_URL, TIINY_AUTH_KEY and optionally AGENT_DOMAIN
@@ -345,5 +345,7 @@ networks, addresses, personalization, conversation titles, Vault files and summa
 replaced in the page before each shot; it sends one chat message, deletes that conversation afterwards, and
 unloads the chat model if it loaded it.
 
-UI built on [Devias Material Kit React](https://github.com/devias-io/material-kit-react) (MIT, see
-`LICENSE-material-kit-react.md`).
+## License
+
+MIT, see `LICENSE`. The UI is built on [Devias Material Kit React](https://github.com/devias-io/material-kit-react)
+(MIT, see `LICENSE-material-kit-react.md`).
