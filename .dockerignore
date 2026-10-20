@@ -5,6 +5,8 @@ node_modules/
 test-results/
 playwright-report/
 e2e/
+# Dev tooling that imports e2e/ (the README screenshots).
+scripts/screenshots.*
 .git/
 .gitignore
 .dockerignore
