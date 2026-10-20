@@ -255,8 +255,8 @@ docker buildx build --platform linux/amd64,linux/arm64 -t tiiny-web .
 ```
 
 The images are built by `.github/workflows/docker.yml` on every push to `main` and every `v*` tag. It needs the
-repository secrets `DHI_USERNAME` and `DHI_TOKEN` (a Docker Hub username and an access token with Read & Write)
-to pull the `dhi.io` base images and push to Docker Hub.
+repository secrets `DHI_USERNAME` and `DHI_TOKEN` (a Docker Hub username and an access token with Read,
+Write, Delete) to pull the `dhi.io` base images, push to Docker Hub and set its repository overview.
 
 ### Without Docker (Node 26)
 

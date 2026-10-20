@@ -1,12 +1,13 @@
 # Builds the Docker image for linux/amd64 and linux/arm64 and publishes it to Docker Hub
 # (docker.io/cooperativepenguintoby/tiiny-web) and to this repository's GitHub Container Registry
-# (ghcr.io/<owner>/<repo>, listed under the repo's Packages).
+# (ghcr.io/<owner>/<repo>, listed under the repo's Packages). Pushes to main also set the Docker Hub
+# repository overview from README.md.
 #
 # Tags: `latest`, `main` and `sha-<commit>` for pushes to main; `1.2.3`, `1.2` and `latest` for a `v1.2.3` tag.
 #
 # The base images come from Docker Hardened Images (dhi.io), which needs a sign-in, and the same account pushes
 # to Docker Hub. Set these repository secrets: DHI_USERNAME (your Docker Hub username) and DHI_TOKEN (a Docker
-# Hub access token with Read & Write).
+# Hub access token with Read, Write, Delete; updating the overview needs Delete).
 name: Docker image
 
 on:
@@ -75,3 +76,19 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # Docker Hub can't resolve the README's relative <img src="docs/..."> paths, so point them at this commit's
+      # files on GitHub before uploading the README as the repository overview.
+      - name: Point README images at GitHub
+        if: github.ref == 'refs/heads/main'
+        run: |
+          sed 's#src="docs/#src="https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/docs/#g' \
+            README.md > "$RUNNER_TEMP/dockerhub-README.md"
+      - name: Update the Docker Hub overview
+        if: github.ref == 'refs/heads/main'
+        uses: peter-evans/dockerhub-description@v5
+        with:
+          username: ${{ secrets.DHI_USERNAME }}
+          password: ${{ secrets.DHI_TOKEN }}
+          repository: cooperativepenguintoby/tiiny-web
+          readme-filepath: ${{ runner.temp }}/dockerhub-README.md
