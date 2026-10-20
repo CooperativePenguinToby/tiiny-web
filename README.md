@@ -214,9 +214,13 @@ keeps both in `~/.local/tiiny/config.json`; TiinyOS shows the key too.
 
 ### Docker (prebuilt image)
 
-Images for `linux/amd64` and `linux/arm64` are published to `ghcr.io/cooperativepenguintoby/tiiny-web`: `main` follows the
-main branch, and each release `vX.Y.Z` is tagged `X.Y.Z`, `X.Y` and `latest`. The image is built on
-`dhi.io/node:26-alpine3.23` and runs as a non-root user with no shell.
+Images for `linux/amd64` and `linux/arm64` are published to two registries; pull from either:
+
+- Docker Hub: `cooperativepenguintoby/tiiny-web`
+- GitHub Container Registry: `ghcr.io/cooperativepenguintoby/tiiny-web`
+
+`latest` and `main` follow the main branch, and each release `vX.Y.Z` is also tagged `X.Y.Z` and `X.Y`. The
+image is built on `dhi.io/node:26-alpine3.23` and runs as a non-root user with no shell.
 
 ```sh
 docker run -d --name tiiny-web --restart unless-stopped \
@@ -225,7 +229,7 @@ docker run -d --name tiiny-web --restart unless-stopped \
   -e TIINY_DEVICE_URL=http://10.11.0.11 \
   -e TIINY_AUTH_KEY='the device API key' \
   -v tiiny-data:/data \
-  ghcr.io/cooperativepenguintoby/tiiny-web:main
+  cooperativepenguintoby/tiiny-web:latest   # or ghcr.io/cooperativepenguintoby/tiiny-web:latest
 ```
 
 Add `-p <port>:<port>` for each agent you install (e.g. `9891` for Open WebUI, `7866` for SillyTavern, `18880`
@@ -234,7 +238,7 @@ for Tiiny Music), unless you use `AGENT_DOMAIN`.
 ### Docker Compose
 
 `compose.yaml` builds the image from this repo; to use the prebuilt image instead, replace `build: .` with
-`image: ghcr.io/cooperativepenguintoby/tiiny-web:main`.
+`image: cooperativepenguintoby/tiiny-web:latest` (or `ghcr.io/cooperativepenguintoby/tiiny-web:latest`).
 
 ```sh
 cp .env.example .env   # fill in ADMIN_PASSWORD, TIINY_DEVICE_URL, TIINY_AUTH_KEY and optionally AGENT_DOMAIN
@@ -251,8 +255,8 @@ docker buildx build --platform linux/amd64,linux/arm64 -t tiiny-web .
 ```
 
 The images are built by `.github/workflows/docker.yml` on every push to `main` and every `v*` tag. It needs the
-repository secrets `DHI_USERNAME` and `DHI_TOKEN` (a Docker Hub username and access token) to pull the
-`dhi.io` base images.
+repository secrets `DHI_USERNAME` and `DHI_TOKEN` (a Docker Hub username and an access token with Read & Write)
+to pull the `dhi.io` base images and push to Docker Hub.
 
 ### Without Docker (Node 26)
 
